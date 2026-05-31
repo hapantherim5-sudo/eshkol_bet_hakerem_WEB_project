@@ -7,13 +7,14 @@ import EventsCalendar from './components/calendar/EventsCalendar';
 import OpportunityDetailModal from './components/OpportunityDetailModal';
 import MyRegistrations from './components/MyRegistrations';
 import RegistrationModal from './components/RegistrationModal';
-import { useLocalStore, loadSession, saveSession } from './hooks/useLocalStore';
+import { useDataStore } from './hooks/useDataStore';
+import { loadSession, saveSession } from './hooks/useLocalStore';
 import { ORGANIZATIONS } from './data/organizations';
 import { setDocumentLang, pick } from './lib/i18n';
 import { isStaffRole } from './lib/permissions';
 
 function App() {
-  const store = useLocalStore();
+  const store = useDataStore();
   const [currentScreen, setCurrentScreen] = useState('home');
   const [currentUser, setCurrentUser] = useState(() => loadSession());
   const [theme, setTheme] = useState('');
@@ -97,6 +98,14 @@ function App() {
       if (selectedOpp?.id === oppId) setSelectedOpp(null);
     }
   };
+
+  if (store.ready === false) {
+    return (
+      <div dir="rtl" className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-600">
+        {isAr ? 'جاري التحميل...' : 'טוען נתונים...'}
+      </div>
+    );
+  }
 
   return (
     <div dir="rtl" className={`min-h-screen font-sans
