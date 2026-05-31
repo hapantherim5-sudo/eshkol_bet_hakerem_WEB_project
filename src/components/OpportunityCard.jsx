@@ -1,4 +1,5 @@
 import { STATUS_AR, TYPE_AR, SCOPE_AR } from '../data/fakeData';
+import { getOrgName } from '../data/organizations';
 
 function OpportunityCard({ opportunity, lang, onOpenModal }) {
   const o    = opportunity;
@@ -19,7 +20,7 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
   return (
     <div onClick={() => onOpenModal(o)}
       className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5
-        cursor-pointer transition hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-100">
+        cursor-pointer transition md:hover:-translate-y-1 md:hover:shadow-lg md:hover:shadow-emerald-100">
 
       <div className="flex items-start justify-between gap-2 mb-3">
         <span className="text-3xl">{o.icon}</span>
@@ -32,6 +33,7 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
       <p className="text-xs text-gray-500 mb-3 line-clamp-2">{description}</p>
 
       <div className="flex flex-wrap gap-1.5">
+        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md">{getOrgName(o.organizationId, isAr)}</span>
         <span className="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">{o.city}</span>
         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">{typeText}</span>
         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md">{ageLabel}</span>

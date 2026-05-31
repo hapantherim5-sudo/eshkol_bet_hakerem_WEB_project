@@ -23,7 +23,7 @@ function Login({ lang, onLogin, onNavigate }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
 
         <div className="text-center mb-8">
           <img src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
@@ -39,6 +39,7 @@ function Login({ lang, onLogin, onNavigate }) {
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-6 text-xs text-emerald-800">
           <p className="font-bold mb-1">👤 {isAr ? 'مستخدمو Demo:' : 'משתמשי Demo:'}</p>
           <p>Admin: <code className="bg-white px-1 rounded font-mono">admin</code> / <code className="bg-white px-1 rounded font-mono">1234</code></p>
+          <p>Staff: <code className="bg-white px-1 rounded font-mono">staff1</code> / <code className="bg-white px-1 rounded font-mono">staff2</code> / 1234</p>
           <p>User: <code className="bg-white px-1 rounded font-mono">youth</code> / <code className="bg-white px-1 rounded font-mono">1234</code></p>
         </div>
 
@@ -56,7 +57,7 @@ function Login({ lang, onLogin, onNavigate }) {
             <input type="text" value={username}
               onChange={e => setUsername(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              placeholder="admin / youth"
+              placeholder="admin / staff1 / youth"
               className="w-full px-4 py-3 border border-gray-200 bg-gray-50
                 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-800" />
           </div>
@@ -74,7 +75,7 @@ function Login({ lang, onLogin, onNavigate }) {
           </div>
 
           <button onClick={handleLogin}
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700
+            className="w-full py-3 min-h-[44px] bg-emerald-600 hover:bg-emerald-700
               text-white font-bold rounded-xl transition shadow-md text-base">
             {isAr ? 'دخول' : 'כניסה'}
           </button>
