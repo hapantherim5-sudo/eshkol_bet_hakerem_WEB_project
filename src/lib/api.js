@@ -1,4 +1,5 @@
-const BASE = import.meta.env.VITE_API_URL || '';
+/** In production always use same-origin /api — ignore VITE_API_URL from Vercel env. */
+const BASE = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || '');
 
 /**
  * Production (Vercel): always use MongoDB via same-origin /api.
