@@ -1,8 +1,11 @@
 const BASE = import.meta.env.VITE_API_URL || '';
 
-/** Same-origin /api on Vercel, or VITE_API_URL for a separate backend. */
+/**
+ * Production (Vercel): always use MongoDB via same-origin /api.
+ * Local dev: set VITE_USE_API=true in .env (optional — uses vite proxy to /api).
+ */
 export function apiEnabled() {
-  return import.meta.env.VITE_USE_API === 'true' || Boolean(BASE);
+  return import.meta.env.PROD || import.meta.env.VITE_USE_API === 'true';
 }
 
 async function request(path, options = {}) {
