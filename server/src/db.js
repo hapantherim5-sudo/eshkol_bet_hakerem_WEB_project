@@ -1,7 +1,11 @@
+import dns from 'dns';
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+// Windows / some ISPs fail SRV lookup for mongodb+srv:// — use public DNS
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '../../.env') });

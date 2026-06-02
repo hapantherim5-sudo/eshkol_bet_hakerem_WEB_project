@@ -1,7 +1,8 @@
 const BASE = import.meta.env.VITE_API_URL || '';
 
+/** Same-origin /api on Vercel, or VITE_API_URL for a separate backend. */
 export function apiEnabled() {
-  return Boolean(BASE);
+  return import.meta.env.VITE_USE_API === 'true' || Boolean(BASE);
 }
 
 async function request(path, options = {}) {
