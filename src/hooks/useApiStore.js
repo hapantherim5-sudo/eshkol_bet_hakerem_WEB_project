@@ -5,7 +5,7 @@ import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS } from '../data/fakeData';
 
 /**
  * Same interface as useLocalStore, backed by MongoDB via Express API.
- * Enable with VITE_API_URL in .env at project root.
+ * Enable with VITE_USE_API=true (same-origin /api) or VITE_API_URL in .env at project root.
  */
 export function useApiStore() {
   const [ready, setReady] = useState(false);
