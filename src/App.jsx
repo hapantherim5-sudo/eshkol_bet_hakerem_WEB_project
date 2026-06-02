@@ -1,31 +1,111 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import OpportunitiesBoard from './components/OpportunitiesBoard';
-import { INITIAL_OPPORTUNITIES } from './data/fakeData';
+import StaffPanel from './components/staff/StaffPanel';
+import EventsCalendar from './components/calendar/EventsCalendar';
+import OpportunityDetailModal from './components/OpportunityDetailModal';
+import MyRegistrations from './components/MyRegistrations';
+import RegistrationModal from './components/RegistrationModal';
+import { useDataStore } from './hooks/useDataStore';
+import { loadSession, saveSession } from './hooks/useLocalStore';
+import { ORGANIZATIONS } from './data/organizations';
+import { setDocumentLang, pick } from './lib/i18n';
+import { isStaffRole } from './lib/permissions';
 
 function App() {
+  const store = useDataStore();
   const [currentScreen, setCurrentScreen] = useState('home');
-  const [currentUser,   setCurrentUser]   = useState(null);
-  const [theme,         setTheme]         = useState('');
-  const [lang,          setLang]          = useState('he');
-  const [selectedOpp,   setSelectedOpp]   = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => loadSession());
+  const [theme, setTheme] = useState('');
+  const [lang, setLang] = useState('he');
+  const [selectedOpp, setSelectedOpp] = useState(null);
+  const [showRegModal, setShowRegModal] = useState(false);
+  const [toast, setToast] = useState('');
 
   const isAr = lang === 'ar';
 
-  const handleLogin = (user) => {
-    setCurrentUser(user);
-    setCurrentScreen(user.role === 'Admin' ? 'admin' : 'opportunities');
+  useEffect(() => setDocumentLang(lang), [lang]);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
   };
 
-  const handleLogout = () => { setCurrentUser(null); setCurrentScreen('home'); };
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    saveSession(user);
+    setCurrentScreen(isStaffRole(user) ? 'admin' : 'opportunities');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    saveSession(null);
+    setCurrentScreen('home');
+  };
 
   const handleNavigate = (screen) => {
-    if (screen === 'admin' && currentUser?.role !== 'Admin') {
-      setCurrentScreen('login'); return;
+    if (screen === 'admin' && !isStaffRole(currentUser)) {
+      setCurrentScreen('login');
+      return;
+    }
+    if (screen === 'my-registrations') {
+      if (!currentUser || currentUser.role !== 'User') {
+        setCurrentScreen('login');
+        showToast(pick(isAr, 'יש להתחבר כמשתמש נוער', 'يجب تسجيل الدخول كشاب'));
+        return;
+      }
     }
     setCurrentScreen(screen);
   };
+
+  const openOppModal = (opp) => {
+    setSelectedOpp(opp);
+    store.recordView(opp.id, currentUser?.id);
+  };
+
+  const handleRegisterClick = () => {
+    if (!currentUser) {
+      setSelectedOpp(null);
+      setCurrentScreen('login');
+      showToast(pick(isAr, 'יש להתחבר כדי להירשם', 'يجب تسجيل الدخول للتسجيل'));
+      return;
+    }
+    if (currentUser.role !== 'User') {
+      showToast(pick(isAr, 'הרשמה זמינה למשתמשי נוער בלבד', 'التسجيل للشباب فقط'));
+      return;
+    }
+    setShowRegModal(true);
+  };
+
+  const handleRegisterConfirm = (profilePatch) => {
+    const result = store.register(currentUser.id, selectedOpp.id, profilePatch);
+    setShowRegModal(false);
+    if (result.ok) {
+      showToast(pick(isAr, 'נרשמת בהצלחה!', 'تم التسجيل بنجاح!'));
+    } else if (result.reason === 'duplicate') {
+      showToast(pick(isAr, 'כבר נרשמת לפעילות זו', 'مسجل بالفعل'));
+    }
+  };
+
+  const handleCancelRegistration = (opportunityId) => {
+    if (!currentUser || currentUser.role !== 'User') return;
+    const oppId = opportunityId ?? selectedOpp?.id;
+    if (!oppId) return;
+    const result = store.unregister(currentUser.id, oppId);
+    if (result.ok) {
+      showToast(pick(isAr, 'ההרשמה בוטלה', 'تم إلغاء التسجيل'));
+      if (selectedOpp?.id === oppId) setSelectedOpp(null);
+    }
+  };
+
+  if (store.ready === false) {
+    return (
+      <div dir="rtl" className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-600">
+        {isAr ? 'جاري التحميل...' : 'טוען נתונים...'}
+      </div>
+    );
+  }
 
   return (
     <div dir="rtl" className={`min-h-screen font-sans
@@ -39,13 +119,19 @@ function App() {
         onLogout={handleLogout}
       />
 
-      <main className="pt-16">
+      {toast && (
+        <div className="fixed top-20 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-sm z-[70] bg-emerald-700 text-white px-4 py-2 rounded-xl shadow-lg text-sm text-center">
+          {toast}
+        </div>
+      )}
+
+      <main className="pt-14 sm:pt-16">
 
         {currentScreen === 'home' && (
-          <div className="max-w-4xl mx-auto px-4 py-20 text-center">
+          <div className="max-w-4xl mx-auto px-4 py-12 sm:py-20 text-center">
             <div className="bg-gradient-to-bl from-emerald-800 to-emerald-500
-              text-white py-20 px-6 rounded-3xl mb-10 shadow-xl">
-              <h1 className="text-4xl font-black mb-3">
+              text-white py-12 sm:py-20 px-4 sm:px-6 rounded-3xl mb-10 shadow-xl">
+              <h1 className="text-2xl sm:text-4xl font-black mb-3">
                 {isAr ? 'مركز الفرص' : 'מרכז ההזדמנויות'}
               </h1>
               <p className="text-emerald-100 mb-8 text-lg">
@@ -53,18 +139,24 @@ function App() {
                   ? 'جميع الفرص لشباب عنقود بيت هكيريم — في مكان واحد'
                   : 'כל ההזדמנויות לבני הנוער של אשכול בית הכרם — במקום אחד'}
               </p>
-              <button onClick={() => handleNavigate('opportunities')}
-                className="px-8 py-3 bg-white text-emerald-700 font-bold
-                  rounded-xl hover:bg-emerald-50 transition shadow-lg text-lg">
-                {isAr ? 'استكشف الفرص ←' : '← גלה הזדמנויות'}
-              </button>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <button onClick={() => handleNavigate('opportunities')}
+                  className="px-8 py-3 bg-white text-emerald-700 font-bold rounded-xl hover:bg-emerald-50 transition shadow-lg text-lg">
+                  {isAr ? 'استكشف الفرص' : 'גלה הזדמנויות'}
+                </button>
+                <button onClick={() => handleNavigate('calendar')}
+                  className="px-8 py-3 bg-emerald-900/40 text-white font-bold rounded-xl hover:bg-emerald-900/60 transition border border-white/30 text-lg">
+                  {isAr ? 'التقويم' : 'לוח אירועים'}
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            {/* Mobile: stack stats; sm+: three columns */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { num: INITIAL_OPPORTUNITIES.length, labelHe: 'הזדמנויות', labelAr: 'فرصة' },
-                { num: 10, labelHe: 'רשויות',  labelAr: 'بلدية' },
-                { num: 6,  labelHe: 'קטגוריות', labelAr: 'فئة'  },
+                { num: store.opportunities.length, labelHe: 'הזדמנויות', labelAr: 'فرصة' },
+                { num: ORGANIZATIONS.length, labelHe: 'ארגונים', labelAr: 'جهة' },
+                { num: 6, labelHe: 'קטגוריות', labelAr: 'فئة' },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                   <p className="text-3xl font-black text-emerald-700">{s.num}</p>
@@ -81,62 +173,75 @@ function App() {
 
         {currentScreen === 'opportunities' && (
           <OpportunitiesBoard
-            opportunities={INITIAL_OPPORTUNITIES}
+            opportunities={store.opportunities}
             lang={lang}
-            onOpenModal={setSelectedOpp}
+            onOpenModal={openOppModal}
           />
         )}
 
-        {currentScreen === 'admin' && currentUser?.role === 'Admin' && (
-          <div className="max-w-4xl mx-auto px-4 py-10">
-            <h1 className="text-2xl font-black text-gray-800 mb-2">
-              {isAr ? '⚙️ لوحة الإدارة' : '⚙️ ממשק ניהול'}
-            </h1>
-            <p className="text-gray-500">
-              {isAr ? `مرحباً ${currentUser.name}` : `שלום ${currentUser.name}`}
-            </p>
-          </div>
+        {currentScreen === 'calendar' && (
+          <EventsCalendar
+            events={store.events}
+            lang={lang}
+            opportunities={store.opportunities}
+            onOpenOpp={openOppModal}
+          />
+        )}
+
+        {currentScreen === 'my-registrations' && currentUser?.role === 'User' && (
+          <MyRegistrations
+            lang={lang}
+            currentUser={currentUser}
+            opportunities={store.opportunities}
+            registrations={store.registrations}
+            onOpenModal={openOppModal}
+            onCancel={handleCancelRegistration}
+          />
+        )}
+
+        {currentScreen === 'admin' && isStaffRole(currentUser) && (
+          <StaffPanel
+            lang={lang}
+            currentUser={currentUser}
+            opportunities={store.opportunities}
+            events={store.events}
+            views={store.views}
+            registrations={store.registrations}
+            cancellations={store.cancellations}
+            profiles={store.profiles}
+            onAdd={store.addOpportunity}
+            onUpdate={store.updateOpportunity}
+            onDelete={store.deleteOpportunity}
+            onAddEvent={store.addEvent}
+            onDeleteEvent={store.deleteEvent}
+            onReplaceEventsForOpportunity={store.replaceEventsForOpportunity}
+          />
         )}
       </main>
 
-      {selectedOpp && (
-        <div onClick={() => setSelectedOpp(null)}
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div onClick={e => e.stopPropagation()}
-            className="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setSelectedOpp(null)}
-              className="float-left text-gray-400 hover:text-gray-700 text-2xl leading-none">✕</button>
-            <div className="text-center mb-5 clear-both">
-              <span className="text-5xl">{selectedOpp.icon}</span>
-              <h2 className="text-xl font-black text-gray-800 mt-2">
-                {isAr ? selectedOpp.titleAr : selectedOpp.title}
-              </h2>
-            </div>
-            <p className="text-gray-600 text-sm leading-relaxed mb-5">
-              {isAr && selectedOpp.descriptionAr ? selectedOpp.descriptionAr : selectedOpp.description}
-            </p>
-            <div className="grid grid-cols-2 gap-3 mb-5">
-              {[
-                { labelHe:'📍 יישוב',   labelAr:'📍 البلدة',      val: selectedOpp.city },
-                { labelHe:'🎂 גיל',     labelAr:'🎂 العمر',       val: `${selectedOpp.ageMin}–${selectedOpp.ageMax}` },
-                { labelHe:'📅 ימים',    labelAr:'📅 الأيام',      val: isAr && selectedOpp.daysAr ? selectedOpp.daysAr : selectedOpp.days },
-                { labelHe:'🕐 שעות',    labelAr:'🕐 الوقت',       val: selectedOpp.time },
-                { labelHe:'👤 איש קשר', labelAr:'👤 جهة الاتصال', val: selectedOpp.contact },
-                { labelHe:'📝 הרשמה',  labelAr:'📝 التسجيل',    val: isAr && selectedOpp.registrationAr ? selectedOpp.registrationAr : selectedOpp.registration },
-              ].map((item, i) => (
-                <div key={i} className="bg-gray-50 rounded-xl p-3">
-                  <p className="text-xs text-gray-400 mb-0.5">{isAr ? item.labelAr : item.labelHe}</p>
-                  <p className="text-sm font-medium text-gray-800">{item.val}</p>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setSelectedOpp(null)}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700
-                text-white font-bold rounded-xl transition">
-              {isAr ? 'سجل الآن' : 'הרשמה לפעילות'}
-            </button>
-          </div>
-        </div>
+      {selectedOpp && !showRegModal && (
+        <OpportunityDetailModal
+          opportunity={selectedOpp}
+          lang={lang}
+          isRegistered={currentUser?.role === 'User' && store.isRegistered(currentUser.id, selectedOpp.id)}
+          onClose={() => setSelectedOpp(null)}
+          onRegisterClick={handleRegisterClick}
+          onCancelRegistration={
+            currentUser?.role === 'User' && store.isRegistered(currentUser.id, selectedOpp.id)
+              ? () => handleCancelRegistration(selectedOpp.id)
+              : null
+          }
+        />
+      )}
+
+      {showRegModal && selectedOpp && currentUser && (
+        <RegistrationModal
+          opportunity={selectedOpp}
+          lang={lang}
+          profile={store.getProfile(currentUser.id)}
+          onConfirm={handleRegisterConfirm}
+          onClose={() => setShowRegModal(false)}
+        />
       )}
     </div>
   );
