@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../lib/israeliDate';
-import { pick } from '../lib/i18n';
+import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../lib/utils/israeliDate';
+import { pick } from '../lib/i18n/i18n';
 
 function DateInputIL({ value, onChange, lang, className, id }) {
   const isAr = lang === 'ar';

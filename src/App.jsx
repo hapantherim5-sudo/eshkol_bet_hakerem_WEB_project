@@ -7,11 +7,14 @@ import EventsCalendar from './components/calendar/EventsCalendar';
 import OpportunityDetailModal from './components/OpportunityDetailModal';
 import MyRegistrations from './components/MyRegistrations';
 import RegistrationModal from './components/RegistrationModal';
+
 import { useDataStore } from './hooks/useDataStore';
 import { loadSession, saveSession } from './hooks/useLocalStore';
+
 import { ORGANIZATIONS } from './data/organizations';
-import { setDocumentLang, pick } from './lib/i18n';
-import { isStaffRole } from './lib/permissions';
+
+import { setDocumentLang, pick } from './lib/i18n/i18n'; 
+import { isStaffRole } from './lib/utils/permissions';
 
 function App() {
   const store = useDataStore();

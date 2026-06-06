@@ -1,4 +1,4 @@
-import { apiEnabled } from '../lib/api';
+import { apiEnabled } from '../lib/services/api';
 import { useLocalStore } from './useLocalStore';
 import { useApiStore } from './useApiStore';
 
