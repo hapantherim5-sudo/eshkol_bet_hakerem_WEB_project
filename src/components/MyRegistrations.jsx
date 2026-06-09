@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TYPE_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
-import { pick } from '../lib/i18n';
+import { pick } from '../lib/i18n/i18n';
 
 function formatDate(iso, isAr) {
   if (!iso) return '';
