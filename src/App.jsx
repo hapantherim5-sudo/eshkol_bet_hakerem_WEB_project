@@ -7,11 +7,14 @@ import EventsCalendar from './components/calendar/EventsCalendar';
 import OpportunityDetailModal from './components/OpportunityDetailModal';
 import MyRegistrations from './components/MyRegistrations';
 import RegistrationModal from './components/RegistrationModal';
+
 import { useDataStore } from './hooks/useDataStore';
 import { loadSession, saveSession } from './hooks/useLocalStore';
+
 import { ORGANIZATIONS } from './data/organizations';
-import { setDocumentLang, pick } from './lib/i18n';
-import { isStaffRole } from './lib/permissions';
+
+import { setDocumentLang, pick } from './lib/i18n/i18n'; 
+import { isStaffRole } from './lib/utils/permissions';
 
 function App() {
   const store = useDataStore();
@@ -78,24 +81,32 @@ function App() {
     setShowRegModal(true);
   };
 
-  const handleRegisterConfirm = (profilePatch) => {
-    const result = store.register(currentUser.id, selectedOpp.id, profilePatch);
-    setShowRegModal(false);
-    if (result.ok) {
-      showToast(pick(isAr, 'נרשמת בהצלחה!', 'تم التسجيل بنجاح!'));
-    } else if (result.reason === 'duplicate') {
-      showToast(pick(isAr, 'כבר נרשמת לפעילות זו', 'مسجل بالفعل'));
+  const handleRegisterConfirm = async (profilePatch) => {
+    try {
+      const result = await store.register(currentUser.id, selectedOpp.id, profilePatch);
+      setShowRegModal(false);
+      if (result.ok) {
+        showToast(pick(isAr, 'נרשמת בהצלחה!', 'تم التسجيل بنجاح!'));
+      } else if (result.reason === 'duplicate') {
+        showToast(pick(isAr, 'כבר נרשמת לפעילות זו', 'مسجل بالفعل'));
+      }
+    } catch {
+      showToast(pick(isAr, 'שגיאה בהרשמה, נסה שוב', 'خطأ في التسجيل، حاول مرة أخرى'));
     }
   };
 
-  const handleCancelRegistration = (opportunityId) => {
+  const handleCancelRegistration = async (opportunityId) => {
     if (!currentUser || currentUser.role !== 'User') return;
     const oppId = opportunityId ?? selectedOpp?.id;
     if (!oppId) return;
-    const result = store.unregister(currentUser.id, oppId);
-    if (result.ok) {
-      showToast(pick(isAr, 'ההרשמה בוטלה', 'تم إلغاء التسجيل'));
-      if (selectedOpp?.id === oppId) setSelectedOpp(null);
+    try {
+      const result = await store.unregister(currentUser.id, oppId);
+      if (result.ok) {
+        showToast(pick(isAr, 'ההרשמה בוטלה', 'تم إلغاء التسجيل'));
+        if (selectedOpp?.id === oppId) setSelectedOpp(null);
+      }
+    } catch {
+      showToast(pick(isAr, 'שגיאה בביטול ההרשמה', 'خطأ في إلغاء التسجيل'));
     }
   };
 

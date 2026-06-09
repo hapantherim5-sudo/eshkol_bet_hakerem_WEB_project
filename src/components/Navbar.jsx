@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { isStaffRole } from '../lib/permissions';
+import { isStaffRole } from '../lib//utils/permissions';
 
 function Navbar({ theme, lang, currentUser, onToggleDark, onToggleLang, onNavigate, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);

@@ -1,6 +1,6 @@
 import { STATUS_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
-import { pick } from '../lib/i18n';
+import { pick } from '../lib/i18n/i18n';
 
 function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRegisterClick, onCancelRegistration }) {
   const isAr = lang === 'ar';

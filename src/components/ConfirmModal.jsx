@@ -1,4 +1,4 @@
-import { pick } from '../lib/i18n';
+import { pick } from '../lib/i18n/i18n';
 
 function ConfirmModal({
   lang,

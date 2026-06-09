@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CATEGORIES } from '../data/fakeData';
-import { pick } from '../lib/i18n';
+import { pick } from '../lib/i18n/i18n';
 
 function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
   const isAr = lang === 'ar';

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { CATEGORIES, OPPORTUNITY_TYPES, STATUSES } from '../../data/fakeData';
 import { ORGANIZATIONS } from '../../data/organizations';
-import { pick } from '../../lib/i18n';
-import { buildCalendarEvents } from '../../lib/scheduleEvents';
+import { pick } from '../../lib/i18n/i18n';
+import { buildCalendarEvents } from '../../lib/utils/scheduleEvents';
 import DateInputIL from '../DateInputIL';
 
 const empty = (defaults = {}) => ({

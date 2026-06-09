@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { getMonthGrid, dateKey, eventsOnDay } from '../../lib/calendar';
+import { getMonthGrid, dateKey, eventsOnDay } from '../../lib/utils/calendar';
 import { getOrgName } from '../../data/organizations';
-import { pick } from '../../lib/i18n';
-import { formatIsraeliDate } from '../../lib/israeliDate';
+import { pick } from '../../lib/i18n/i18n';
+import { formatIsraeliDate } from '../../lib/utils/israeliDate';
 
 const WEEK_HE = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 const WEEK_AR = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
