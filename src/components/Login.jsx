@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { FAKE_USERS } from '../data/fakeData';
 
+const STAFF_USERNAMES = FAKE_USERS.filter(u => u.role === 'Staff').map(u => u.username);
+const staffLabel = STAFF_USERNAMES.join(' · ');
+
 function Login({ lang, onLogin, onNavigate }) {
   const isAr = lang === 'ar';
   const [username, setUsername] = useState('');
@@ -39,7 +42,8 @@ function Login({ lang, onLogin, onNavigate }) {
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-6 text-xs text-emerald-800">
           <p className="font-bold mb-1">👤 {isAr ? 'مستخدمو Demo:' : 'משתמשי Demo:'}</p>
           <p>Admin: <code className="bg-white px-1 rounded font-mono">admin</code> / <code className="bg-white px-1 rounded font-mono">1234</code></p>
-          <p>Staff: <code className="bg-white px-1 rounded font-mono">staff1</code> / <code className="bg-white px-1 rounded font-mono">staff2</code> / 1234</p>
+          <p>{isAr ? 'الموظفون' : 'צוות'} ({isAr ? 'كلمة المرور' : 'סיסמה'} 1234):</p>
+          <p className="leading-relaxed">{staffLabel}</p>
           <p>User: <code className="bg-white px-1 rounded font-mono">youth</code> / <code className="bg-white px-1 rounded font-mono">1234</code></p>
         </div>
 
@@ -57,7 +61,7 @@ function Login({ lang, onLogin, onNavigate }) {
             <input type="text" value={username}
               onChange={e => setUsername(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              placeholder="admin / staff1 / youth"
+              placeholder="משגב / כרמיאל / admin / youth"
               className="w-full px-4 py-3 border border-gray-200 bg-gray-50
                 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-800" />
           </div>
