@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { apiEnabled } from '../lib/services/api';
+import { api, apiEnabled } from '../lib/services/api';
 import { KEYS, load, save } from '../lib/storage/storage';
 import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS } from '../data/fakeData';
 
