@@ -1,4 +1,3 @@
-// localStorage keys — swap for Supabase later without UI changes
 export const KEYS = {
   opportunities: 'eshkol_opportunities',
   events:        'eshkol_events',

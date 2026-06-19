@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { filterManageable, canManageOpportunity } from '../../lib/utils/permissions';
+import { filterManageable, canManageOpportunity } from '../../utils/permissions';
 import { getOrgName } from '../../data/organizations';
-import { computeStats } from '../../lib/analytics/analytics';
-import { pick } from '../../lib/i18n/i18n';
-import { formatIsraeliDateTime } from '../../lib/utils/israeliDate';
+import { computeStats } from '../../utils/analytics';
+import { pick } from '../../i18n/i18n';
+import { formatIsraeliDateTime } from '../../utils/israeliDate';
 import ConfirmModal from '../ConfirmModal';
 import OpportunityForm from './OpportunityForm';
 

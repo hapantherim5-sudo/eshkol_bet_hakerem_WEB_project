@@ -2,7 +2,7 @@
  * Fills MongoDB with demo data from src/data (same as the React app).
  * Run: cd server && npm install && npm run seed
  */
-import { connectDb, closeDb, COLLECTIONS } from '../src/db.js';
+import { connectDb, closeDb, COLLECTIONS } from '../src/database/db.js';
 import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS, FAKE_USERS } from '../../src/data/fakeData.js';
 import { ORGANIZATIONS } from '../../src/data/organizations.js';
 
