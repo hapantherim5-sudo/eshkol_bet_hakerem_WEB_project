@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { CATEGORIES } from '../data/fakeData';
-import { pick } from '../i18n/i18n';
+import { useT } from '../i18n/i18n';
 
 function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
+  const t = useT(lang);
   const isAr = lang === 'ar';
-  const t = (he, ar) => pick(isAr, he, ar);
   const needsProfile = !profile?.settlement;
 
   const [settlement, setSettlement] = useState(profile?.settlement || '');
@@ -28,9 +28,8 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
         className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full shadow-2xl
           max-h-[90dvh] overflow-y-auto animate-slide-up">
 
-        {/* Header */}
         <div className="bg-gradient-to-l from-emerald-600 to-teal-500 text-white px-6 py-5 rounded-t-3xl sm:rounded-t-3xl">
-          <h3 className="text-lg font-black mb-1">{t('אישור הרשמה', 'تأكيد التسجيل')}</h3>
+          <h3 className="text-lg font-black mb-1">{t('reg_modal_title')}</h3>
           <p className="text-emerald-100 text-sm font-medium truncate">
             {isAr ? opportunity.titleAr : opportunity.title}
           </p>
@@ -41,19 +40,19 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
             <div className="space-y-4 mb-5">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1.5">
-                  📍 {t('יישוב מגורים', 'بلدة السكن')}
+                  📍 {t('reg_city_label')}
                 </label>
                 <input
                   value={settlement}
                   onChange={e => setSettlement(e.target.value)}
-                  placeholder={t('הכנס יישוב...', 'أدخل البلدة...')}
+                  placeholder={t('reg_city_placeholder')}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
                     focus:outline-none focus:border-emerald-500 bg-gray-50 focus:bg-white transition-all" />
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  ✨ {t('תחומי עניין', 'مجالات الاهتمام')}
+                  ✨ {t('reg_interests_label')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map(c => (
@@ -78,14 +77,14 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
               onClick={onClose}
               className="flex-1 py-3.5 sm:py-3 min-h-[44px] text-sm font-bold text-gray-600
                 border-2 border-gray-200 rounded-2xl hover:bg-gray-50 transition-all">
-              {t('ביטול', 'إلغاء')}
+              {t('reg_cancel_btn')}
             </button>
             <button
               onClick={handleConfirm}
               className="flex-1 py-3.5 sm:py-3 min-h-[44px] text-sm font-black bg-emerald-600
                 text-white rounded-2xl hover:bg-emerald-700 transition-all
                 hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-100">
-              {t('אשר הרשמה ✓', 'أكد التسجيل ✓')}
+              {t('reg_confirm_btn')}
             </button>
           </div>
         </div>

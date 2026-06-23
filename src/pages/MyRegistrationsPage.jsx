@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { TYPE_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
-import { pick } from '../i18n/i18n';
+import { useT } from '../i18n/i18n';
 
-function formatDate(iso, isAr) {
+function formatDate(iso, locale) {
   if (!iso) return '';
-  return new Date(iso).toLocaleDateString(isAr ? 'ar-IL' : 'he-IL', {
+  return new Date(iso).toLocaleDateString(locale, {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 }
 
 function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, onOpenModal, onCancel }) {
+  const t = useT(lang);
   const isAr = lang === 'ar';
-  const t = (he, ar) => pick(isAr, he, ar);
   const [confirmCancelId, setConfirmCancelId] = useState(null);
 
   const items = registrations
@@ -31,13 +31,10 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 animate-fade-in">
-      {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-black text-gray-800">
-          {t('ההרשמות שלי', 'فرصي المسجلة')}
-        </h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-gray-800">{t('my_reg_title')}</h1>
         <p className="text-sm text-gray-500 mt-0.5 font-medium">
-          {t(`${items.length} פעילויות פעילות`, `${items.length} نشاط مسجل`)}
+          {items.length} {t('my_reg_count')}
         </p>
       </div>
 
@@ -54,7 +51,6 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
                   flex flex-col hover:shadow-md transition-shadow duration-200 animate-card-in"
                 style={{ animationDelay: `${Math.min(i, 6) * 0.05}s` }}>
 
-                {/* Registered badge strip */}
                 <div className="h-1.5 bg-emerald-500" />
 
                 <div className="p-5 flex flex-col flex-1">
@@ -62,7 +58,7 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
                     <span className="text-4xl leading-none">{o.icon}</span>
                     <span className="text-xs font-semibold px-2.5 py-1 rounded-full
                       bg-emerald-100 text-emerald-700 flex items-center gap-1">
-                      <span>✓</span> {t('רשום', 'مسجل')}
+                      <span>✓</span> {t('my_reg_badge')}
                     </span>
                   </div>
 
@@ -72,26 +68,26 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
                   </p>
                   <p className="text-xs text-gray-400 mb-4 flex items-center gap-1">
                     <span>🗓️</span>
-                    {t('נרשמת: ', 'تاريخ التسجيل: ')}{formatDate(o.registeredAt, isAr)}
+                    {t('my_reg_date_label')}{formatDate(o.registeredAt, t('calendar_date_locale'))}
                   </p>
 
                   {isConfirming ? (
                     <div className="mt-auto bg-red-50 border border-red-100 rounded-2xl p-4 space-y-2">
                       <p className="text-sm text-red-700 font-bold text-center">
-                        {t('לבטל את ההרשמה?', 'هل تريد إلغاء التسجيل؟')}
+                        {t('my_reg_confirm_cancel')}
                       </p>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setConfirmCancelId(null)}
                           className="flex-1 py-2.5 min-h-[44px] text-sm font-semibold text-gray-600
                             border border-gray-200 rounded-xl hover:bg-white transition">
-                          {t('לא', 'لا')}
+                          {t('my_reg_cancel_btn')}
                         </button>
                         <button
                           onClick={() => handleCancel(o.id)}
                           className="flex-1 py-2.5 min-h-[44px] text-sm font-bold bg-red-600
                             text-white rounded-xl hover:bg-red-700 transition">
-                          {t('כן, בטל', 'نعم، إلغاء')}
+                          {t('my_reg_yes_cancel')}
                         </button>
                       </div>
                     </div>
@@ -101,13 +97,13 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
                         onClick={() => onOpenModal(o)}
                         className="flex-1 py-2.5 min-h-[44px] text-sm font-bold text-emerald-700
                           bg-emerald-50 rounded-xl hover:bg-emerald-100 transition">
-                        {t('📋 פרטים', '📋 التفاصيل')}
+                        {t('my_reg_details_btn')}
                       </button>
                       <button
                         onClick={() => setConfirmCancelId(o.id)}
                         className="flex-1 py-2.5 min-h-[44px] text-sm font-bold text-red-600
                           border border-red-200 rounded-xl hover:bg-red-50 transition">
-                        {t('ביטול', 'إلغاء')}
+                        {t('my_reg_cancel_btn')}
                       </button>
                     </div>
                   )}
@@ -119,17 +115,15 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
       ) : (
         <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm">
           <p className="text-6xl mb-5 animate-float inline-block">📋</p>
-          <p className="text-xl font-black text-gray-600 mb-2">
-            {t('עדיין לא נרשמת', 'لم تسجل في أي نشاط بعد')}
-          </p>
+          <p className="text-xl font-black text-gray-600 mb-2">{t('my_reg_empty_title')}</p>
           <p className="text-sm text-gray-400 mb-6 max-w-xs mx-auto leading-relaxed">
-            {t('גלה הזדמנויות מעניינות ובחר את מה שמתאים לך', 'تصفح الفرص المتاحة واختر ما يناسبك')}
+            {t('my_reg_empty_subtitle')}
           </p>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'opportunities' }))}
             className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold
               rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
-            {t('🔍 גלה הזדמנויות', '🔍 استكشف الفرص')}
+            {t('my_reg_explore_btn')}
           </button>
         </div>
       )}
