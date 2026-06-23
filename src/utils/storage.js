@@ -6,6 +6,7 @@ export const KEYS = {
   views:         'eshkol_views',
   session:       'eshkol_session',
   profiles:      'eshkol_profiles',
+  theme:         'eshkol_theme',
 };
 
 export function load(key, fallback) {

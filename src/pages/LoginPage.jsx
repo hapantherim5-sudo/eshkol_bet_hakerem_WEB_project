@@ -36,7 +36,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4
+    <div className="login-page min-h-screen flex items-center justify-center px-4
       bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 relative overflow-hidden">
 
       <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72
@@ -128,7 +128,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-l from-emerald-600 to-teal-500
+              className="login-submit w-full py-3.5 bg-gradient-to-l from-emerald-600 to-teal-500
                 hover:from-emerald-700 hover:to-teal-600 text-white font-black rounded-2xl
                 transition-all duration-200 shadow-lg shadow-emerald-100
                 hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed

@@ -8,8 +8,8 @@ const WEEKDAY_NAMES = [
   ['שבת', 6],
 ];
 
-/** @returns {number[] | null} null = כל ימי השבוע */
 export function parseWeekdays(daysStr) {
+  // No weekday specified means the activity repeats every day.
   if (!daysStr?.trim()) return null;
   const found = new Set();
   for (const [name, day] of WEEKDAY_NAMES) {
@@ -35,14 +35,11 @@ function dateKeyLocal(d) {
 
 function parseDateOnly(str) {
   if (!str) return null;
+  // Noon prevents timezone offsets from moving a date-only value to the previous day.
   const d = new Date(`${str}T12:00:00`);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-/**
- * יוצר רשימת אירועי לוח שנה לפי טווח תאריכים, ימים בשבוע ושעת התחלה.
- * @returns {{ title, titleAr, organizationId, city, startsAt: string }[]}
- */
 export function buildCalendarEvents(opp) {
   const { startDate, endDate, days, time, title, titleAr, organizationId, city } = opp;
   const start = parseDateOnly(startDate);
@@ -53,6 +50,7 @@ export function buildCalendarEvents(opp) {
   const startTime = parseStartTime(time);
   const events = [];
 
+  // Include each matching date from the start date through the end date.
   const cursor = new Date(start);
   while (cursor <= end) {
     const dow = cursor.getDay();

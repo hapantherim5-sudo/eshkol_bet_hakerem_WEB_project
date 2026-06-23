@@ -23,7 +23,7 @@ router.post('/users', async (req, res) => {
   const existing = await db.collection(COLLECTIONS.users).findOne({ username: username.trim() });
   if (existing) return res.status(409).json({ error: 'username_taken' });
 
-  /* Derive next id from the current maximum — safe for admin-only, low-concurrency use */
+  /* Derive next id from the current maximum - safe for admin-only, low-concurrency use */
   const lastUser = await db.collection(COLLECTIONS.users)
     .find({}, { projection: { id: 1, _id: 0 } })
     .sort({ id: -1 })

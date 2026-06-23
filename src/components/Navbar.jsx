@@ -50,7 +50,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
     return (
       <button
         onClick={() => { onNavigate(link.screen); setMenuOpen(false); }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-150
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all duration-150
           ${active
             ? isAdmin
               ? 'bg-violet-600 text-white shadow-md'
@@ -87,10 +87,10 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 ring-2 ring-transparent group-hover:ring-emerald-300 transition-all duration-200"
             />
             <div className="hidden sm:block">
-              <p className={`text-sm font-black leading-none ${isDark ? 'text-white' : 'text-gray-800'}`}>
+              <p className={`text-base font-black leading-none ${isDark ? 'text-white' : 'text-gray-800'}`}>
                 {t('nav_brand_title')}
               </p>
-              <p className="text-[10px] text-emerald-500 font-semibold mt-0.5 leading-none">
+              <p className="text-[12px] text-emerald-500 font-semibold mt-0.5 leading-none">
                 {t('nav_brand_subtitle')}
               </p>
             </div>
@@ -104,7 +104,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
           <div className="flex items-center gap-1.5 shrink-0">
 
             <button onClick={onToggleLang}
-              className={`h-8 w-8 flex items-center justify-center text-xs font-black rounded-xl border-2 transition-all duration-150
+              className={`h-8 w-8 flex items-center justify-center text-sm font-black rounded-xl border-2 transition-all duration-150
                 ${isDark
                   ? 'border-emerald-500 text-emerald-400 hover:bg-slate-700'
                   : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
@@ -125,13 +125,13 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                     flex items-center justify-center text-white text-xs font-black shrink-0">
                     {currentUser.name?.[0] ?? '?'}
                   </div>
-                  <span className={`text-xs font-semibold max-w-[72px] truncate
+                  <span className={`text-sm font-semibold max-w-[72px] truncate
                     ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
                     {currentUser.name}
                   </span>
                 </div>
                 <button onClick={onLogout}
-                  className="h-8 px-2.5 text-xs font-semibold border border-red-200 text-red-500
+                  className="h-8 px-2.5 text-sm font-semibold border border-red-200 text-red-500
                     rounded-xl hover:bg-red-50 transition-all duration-150">
                   {t('nav_logout')}
                 </button>
@@ -139,7 +139,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             ) : (
               <button onClick={() => onNavigate('login')}
                 className="h-8 px-4 bg-gradient-to-l from-emerald-600 to-teal-500
-                  hover:from-emerald-700 hover:to-teal-600 text-white text-xs font-black
+                  hover:from-emerald-700 hover:to-teal-600 text-white text-sm font-black
                   rounded-xl transition-all duration-150 shadow-md hover:shadow-emerald-200
                   hover:scale-105 active:scale-95">
                 {t('nav_login_btn')}

@@ -141,7 +141,7 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
                   value={form.organizationId}
                   onChange={e => set('organizationId', e.target.value)}
                 >
-                  <option value="">{t('— בחר ארגון —', '— اختر منظمة —')}</option>
+                  <option value="">{t('- בחר ארגון -', '- اختر منظمة -')}</option>
                   {ORGANIZATIONS.map(o => (
                     <option key={o.id} value={o.id}>
                       {isAr ? o.nameAr : o.nameHe}
@@ -213,7 +213,7 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
           value={filterRole}
           onChange={e => onChange('filterRole', e.target.value)}
         >
-          <option value="">{t('— כל התפקידים —', '— جميع الأدوار —')}</option>
+          <option value="">{t('- כל התפקידים -', '- جميع الأدوار -')}</option>
           <option value="Admin">{t('מנהל', 'مسؤول')}</option>
           <option value="Staff">{t('סגל', 'طاقم')}</option>
           <option value="User">{t('נוער', 'شباب')}</option>
@@ -223,7 +223,7 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
           value={filterOrg}
           onChange={e => onChange('filterOrg', e.target.value)}
         >
-          <option value="">{t('— כל הארגונים —', '— جميع المنظمات —')}</option>
+          <option value="">{t('- כל הארגונים -', '- جميع المنظمات -')}</option>
           {ORGANIZATIONS.map(o => (
             <option key={o.id} value={o.id}>
               {isAr ? o.nameAr : o.nameHe}
@@ -279,15 +279,15 @@ export default function UserManagement({ lang, currentUser, showToast }) {
   };
 
   useEffect(() => {
-    /* Only run when the API is reachable — prevents false error toasts
+    /* Only run when the API is reachable - prevents false error toasts
        in localStorage-mode where there is no backend to call.           */
     if (!apiEnabled()) return;
     loadUsers();
-  // loadUsers is stable within this mount — no deps needed
+  // loadUsers is stable within this mount - no deps needed
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Filtered view — computed from full users array */
+  /* Filtered view - computed from full users array */
   const filteredUsers = useMemo(() => {
     const nameLo     = searchName.toLowerCase();
     const usernameLo = searchUsername.toLowerCase();
@@ -344,7 +344,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
 
   const orgLabel = (orgId) => {
     const org = ORGANIZATIONS.find(o => o.id === orgId);
-    return org ? (isAr ? org.nameAr : org.nameHe) : '—';
+    return org ? (isAr ? org.nameAr : org.nameHe) : '-';
   };
 
   /* ── API unavailable (localStorage mode) ── */

@@ -48,10 +48,10 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
         <p className="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed">{description}</p>
 
         <div className="flex flex-wrap gap-1.5">
-          <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-medium">
+          <span className="opportunity-org-badge text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg font-medium">
             {getOrgName(o.organizationId, isAr)}
           </span>
-          <span className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg font-medium">
+          <span className="opportunity-city-badge text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg font-medium">
             📍 {o.city}
           </span>
           <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg">

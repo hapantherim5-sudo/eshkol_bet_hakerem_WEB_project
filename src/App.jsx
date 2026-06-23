@@ -14,16 +14,17 @@ import GalleryPage from './pages/GalleryPage';
 import HotThisWeekPage from './pages/HotThisWeekPage';
 
 import { useDataStore } from './hooks/useDataStore';
-import { loadSession, saveSession } from './hooks/useLocalStore';
+import { loadSession, saveSession, loadTheme, saveTheme } from './hooks/useLocalStore';
 
 import { setDocumentLang, useT } from './i18n/i18n';
 import { isStaffRole } from './utils/permissions';
 
 function App() {
   const store = useDataStore();
+  // Screen state replaces a routing library in this single-page application.
   const [currentScreen, setCurrentScreen] = useState('home');
   const [currentUser, setCurrentUser] = useState(() => loadSession());
-  const [theme, setTheme] = useState('');
+  const [theme, setTheme] = useState(() => loadTheme());
   const [lang, setLang] = useState('he');
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [showRegModal, setShowRegModal] = useState(false);
@@ -128,12 +129,16 @@ function App() {
 
   return (
     <div dir="rtl" className={`min-h-screen font-sans
-      ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-slate-50 text-gray-900'}`}>
+      ${theme === 'dark' ? 'app-dark bg-slate-900 text-white' : 'bg-slate-50 text-gray-900'}`}>
 
       <Navbar
         theme={theme} lang={lang} currentUser={currentUser}
         currentScreen={currentScreen}
-        onToggleDark={() => setTheme(p => p === 'dark' ? '' : 'dark')}
+        onToggleDark={() => setTheme(p => {
+          const nextTheme = p === 'dark' ? '' : 'dark';
+          saveTheme(nextTheme);
+          return nextTheme;
+        })}
         onToggleLang={() => setLang(p => p === 'he' ? 'ar' : 'he')}
         onNavigate={handleNavigate}
         onLogout={handleLogout}

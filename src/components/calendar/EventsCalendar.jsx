@@ -109,8 +109,8 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp, currentUser, r
           <h2 className="font-black text-gray-700 mb-4 text-sm sm:text-base flex items-center gap-2">
             <span className="text-base">📆</span>
             {t(
-              `אירועים — ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
-              `أحداث — ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
+              `אירועים - ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
+              `أحداث - ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
             )}
           </h2>
 

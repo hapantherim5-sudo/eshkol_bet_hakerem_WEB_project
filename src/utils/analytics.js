@@ -1,5 +1,4 @@
 import { FAKE_USERS } from '../data/fakeData.js';
-/** צפייה אחת לכל משתמש (או אורח) לכל הזדמנות */
 function aggregateUniqueViews(views) {
   const seen = new Set();
   const viewsByOpp = {};
@@ -28,7 +27,7 @@ export function computeStats({ opportunities, views, registrations, profiles, ca
   const bySettlement = {};
   registrations.forEach(r => {
     const p = profiles[r.userId];
-    const key = p?.settlement || '—';
+    const key = p?.settlement || '-';
     bySettlement[key] = (bySettlement[key] || 0) + 1;
   });
 

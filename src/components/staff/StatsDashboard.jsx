@@ -124,7 +124,7 @@ function KpiCard({ icon, value, labelHe, labelAr, color, isAr }) {
         {icon}
       </div>
       <div className={`text-2xl sm:text-3xl font-black tabular-nums ${c.num}`}>
-        {value !== null && value !== undefined ? value.toLocaleString() : '—'}
+        {value !== null && value !== undefined ? value.toLocaleString() : '-'}
       </div>
       <div className="text-xs text-gray-500 mt-1 font-medium">{label}</div>
     </div>
@@ -242,8 +242,8 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={registrationsByMonth} margin={{ top: 4, right: 4, left: -24, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#94a3b8' }} interval={1} />
-                  <YAxis tick={{ fontSize: 9, fill: '#94a3b8' }} allowDecimals={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} interval={1} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
                   <Tooltip content={<BarTip />} cursor={{ fill: '#f0fdf4' }} />
                   <Bar dataKey="count" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={36} />
                 </BarChart>
@@ -258,8 +258,8 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={cancellationsByMonth} margin={{ top: 4, right: 4, left: -24, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#94a3b8' }} interval={1} />
-                  <YAxis tick={{ fontSize: 9, fill: '#94a3b8' }} allowDecimals={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} interval={1} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
                   <Tooltip content={<BarTip />} cursor={{ fill: '#fff1f2' }} />
                   <Bar dataKey="count" fill="#f43f5e" radius={[5, 5, 0, 0]} maxBarSize={36} />
                 </BarChart>
@@ -292,7 +292,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                   </Pie>
                   <Tooltip content={<PieTip />} />
                   <Legend
-                    formatter={val => <span style={{ fontSize: 11, color: '#4b5563' }}>{val}</span>}
+                    formatter={val => <span style={{ fontSize: 13, color: '#4b5563' }}>{val}</span>}
                     iconSize={8}
                     wrapperStyle={{ paddingTop: 4 }}
                   />
@@ -323,7 +323,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                   </Pie>
                   <Tooltip content={<PieTip />} />
                   <Legend
-                    formatter={val => <span style={{ fontSize: 11, color: '#4b5563' }}>{val}</span>}
+                    formatter={val => <span style={{ fontSize: 13, color: '#4b5563' }}>{val}</span>}
                     iconSize={8}
                     wrapperStyle={{ paddingTop: 4 }}
                   />
@@ -345,12 +345,12 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                 margin={{ top: 4, right: 24, left: 0, bottom: 4 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} allowDecimals={false} />
+                <XAxis type="number" tick={{ fontSize: 12, fill: '#94a3b8' }} allowDecimals={false} />
                 <YAxis
                   type="category"
                   dataKey="title"
                   width={140}
-                  tick={{ fontSize: 10, fill: '#374151' }}
+                  tick={{ fontSize: 12, fill: '#374151' }}
                   tickFormatter={v => v?.length > 22 ? v.slice(0, 21) + '…' : v}
                 />
                 <Tooltip content={<BarTip />} cursor={{ fill: '#f8fafc' }} />
@@ -378,7 +378,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                   : 0;
                 return (
                   <div key={item.city} className="flex items-center gap-3 group">
-                    <span className="w-5 text-[11px] font-bold text-gray-300 text-center shrink-0">{i + 1}</span>
+                    <span className="w-5 text-[13px] font-bold text-gray-300 text-center shrink-0">{i + 1}</span>
                     <span className="text-sm font-semibold text-gray-700 w-20 shrink-0">{item.city}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-2">
                       <div
@@ -419,7 +419,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                 />
               </div>
               <p className="text-xs text-gray-400 mt-2 text-center">
-                {t('מתוך כל הצפיות — כמה הפכו להרשמות', 'من إجمالي المشاهدات — كم تحولت إلى تسجيلات')}
+                {t('מתוך כל הצפיות - כמה הפכו להרשמות', 'من إجمالي المشاهدات - كم تحولت إلى تسجيلات')}
               </p>
             </div>
           </div>

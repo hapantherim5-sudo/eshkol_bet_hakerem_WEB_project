@@ -4,6 +4,10 @@
   --font-sans: 'Heebo', system-ui, sans-serif;
 }
 
+:root {
+  font-size: 18px;
+}
+
 /* Heebo Black for Hebrew */
 :root:lang(he),
 :root:lang(he) * {
@@ -14,6 +18,18 @@
 body {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+/* Make every actionable button clearly feel clickable. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed !important;
 }
 
 /* ── Animations ── */
@@ -112,4 +128,207 @@ body {
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+/* Dark theme overrides for components that use fixed light utility classes. */
+.app-dark {
+  color-scheme: dark;
+}
+
+.app-dark .bg-white,
+.app-dark .bg-gray-50 {
+  background-color: #1e293b;
+}
+
+.app-dark .bg-gray-100,
+.app-dark .bg-gray-200 {
+  background-color: #334155;
+}
+
+.app-dark .bg-gray-300 {
+  background-color: #475569;
+}
+
+.app-dark .text-gray-900,
+.app-dark .text-gray-800 {
+  color: #f8fafc;
+}
+
+.app-dark .text-gray-700,
+.app-dark .text-gray-600 {
+  color: #e2e8f0;
+}
+
+.app-dark .text-gray-500,
+.app-dark .text-gray-400 {
+  color: #cbd5e1;
+}
+
+.app-dark .text-gray-300,
+.app-dark .text-gray-200 {
+  color: #e2e8f0;
+}
+
+.app-dark .border-gray-50,
+.app-dark .border-gray-100,
+.app-dark .border-gray-200,
+.app-dark .border-gray-400 {
+  border-color: #475569;
+}
+
+.app-dark input,
+.app-dark select,
+.app-dark textarea {
+  background-color: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.app-dark input::placeholder,
+.app-dark textarea::placeholder {
+  color: #94a3b8;
+}
+
+.app-dark select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+.app-dark .hover\:bg-gray-50:hover,
+.app-dark .hover\:bg-gray-100:hover,
+.app-dark .hover\:bg-gray-200:hover {
+  background-color: #475569;
+}
+
+.app-dark .glass-card {
+  background: rgba(30, 41, 59, 0.88);
+}
+
+/* Keep the community-benefit cards readable and colorful in dark mode. */
+.app-dark .community-perk {
+  border-color: #334155;
+}
+
+.app-dark .community-perk:nth-child(1) { background-color: #352c16; }
+.app-dark .community-perk:nth-child(2) { background-color: #351f2b; }
+.app-dark .community-perk:nth-child(3) { background-color: #2d2648; }
+.app-dark .community-perk:nth-child(4) { background-color: #15362b; }
+
+.app-dark .community-perk:nth-child(1) .community-perk-title { color: #fcd34d; }
+.app-dark .community-perk:nth-child(2) .community-perk-title { color: #f9a8d4; }
+.app-dark .community-perk:nth-child(3) .community-perk-title { color: #c4b5fd; }
+.app-dark .community-perk:nth-child(4) .community-perk-title { color: #6ee7b7; }
+
+.app-dark .community-perk-description {
+  color: #cbd5e1;
+}
+
+.app-dark .home-cta-login {
+  color: #ffffff;
+}
+
+.app-dark .home-hero-explore {
+  color: #ffffff;
+}
+
+.app-dark .login-page {
+  background: linear-gradient(135deg, #0f172a, #111827, #0f172a);
+}
+
+.app-dark .login-page > .pointer-events-none {
+  opacity: 0.15;
+}
+
+.app-dark .login-submit {
+  box-shadow: none;
+}
+
+.app-dark .modal-register-btn {
+  box-shadow: none;
+}
+
+.app-dark .opportunity-org-badge,
+.app-dark .opportunity-city-badge {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+.app-dark .filter-dropdown-options {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.app-dark .filter-dropdown-option {
+  color: #e2e8f0;
+}
+
+.app-dark .filter-dropdown-option:hover {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+.app-dark .filter-dropdown-option[aria-selected="true"] {
+  background-color: #065f46;
+  color: #ecfdf5;
+}
+
+.app-dark .hot-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+.app-dark .hot-card-age {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+.app-dark .hot-card .text-violet-600 {
+  color: #c4b5fd;
+}
+
+.app-dark .hot-board-cta {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.app-dark .hot-hero {
+  background: linear-gradient(135deg, #8a3f16, #9a421d, #743222);
+}
+
+.app-dark .hot-featured-gradient {
+  background: linear-gradient(135deg, #93411f, #a14c26, #7c3626);
+}
+
+.app-dark .about-hero {
+  background: linear-gradient(135deg, #37345b, #4a3864, #5d426d);
+}
+
+.app-dark .about-info-card,
+.app-dark .about-mission-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.app-dark .about-email-chip {
+  background-color: #0f766e;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* A calmer purple palette for the regular theme. */
+.home-featured-card {
+  background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
+}
+
+.home-login-cta {
+  background: linear-gradient(90deg, #69539a, #4b6a94);
+}
+
+/* Softer purple surfaces for the dark theme. */
+.app-dark .home-featured-card {
+  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
+}
+
+.app-dark .home-login-cta {
+  background: linear-gradient(90deg, #493b69, #35466b);
 }

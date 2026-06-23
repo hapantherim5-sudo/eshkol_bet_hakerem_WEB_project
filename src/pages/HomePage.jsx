@@ -124,7 +124,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
 
           <div className="flex flex-wrap gap-3 justify-center">
             <button onClick={() => handleNavigate('opportunities')}
-              className="px-8 py-3.5 bg-white text-emerald-700 font-black rounded-2xl
+              className="home-hero-explore px-8 py-3.5 bg-white text-emerald-700 font-black rounded-2xl
                 hover:bg-emerald-50 hover:scale-105 active:scale-95
                 transition-all duration-200 shadow-xl text-base tracking-wide">
               {t('home_explore_btn')}
@@ -144,7 +144,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="grid grid-cols-3 gap-3 sm:gap-5">
             {statItems.map((s, i) => (
-              <div key={i} className="text-center hover:-translate-y-0.5 transition-transform duration-200">
+              <div key={i} className="text-center">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${s.gradient}
                   flex items-center justify-center text-2xl mx-auto mb-2 shadow-md`}>
                   {s.icon}
@@ -169,8 +169,8 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
                 className={`relative overflow-hidden rounded-2xl p-5 text-white text-right
                   bg-gradient-to-br ${ql.gradient} shadow-md ${ql.shadow}
                   hover:shadow-lg hover:-translate-y-1 active:scale-95 transition-all duration-200
-                  animate-card-in`}
-                style={{ animationDelay: `${i * 0.08}s` }}>
+                  animate-card-in cursor-pointer`}
+                style={{ animationDelay: `${i * 0.08}s`, cursor: 'pointer' }}>
                 <div className="pointer-events-none absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/10" />
                 <p className="text-3xl mb-2">{ql.icon}</p>
                 <p className="text-sm font-black leading-tight">{ql.label}</p>
@@ -186,7 +186,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
 
             <div
               onClick={() => handleNavigate('opportunities')}
-              className="relative overflow-hidden bg-gradient-to-bl from-indigo-600 via-violet-600 to-purple-500
+              className="home-featured-card relative overflow-hidden bg-gradient-to-bl from-indigo-600 via-violet-600 to-purple-500
                 rounded-3xl p-6 sm:p-8 text-white cursor-pointer
                 hover:shadow-2xl hover:shadow-violet-200 hover:-translate-y-1 transition-all duration-300">
               <div className="pointer-events-none absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5 animate-blob" />
@@ -227,7 +227,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
                           <div key={key}
                             className="text-center bg-white/15 rounded-lg px-1.5 py-1 min-w-[36px]">
                             <p className="text-sm font-black tabular-nums leading-none">{p2(cd[key])}</p>
-                            <p className="text-white/45 text-[8px] font-semibold leading-none mt-0.5">
+                            <p className="text-white/45 text-[10px] font-semibold leading-none mt-0.5">
                               {isAr ? lAr : lHe}
                             </p>
                           </div>
@@ -268,14 +268,14 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {COMMUNITY_PERKS.map((p, i) => (
               <div key={i}
-                className={`${p.bg} rounded-2xl p-5 border border-white/50
-                  hover:-translate-y-0.5 transition-transform duration-200 animate-card-in`}
+                className={`community-perk ${p.bg} rounded-2xl p-5 border border-white/50
+                  animate-card-in`}
                 style={{ animationDelay: `${i * 0.08}s` }}>
                 <div className="flex items-start gap-3">
                   <span className="text-3xl shrink-0">{p.icon}</span>
                   <div>
-                    <p className={`font-black text-gray-800 text-sm mb-1 ${p.color}`}>{p.title}</p>
-                    <p className="text-xs text-gray-500 leading-relaxed">{p.text}</p>
+                    <p className={`community-perk-title font-black text-sm mb-1 ${p.color}`}>{p.title}</p>
+                    <p className="community-perk-description text-xs text-gray-500 leading-relaxed">{p.text}</p>
                   </div>
                 </div>
               </div>
@@ -303,7 +303,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
           </section>
         ) : !currentUser ? (
           <section>
-            <div className="relative overflow-hidden bg-gradient-to-l from-violet-600 to-indigo-600
+            <div className="home-login-cta relative overflow-hidden bg-gradient-to-l from-violet-600 to-indigo-600
               rounded-2xl p-6 text-white">
               <div className="pointer-events-none absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5 animate-blob" />
               <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
@@ -312,7 +312,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
                   <p className="text-violet-200 text-sm">{t('home_cta_subtitle')}</p>
                 </div>
                 <button onClick={() => handleNavigate('login')}
-                  className="shrink-0 px-7 py-3 bg-white text-violet-700 font-black
+                  className="home-cta-login shrink-0 px-7 py-3 bg-white text-violet-700 font-black
                     rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg text-sm">
                   {t('home_cta_login_btn')}
                 </button>

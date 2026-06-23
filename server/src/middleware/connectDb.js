@@ -2,6 +2,7 @@ import { connectDb } from '../db.js';
 
 export default async function (_req, res, next) {
   try {
+    // The connector caches a successful connection, so later requests reuse it.
     await connectDb();
     next();
   } catch (err) {
