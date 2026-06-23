@@ -178,6 +178,8 @@ function App() {
             lang={lang}
             opportunities={store.opportunities}
             onOpenOpp={openOppModal}
+            currentUser={currentUser}
+            registrations={store.registrations}
           />
         )}
 
