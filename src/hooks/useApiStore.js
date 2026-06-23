@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { apiEnabled } from '../lib/services/api';
-import { KEYS, load, save } from '../lib/storage/storage';
+import { api, apiEnabled } from '../services/api';
 import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS } from '../data/fakeData';
 
 /**
@@ -8,7 +7,7 @@ import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS } from '../data/fakeData';
  * Enable with VITE_USE_API=true (same-origin /api) or VITE_API_URL in .env at project root.
  */
 export function useApiStore() {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(!apiEnabled());
   const [opportunities, setOpportunities] = useState(INITIAL_OPPORTUNITIES);
   const [events, setEvents] = useState(INITIAL_EVENTS);
   const [registrations, setRegistrations] = useState([]);
@@ -17,10 +16,7 @@ export function useApiStore() {
   const [profiles, setProfiles] = useState({});
 
   useEffect(() => {
-    if (!apiEnabled()) {
-      setReady(true);
-      return;
-    }
+    if (!apiEnabled()) return;
     let cancelled = false;
     (async () => {
       try {

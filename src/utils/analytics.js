@@ -1,5 +1,4 @@
-import { FAKE_USERS } from '../../data/fakeData.js';
-
+import { FAKE_USERS } from '../data/fakeData.js';
 /** צפייה אחת לכל משתמש (או אורח) לכל הזדמנות */
 function aggregateUniqueViews(views) {
   const seen = new Set();

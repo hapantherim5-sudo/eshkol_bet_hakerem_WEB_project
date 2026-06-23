@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { CATEGORIES, OPPORTUNITY_TYPES, STATUSES } from '../../data/fakeData';
 import { ORGANIZATIONS } from '../../data/organizations';
-import { pick } from '../../lib/i18n/i18n';
-import { buildCalendarEvents } from '../../lib/utils/scheduleEvents';
+import { pick } from '../../i18n/i18n';
+import { buildCalendarEvents } from '../../utils/scheduleEvents';
 import DateInputIL from '../DateInputIL';
 
 const empty = (defaults = {}) => ({
@@ -100,7 +100,7 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
         <div>
           <label className="text-xs text-gray-500">{label('סוג', 'النوع')}</label>
           <select className={inputClass} value={form.type} onChange={e => set('type', e.target.value)}>
-            {OPPORTUNITY_TYPES.map(t => <option key={t} value={t}>{isAr ? t : t}</option>)}
+            {OPPORTUNITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
         <div>
