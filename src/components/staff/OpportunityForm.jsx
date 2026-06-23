@@ -132,6 +132,18 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
           <label className="text-xs text-gray-500">{label('תיאור', 'الوصف')}</label>
           <textarea className={inputClass} rows={2} value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
+        <div className="md:col-span-2">
+          <label className="text-xs text-gray-500">{label('תיאור בערבית (אופציונלי)', 'الوصف بالعربية (اختياري)')}</label>
+          <textarea className={inputClass} rows={2} dir="rtl" value={form.descriptionAr} onChange={e => set('descriptionAr', e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500">{label('אימוג׳י (אופציונלי)', 'رمز تعبيري (اختياري)')}</label>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl leading-none">{form.icon || '✨'}</span>
+            <input className={inputClass} maxLength={2} value={form.icon}
+              placeholder="✨" onChange={e => set('icon', e.target.value)} />
+          </div>
+        </div>
         <div>
           <label className="text-xs text-gray-500">{label('איש קשר', 'جهة الاتصال')}</label>
           <input className={inputClass} value={form.contact} onChange={e => set('contact', e.target.value)} />
