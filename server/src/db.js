@@ -11,17 +11,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
-const dbName = process.env.MONGODB_DB || 'eshkol';
+const env = typeof globalThis !== 'undefined' && globalThis.process ? globalThis.process.env : {};
+const uri = env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
+const dbName = env.MONGODB_DB || 'eshkol'; 
 
 let client;
 let db;
 
 export async function connectDb() {
   if (db) return db;
+  const maskedUri = uri.replace(/:\/\/([^:]+):([^@]+)@/, '://<user>:<pass>@');
+  console.log('[db] connecting  uri=%s  db=%s', maskedUri, dbName);
   client = new MongoClient(uri);
   await client.connect();
   db = client.db(dbName);
+  console.log('[db] connected   db=%s', dbName);
   return db;
 }
 

@@ -1,24 +1,20 @@
 import { useState } from 'react';
-import { filterManageable, canManageOpportunity } from '../../lib/utils/permissions';
+import { filterManageable, canManageOpportunity } from '../../utils/permissions';
 import { getOrgName } from '../../data/organizations';
-import { computeStats } from '../../lib/analytics/analytics';
-import { pick } from '../../lib/i18n/i18n';
-import { formatIsraeliDateTime } from '../../lib/utils/israeliDate';
-import ConfirmModal from '../ConfirmModal';
+import { pick } from '../../i18n/i18n';
 import OpportunityForm from './OpportunityForm';
+import UserManagement from './UserManagement';
+import StatsDashboard from './StatsDashboard';
 
 function StaffPanel({
   lang, currentUser, opportunities, events, views, registrations, cancellations, profiles,
-  onAdd, onUpdate, onDelete, onAddEvent, onDeleteEvent, onReplaceEventsForOpportunity,
+  onAdd, onUpdate, onDelete, onAddEvent, onDeleteEvent, onReplaceEventsForOpportunity, showToast,
 }) {
   const isAr = lang === 'ar';
+  const isAdmin = currentUser.role === 'Admin';
   const [mode, setMode] = useState(null); // null | 'add' | opp object
-  const [tab, setTab] = useState('opps'); // opps | stats | events
-  const [eventForm, setEventForm] = useState({ title: '', titleAr: '', organizationId: '', city: '', startsAt: '' });
-  const [eventToDelete, setEventToDelete] = useState(null);
-
+  const [tab, setTab] = useState('opps'); // opps | stats | users
   const manageable = filterManageable(currentUser, opportunities);
-  const stats = computeStats({ opportunities, views, registrations, cancellations, profiles });
 
   const handleSave = (opp, calendarEvents) => {
     if (mode === 'add') {
@@ -37,26 +33,6 @@ function StaffPanel({
     if (window.confirm(pick(isAr, 'למחוק הזדמנות זו?', 'حذف هذه الفرصة؟'))) onDelete(opp.id);
   };
 
-  const confirmDeleteEvent = () => {
-    if (!eventToDelete) return;
-    onDeleteEvent(eventToDelete.id);
-    setEventToDelete(null);
-  };
-
-  const staffEvents = currentUser.role === 'Admin'
-    ? events
-    : events.filter(e => e.organizationId === currentUser.organizationId);
-
-  const addStandaloneEvent = () => {
-    if (!eventForm.title || !eventForm.startsAt) return;
-    onAddEvent({
-      ...eventForm,
-      organizationId: eventForm.organizationId || currentUser.organizationId,
-      startsAt: new Date(eventForm.startsAt).toISOString(),
-    });
-    setEventForm({ title: '', titleAr: '', organizationId: '', city: '', startsAt: '' });
-  };
-
   const t = (he, ar) => pick(isAr, he, ar);
 
   return (
@@ -65,11 +41,15 @@ function StaffPanel({
       <p className="text-gray-500 text-sm mb-6">{t(`שלום ${currentUser.name}`, `مرحباً ${currentUser.name}`)}</p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {['opps', 'events', 'stats'].map(key => (
+        {[
+          { key: 'opps',   labelHe: 'הזדמנויות',    labelAr: 'الفرص'       },
+          { key: 'stats',  labelHe: 'סטטיסטיקות',   labelAr: 'إحصائيات'   },
+          ...(isAdmin ? [{ key: 'users', labelHe: 'משתמשים 👤', labelAr: 'المستخدمون 👤' }] : []),
+        ].map(({ key, labelHe, labelAr }) => (
           <button key={key} onClick={() => setTab(key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition
               ${tab === key ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-emerald-50'}`}>
-            {key === 'opps' ? t('הזדמנויות', 'الفرص') : key === 'events' ? t('אירועים', 'الأحداث') : t('סטטיסטיקות', 'إحصائيات')}
+            {isAr ? labelAr : labelHe}
           </button>
         ))}
       </div>
@@ -115,85 +95,27 @@ function StaffPanel({
         </>
       )}
 
-      {tab === 'events' && (
-        <div>
-          <div className="bg-white rounded-xl border p-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input placeholder={t('כותרת', 'العنوان')} className="px-3 py-2 border rounded-lg text-sm"
-              value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} />
-            <input type="datetime-local" className="px-3 py-2 border rounded-lg text-sm"
-              value={eventForm.startsAt} onChange={e => setEventForm(f => ({ ...f, startsAt: e.target.value }))} />
-            <input placeholder={t('יישוב', 'البلدة')} className="px-3 py-2 border rounded-lg text-sm"
-              value={eventForm.city} onChange={e => setEventForm(f => ({ ...f, city: e.target.value }))} />
-            <button onClick={addStandaloneEvent} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-lg">
-              + {t('הוסף אירוע', 'أضف حدث')}
-            </button>
-          </div>
-          {staffEvents.map(e => (
-            <div key={e.id} className="bg-white rounded-xl border p-3 mb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <span className="text-sm">{isAr ? e.titleAr : e.title} — {formatIsraeliDateTime(e.startsAt)}</span>
-              <button onClick={() => setEventToDelete(e)} className="text-xs text-red-600 min-h-[44px] sm:min-h-0 self-start sm:self-center">{t('מחק', 'حذف')}</button>
-            </div>
-          ))}
-        </div>
-      )}
 
       {tab === 'stats' && (
-        <div>
-          {/* Mobile: one KPI per row; md: four columns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            {[
-              { n: stats.userCount, l: t('משתמשים', 'المستخدمون') },
-              { n: stats.totalViews, l: t('צפיות', 'المشاهدات') },
-              { n: stats.totalRegistrations, l: t('הרשמות', 'التسجيلات') },
-              { n: opportunities.length, l: t('הזדמנויות', 'الفرص') },
-            ].map((s, i) => (
-              <div key={i} className="bg-white rounded-xl p-4 border text-center">
-                <p className="text-2xl font-black text-emerald-700">{s.n}</p>
-                <p className="text-xs text-gray-500">{s.l}</p>
-              </div>
-            ))}
-          </div>
-          <h3 className="font-bold text-gray-700 mb-2">{t('מובילות לפי הרשמות', 'الأكثر تسجيلاً')}</h3>
-          {/* Mobile: horizontal scroll for wide table */}
-          <div className="bg-white rounded-xl border overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <table className="w-full text-sm min-w-[480px]">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="text-right p-2">{t('פעילות', 'النشاط')}</th>
-                  <th className="p-2">{t('הרשמות', 'تسجيل')}</th>
-                  <th className="p-2">{t('ביטולים', 'إلغاءات')}</th>
-                  <th className="p-2">{t('צפיות', 'مشاهدة')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.topOpps.map(row => (
-                  <tr key={row.id} className="border-t">
-                    <td className="p-2">{row.title}</td>
-                    <td className="p-2 text-center">{row.registrations}</td>
-                    <td className="p-2 text-center">{row.cancellations}</td>
-                    <td className="p-2 text-center">{row.views}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {eventToDelete && (
-        <ConfirmModal
+        <StatsDashboard
+          opportunities={opportunities}
+          registrations={registrations}
+          cancellations={cancellations}
+          views={views}
+          profiles={profiles}
           lang={lang}
-          titleHe="מחיקת אירוע"
-          titleAr="حذف الحدث"
-          messageHe={`האם אתה בטוח שברצונך למחוק את האירוע "${eventToDelete.title}"?`}
-          messageAr={`هل أنت متأكد أنك تريد حذف الحدث "${eventToDelete.titleAr || eventToDelete.title}"؟`}
-          confirmHe="כן, מחק"
-          confirmAr="نعم، حذف"
-          danger
-          onConfirm={confirmDeleteEvent}
-          onClose={() => setEventToDelete(null)}
+          showToast={showToast}
         />
       )}
+
+      {tab === 'users' && isAdmin && (
+        <UserManagement
+          lang={lang}
+          currentUser={currentUser}
+          showToast={showToast}
+        />
+      )}
+
     </div>
   );
 }

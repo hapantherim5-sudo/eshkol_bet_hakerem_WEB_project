@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../lib/utils/israeliDate';
-import { pick } from '../lib/i18n/i18n';
+import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../utils/israeliDate';
+import { pick } from '../i18n/i18n';
 
 function DateInputIL({ value, onChange, lang, className, id }) {
   const isAr = lang === 'ar';
   const [text, setText] = useState(() => isoToDisplay(value));
 
-  useEffect(() => {
-    setText(isoToDisplay(value));
-  }, [value]);
+  // Sync display text when the parent resets the ISO value (e.g. clearing the form)
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setText(isoToDisplay(value)); }, [value]);
 
   const apply = (display) => {
     const trimmed = display.trim();

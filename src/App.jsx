@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import Login from './components/Login';
-import OpportunitiesBoard from './components/OpportunitiesBoard';
 import StaffPanel from './components/staff/StaffPanel';
 import EventsCalendar from './components/calendar/EventsCalendar';
 import OpportunityDetailModal from './components/OpportunityDetailModal';
-import MyRegistrations from './components/MyRegistrations';
 import RegistrationModal from './components/RegistrationModal';
+
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import OpportunitiesBoardPage from './pages/OpportunitiesBoardPage';
+import MyRegistrationsPage from './pages/MyRegistrationsPage';
+import AboutPage from './pages/AboutPage';
+import GalleryPage from './pages/GalleryPage';
+import HotThisWeekPage from './pages/HotThisWeekPage';
 
 import { useDataStore } from './hooks/useDataStore';
 import { loadSession, saveSession } from './hooks/useLocalStore';
 
-import { ORGANIZATIONS } from './data/organizations';
-
-import { setDocumentLang, pick } from './lib/i18n/i18n'; 
-import { isStaffRole } from './lib/utils/permissions';
+import { setDocumentLang, useT } from './i18n/i18n';
+import { isStaffRole } from './utils/permissions';
 
 function App() {
   const store = useDataStore();
@@ -24,14 +27,16 @@ function App() {
   const [lang, setLang] = useState('he');
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [showRegModal, setShowRegModal] = useState(false);
-  const [toast, setToast] = useState('');
+  const [toast,     setToast    ] = useState('');
+  const [toastType, setToastType] = useState('success');
 
-  const isAr = lang === 'ar';
+  const t = useT(lang);
 
   useEffect(() => setDocumentLang(lang), [lang]);
 
-  const showToast = (msg) => {
+  const showToast = (msg, type = 'success') => {
     setToast(msg);
+    setToastType(type);
     setTimeout(() => setToast(''), 3000);
   };
 
@@ -55,7 +60,7 @@ function App() {
     if (screen === 'my-registrations') {
       if (!currentUser || currentUser.role !== 'User') {
         setCurrentScreen('login');
-        showToast(pick(isAr, 'יש להתחבר כמשתמש נוער', 'يجب تسجيل الدخول كشاب'));
+        showToast(t('toast_youth_login'));
         return;
       }
     }
@@ -71,11 +76,11 @@ function App() {
     if (!currentUser) {
       setSelectedOpp(null);
       setCurrentScreen('login');
-      showToast(pick(isAr, 'יש להתחבר כדי להירשם', 'يجب تسجيل الدخول للتسجيل'));
+      showToast(t('toast_login_required'));
       return;
     }
     if (currentUser.role !== 'User') {
-      showToast(pick(isAr, 'הרשמה זמינה למשתמשי נוער בלבד', 'التسجيل للشباب فقط'));
+      showToast(t('toast_staff_only'));
       return;
     }
     setShowRegModal(true);
@@ -86,12 +91,12 @@ function App() {
       const result = await store.register(currentUser.id, selectedOpp.id, profilePatch);
       setShowRegModal(false);
       if (result.ok) {
-        showToast(pick(isAr, 'נרשמת בהצלחה!', 'تم التسجيل بنجاح!'));
+        showToast(t('toast_registered'));
       } else if (result.reason === 'duplicate') {
-        showToast(pick(isAr, 'כבר נרשמת לפעילות זו', 'مسجل بالفعل'));
+        showToast(t('toast_already_reg'));
       }
     } catch {
-      showToast(pick(isAr, 'שגיאה בהרשמה, נסה שוב', 'خطأ في التسجيل، حاول مرة أخرى'));
+      showToast(t('toast_reg_error'), 'error');
     }
   };
 
@@ -102,28 +107,32 @@ function App() {
     try {
       const result = await store.unregister(currentUser.id, oppId);
       if (result.ok) {
-        showToast(pick(isAr, 'ההרשמה בוטלה', 'تم إلغاء التسجيل'));
+        showToast(t('toast_unreg'));
         if (selectedOpp?.id === oppId) setSelectedOpp(null);
       }
     } catch {
-      showToast(pick(isAr, 'שגיאה בביטול ההרשמה', 'خطأ في إلغاء التسجيل'));
+      showToast(t('toast_unreg_error'), 'error');
     }
   };
 
   if (store.ready === false) {
     return (
-      <div dir="rtl" className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-600">
-        {isAr ? 'جاري التحميل...' : 'טוען נתונים...'}
+      <div dir="rtl" className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50">
+        <div className="w-12 h-12 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin mb-4" />
+        <p className="text-emerald-700 font-semibold text-sm">
+          {t('loading')}
+        </p>
       </div>
     );
   }
 
   return (
     <div dir="rtl" className={`min-h-screen font-sans
-      ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-slate-50 text-gray-900'}`}>
 
       <Navbar
         theme={theme} lang={lang} currentUser={currentUser}
+        currentScreen={currentScreen}
         onToggleDark={() => setTheme(p => p === 'dark' ? '' : 'dark')}
         onToggleLang={() => setLang(p => p === 'he' ? 'ar' : 'he')}
         onNavigate={handleNavigate}
@@ -131,59 +140,32 @@ function App() {
       />
 
       {toast && (
-        <div className="fixed top-20 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-sm z-[70] bg-emerald-700 text-white px-4 py-2 rounded-xl shadow-lg text-sm text-center">
+        <div className={`animate-toast fixed top-20 left-1/2 z-[70]
+          ${toastType === 'error' ? 'bg-red-500' : 'bg-emerald-600'}
+          text-white px-5 py-3 rounded-2xl shadow-xl
+          text-sm font-semibold flex items-center gap-2 whitespace-nowrap pointer-events-none`}>
+          <span className="text-base">{toastType === 'error' ? '✕' : '✓'}</span>
           {toast}
         </div>
       )}
 
-      <main className="pt-14 sm:pt-16">
+      <main className="pt-20 sm:pt-20">
 
         {currentScreen === 'home' && (
-          <div className="max-w-4xl mx-auto px-4 py-12 sm:py-20 text-center">
-            <div className="bg-gradient-to-bl from-emerald-800 to-emerald-500
-              text-white py-12 sm:py-20 px-4 sm:px-6 rounded-3xl mb-10 shadow-xl">
-              <h1 className="text-2xl sm:text-4xl font-black mb-3">
-                {isAr ? 'مركز الفرص' : 'מרכז ההזדמנויות'}
-              </h1>
-              <p className="text-emerald-100 mb-8 text-lg">
-                {isAr
-                  ? 'جميع الفرص لشباب عنقود بيت هكيريم — في مكان واحد'
-                  : 'כל ההזדמנויות לבני הנוער של אשכול בית הכרם — במקום אחד'}
-              </p>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <button onClick={() => handleNavigate('opportunities')}
-                  className="px-8 py-3 bg-white text-emerald-700 font-bold rounded-xl hover:bg-emerald-50 transition shadow-lg text-lg">
-                  {isAr ? 'استكشف الفرص' : 'גלה הזדמנויות'}
-                </button>
-                <button onClick={() => handleNavigate('calendar')}
-                  className="px-8 py-3 bg-emerald-900/40 text-white font-bold rounded-xl hover:bg-emerald-900/60 transition border border-white/30 text-lg">
-                  {isAr ? 'التقويم' : 'לוח אירועים'}
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile: stack stats; sm+: three columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                { num: store.opportunities.length, labelHe: 'הזדמנויות', labelAr: 'فرصة' },
-                { num: ORGANIZATIONS.length, labelHe: 'ארגונים', labelAr: 'جهة' },
-                { num: 6, labelHe: 'קטגוריות', labelAr: 'فئة' },
-              ].map((s, i) => (
-                <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <p className="text-3xl font-black text-emerald-700">{s.num}</p>
-                  <p className="text-sm text-gray-500">{isAr ? s.labelAr : s.labelHe}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <HomePage
+            store={store}
+            currentUser={currentUser}
+            lang={lang}
+            handleNavigate={handleNavigate}
+          />
         )}
 
         {currentScreen === 'login' && (
-          <Login lang={lang} onLogin={handleLogin} onNavigate={handleNavigate} />
+          <LoginPage lang={lang} onLogin={handleLogin} onNavigate={handleNavigate} />
         )}
 
         {currentScreen === 'opportunities' && (
-          <OpportunitiesBoard
+          <OpportunitiesBoardPage
             opportunities={store.opportunities}
             lang={lang}
             onOpenModal={openOppModal}
@@ -196,11 +178,29 @@ function App() {
             lang={lang}
             opportunities={store.opportunities}
             onOpenOpp={openOppModal}
+            currentUser={currentUser}
+            registrations={store.registrations}
           />
         )}
 
+        {currentScreen === 'hot-this-week' && (
+          <HotThisWeekPage
+            opportunities={store.opportunities}
+            lang={lang}
+            onOpenModal={openOppModal}
+          />
+        )}
+
+        {currentScreen === 'gallery' && (
+          <GalleryPage lang={lang} />
+        )}
+
+        {currentScreen === 'about' && (
+          <AboutPage lang={lang} />
+        )}
+
         {currentScreen === 'my-registrations' && currentUser?.role === 'User' && (
-          <MyRegistrations
+          <MyRegistrationsPage
             lang={lang}
             currentUser={currentUser}
             opportunities={store.opportunities}
@@ -226,6 +226,7 @@ function App() {
             onAddEvent={store.addEvent}
             onDeleteEvent={store.deleteEvent}
             onReplaceEventsForOpportunity={store.replaceEventsForOpportunity}
+            showToast={showToast}
           />
         )}
       </main>

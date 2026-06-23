@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { KEYS, load, save } from '../lib/storage/storage';
+import { KEYS, load, save } from '../utils/storage';
 import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS } from '../data/fakeData';
 
 function maxId(items) {
