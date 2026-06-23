@@ -1,6 +1,7 @@
 import { STATUS_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
+import { formatIsraeliDate } from '../utils/israeliDate';
 
 const CAT_HEADER = {
   sport:     'from-orange-400 to-amber-500',
@@ -19,11 +20,17 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
   const headerGradient = CAT_HEADER[o.category] ?? 'from-emerald-500 to-teal-600';
   const statusText = isAr ? (STATUS_AR[o.status] || o.status) : o.status;
 
+  const dateVal = o.startDate
+    ? (o.endDate && o.endDate !== o.startDate
+        ? `${formatIsraeliDate(o.startDate)} – ${formatIsraeliDate(o.endDate)}`
+        : formatIsraeliDate(o.startDate))
+    : null;
+
   const rows = [
     { icon: '📍', label: t('modal_city'),         val: o.city },
     { icon: '🏢', label: t('modal_org'),          val: getOrgName(o.organizationId, isAr) },
     { icon: '🎂', label: t('modal_age'),          val: `${o.ageMin}–${o.ageMax}` },
-    { icon: '📅', label: t('modal_days'),         val: isAr && o.daysAr ? o.daysAr : o.days },
+    ...(dateVal ? [{ icon: '📅', label: t('modal_date'), val: dateVal }] : []),
     { icon: '🕐', label: t('modal_time'),         val: o.time },
     { icon: '👤', label: t('modal_contact'),      val: o.contact },
     { icon: '📝', label: t('modal_registration'), val: isAr && o.registrationAr ? o.registrationAr : o.registration },
