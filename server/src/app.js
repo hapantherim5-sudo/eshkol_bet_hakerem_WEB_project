@@ -10,6 +10,8 @@ import eventsRouter from './routes/events.js';
 import viewsRouter from './routes/views.js';
 import registrationsRouter from './routes/registrations.js';
 import profilesRouter from './routes/profiles.js';
+import usersRouter from './routes/users.js';
+import statsRouter from './routes/stats.js';
 
 const app = express();
 app.use(cors());
@@ -24,5 +26,7 @@ app.use('/api', eventsRouter);
 app.use('/api', viewsRouter);
 app.use('/api', registrationsRouter);
 app.use('/api', profilesRouter);
+app.use('/api', usersRouter);
+app.use('/api', statsRouter);
 
 export default app;

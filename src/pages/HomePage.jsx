@@ -1,5 +1,22 @@
+import { useState, useEffect, useMemo } from 'react';
 import { ORGANIZATIONS } from '../data/organizations';
 import { CATEGORIES } from '../data/fakeData';
+
+/* ── Carousel constants ── */
+const ROTATION_MS = 5000;
+const FADE_MS     = 280;
+
+function calcCd(isoDate) {
+  const diff = Math.max(0, new Date(isoDate).getTime() - Date.now());
+  const s    = Math.floor(diff / 1000);
+  return {
+    days:    Math.floor(s / 86400),
+    hours:   Math.floor((s % 86400) / 3600),
+    minutes: Math.floor((s % 3600)  / 60),
+    seconds: s % 60,
+  };
+}
+const p2 = (n) => String(n).padStart(2, '0');
 
 const QUICK_LINKS = [
   { screen: 'opportunities', icon: '🔍', labelHe: 'גלה הזדמנויות', labelAr: 'استكشف الفرص',       gradient: 'from-emerald-400 to-teal-500',   shadow: 'hover:shadow-emerald-200' },
@@ -19,10 +36,61 @@ function HomePage({ store, currentUser, isAr, handleNavigate }) {
   const statItems = [
     { num: store.opportunities.length, labelHe: 'הזדמנויות', labelAr: 'فرصة', icon: '🎯', gradient: 'from-emerald-400 to-teal-500' },
     { num: ORGANIZATIONS.length,       labelHe: 'ארגונים',    labelAr: 'جهة',  icon: '🏢', gradient: 'from-violet-400 to-purple-500' },
-    { num: CATEGORIES.length,          labelHe: 'קטגוריות',   labelAr: 'فئة',  icon: '✨', gradient: 'from-amber-400 to-orange-500' },
+    { num: CATEGORIES.length,          labelHe: 'קטגוריות',   labelAr: 'فئה',  icon: '✨', gradient: 'from-amber-400 to-orange-500' },
   ];
 
-  const featuredOpp = store.opportunities.find(o => o.status === 'פתוח') ?? store.opportunities[0];
+  /* ── Carousel: build items from open opportunities + nearest future event ── */
+  const carouselItems = useMemo(() => {
+    const open = store.opportunities.filter(
+      o => o.status === 'פתוח' || o.status === 'מקומות אחרונים'
+    );
+    const pool = (open.length >= 3 ? open : store.opportunities).slice(0, 5);
+    const now  = Date.now();
+    return pool.map(opp => {
+      const ev = (store.events ?? [])
+        .filter(e => e.opportunityId === opp.id && e.startsAt && new Date(e.startsAt).getTime() > now)
+        .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
+      return { opp, eventDate: ev?.startsAt ?? null };
+    });
+  }, [store.opportunities, store.events]);
+
+  const [idx,     setIdx    ] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [cd,      setCd     ] = useState(null);
+
+  const safeIdx      = carouselItems.length > 0 ? Math.min(idx, carouselItems.length - 1) : 0;
+  const currentItem  = carouselItems[safeIdx];
+  const featuredOpp  = currentItem?.opp ?? store.opportunities[0];
+  const eventDate    = currentItem?.eventDate ?? null;
+
+  /* Countdown ticker — restarts whenever the active event date changes */
+  useEffect(() => {
+    if (!eventDate) { setCd(null); return; }
+    setCd(calcCd(eventDate));
+    const id = setInterval(() => setCd(calcCd(eventDate)), 1000);
+    return () => clearInterval(id);
+  }, [eventDate]);
+
+  /* Auto-rotation */
+  useEffect(() => {
+    if (carouselItems.length <= 1) return;
+    const id = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx(prev => (prev + 1) % carouselItems.length);
+        setVisible(true);
+      }, FADE_MS);
+    }, ROTATION_MS);
+    return () => clearInterval(id);
+  }, [carouselItems.length]);
+
+  const goTo = (next) => {
+    if (next === safeIdx) return;
+    setVisible(false);
+    setTimeout(() => { setIdx(next); setVisible(true); }, FADE_MS);
+  };
+
+  const featuredCat = featuredOpp ? CATEGORIES.find(c => c.id === featuredOpp.category) : null;
 
   return (
     <div className="animate-fade-in">
@@ -114,12 +182,14 @@ function HomePage({ store, currentUser, isAr, handleNavigate }) {
           </div>
         </section>
 
-        {/* ── Featured Activity Spotlight ── */}
+        {/* ── Hot This Week Carousel ── */}
         {featuredOpp && (
           <section>
             <h2 className="text-xl font-black text-gray-800 mb-4">
-              {isAr ? '🌟 هذا الأسبوع' : '🌟 הזדמנות השבוע'}
+              {isAr ? '🔥 الأكثر رواجاً هذا الأسبوع' : '🔥 חם השבוע'}
             </h2>
+
+            {/* Card container — hover/click behaviour unchanged */}
             <div
               onClick={() => handleNavigate('opportunities')}
               className="relative overflow-hidden bg-gradient-to-bl from-indigo-600 via-violet-600 to-purple-500
@@ -128,23 +198,83 @@ function HomePage({ store, currentUser, isAr, handleNavigate }) {
               <div className="pointer-events-none absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5 animate-blob" />
               <div className="pointer-events-none absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-indigo-900/15 animate-blob" style={{ animationDelay: '2s' }} />
 
-              <div className="relative flex items-center gap-5">
-                <span className="text-5xl sm:text-6xl shrink-0">{featuredOpp.icon}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-black border border-white/30">
-                      ⭐ {isAr ? 'مميزة' : 'מומלצת'}
-                    </span>
-                    <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-semibold border border-white/25">
-                      📍 {featuredOpp.city}
-                    </span>
+              {/* Fadeable content — only the inner content transitions, not the card shell */}
+              <div
+                className="relative"
+                style={{ transition: `opacity ${FADE_MS}ms ease`, opacity: visible ? 1 : 0 }}
+              >
+                {/* ── Existing layout: icon + badges + title + description ── */}
+                <div className="flex items-center gap-5">
+                  <span className="text-5xl sm:text-6xl shrink-0">{featuredOpp.icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-black border border-white/30">
+                        🔥 {isAr ? 'الأكثر رواجاً' : 'חם השבוע'}
+                      </span>
+                      {featuredCat && (
+                        <span className="px-2.5 py-1 bg-white/15 rounded-lg text-xs font-semibold border border-white/20">
+                          {featuredCat.icon} {isAr ? featuredCat.labelAr : featuredCat.label}
+                        </span>
+                      )}
+                      <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-semibold border border-white/25">
+                        📍 {featuredOpp.city}
+                      </span>
+                    </div>
+                    <h3 className="text-lg sm:text-2xl font-black leading-tight mb-1">
+                      {isAr ? featuredOpp.titleAr : featuredOpp.title}
+                    </h3>
+                    <p className="text-indigo-200 text-sm line-clamp-2">
+                      {isAr && featuredOpp.descriptionAr ? featuredOpp.descriptionAr : featuredOpp.description}
+                    </p>
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-black leading-tight mb-1">
-                    {isAr ? featuredOpp.titleAr : featuredOpp.title}
-                  </h3>
-                  <p className="text-indigo-200 text-sm line-clamp-2">
-                    {isAr && featuredOpp.descriptionAr ? featuredOpp.descriptionAr : featuredOpp.description}
-                  </p>
+                </div>
+
+                {/* ── Compact countdown + carousel dots ── */}
+                <div className="mt-4 pt-3.5 border-t border-white/20 flex items-center justify-between gap-3">
+
+                  {/* Countdown boxes (only when a future event date exists) */}
+                  {cd ? (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-white/45 text-xs shrink-0">⏱</span>
+                      <div className="flex gap-1">
+                        {[
+                          { v: cd.days,    lHe: 'ימים',   lAr: 'يوم'   },
+                          { v: cd.hours,   lHe: 'שעות',  lAr: 'ساعة'  },
+                          { v: cd.minutes, lHe: 'דקות',  lAr: 'دقيقة' },
+                          { v: cd.seconds, lHe: 'שניות', lAr: 'ثانية' },
+                        ].map(({ v, lHe, lAr }) => (
+                          <div key={lHe}
+                            className="text-center bg-white/15 rounded-lg px-1.5 py-1 min-w-[36px]">
+                            <p className="text-sm font-black tabular-nums leading-none">{p2(v)}</p>
+                            <p className="text-white/45 text-[8px] font-semibold leading-none mt-0.5">
+                              {isAr ? lAr : lHe}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-white/40 text-xs font-semibold">
+                      📅 {isAr ? 'قريباً' : 'בקרוב'}
+                    </p>
+                  )}
+
+                  {/* Navigation dots */}
+                  {carouselItems.length > 1 && (
+                    <div className="flex gap-1.5 shrink-0">
+                      {carouselItems.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={e => { e.stopPropagation(); goTo(i); }}
+                          aria-label={`${isAr ? 'انتقل إلى' : 'עבור לפעילות'} ${i + 1}`}
+                          className={`rounded-full transition-all duration-300
+                            ${i === safeIdx
+                              ? 'w-5 h-2 bg-white shadow-sm'
+                              : 'w-2 h-2 bg-white/35 hover:bg-white/65'}`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

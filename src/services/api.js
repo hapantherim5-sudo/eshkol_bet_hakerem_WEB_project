@@ -64,4 +64,13 @@ export const api = {
       body: JSON.stringify({ userId, opportunityId }),
     }),
   getProfile: userId => request(`/api/profiles/${userId}`),
+
+  /* ── User management (Admin only) ── */
+  getUsers: () => request('/api/users'),
+  createUser: body => request('/api/users', { method: 'POST', body: JSON.stringify(body) }),
+  updateUser: (id, body) => request(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteUser: id => request(`/api/users/${id}`, { method: 'DELETE' }),
+
+  /* ── Analytics dashboard ── */
+  getStats: () => request('/api/stats'),
 };

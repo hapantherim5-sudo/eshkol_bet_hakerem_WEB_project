@@ -27,14 +27,16 @@ function App() {
   const [lang, setLang] = useState('he');
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [showRegModal, setShowRegModal] = useState(false);
-  const [toast, setToast] = useState('');
+  const [toast,     setToast    ] = useState('');
+  const [toastType, setToastType] = useState('success'); // 'success' | 'error'
 
   const isAr = lang === 'ar';
 
   useEffect(() => setDocumentLang(lang), [lang]);
 
-  const showToast = (msg) => {
+  const showToast = (msg, type = 'success') => {
     setToast(msg);
+    setToastType(type);
     setTimeout(() => setToast(''), 3000);
   };
 
@@ -138,10 +140,11 @@ function App() {
       />
 
       {toast && (
-        <div className="animate-toast fixed top-20 left-1/2 z-[70]
-          bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-xl
-          text-sm font-semibold flex items-center gap-2 whitespace-nowrap pointer-events-none">
-          <span className="text-base">✓</span>
+        <div className={`animate-toast fixed top-20 left-1/2 z-[70]
+          ${toastType === 'error' ? 'bg-red-500' : 'bg-emerald-600'}
+          text-white px-5 py-3 rounded-2xl shadow-xl
+          text-sm font-semibold flex items-center gap-2 whitespace-nowrap pointer-events-none`}>
+          <span className="text-base">{toastType === 'error' ? '✕' : '✓'}</span>
           {toast}
         </div>
       )}
@@ -221,6 +224,7 @@ function App() {
             onAddEvent={store.addEvent}
             onDeleteEvent={store.deleteEvent}
             onReplaceEventsForOpportunity={store.replaceEventsForOpportunity}
+            showToast={showToast}
           />
         )}
       </main>

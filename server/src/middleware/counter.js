@@ -1,4 +1,4 @@
-import { getDb, COLLECTIONS } from '../database/db.js';
+import { getDb, COLLECTIONS } from '../db.js';
 
 export async function nextId(counterKey) {
   const db = getDb();

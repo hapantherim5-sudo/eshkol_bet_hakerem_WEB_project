@@ -1,4 +1,4 @@
-import { connectDb } from '../database/db.js';
+import { connectDb } from '../db.js';
 
 export default async function (_req, res, next) {
   try {

@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import { filterManageable, canManageOpportunity } from '../../utils/permissions';
 import { getOrgName } from '../../data/organizations';
-import { computeStats } from '../../utils/analytics';
 import { pick } from '../../i18n/i18n';
 import { formatIsraeliDateTime } from '../../utils/israeliDate';
 import ConfirmModal from '../ConfirmModal';
 import OpportunityForm from './OpportunityForm';
+import UserManagement from './UserManagement';
+import StatsDashboard from './StatsDashboard';
 
 function StaffPanel({
   lang, currentUser, opportunities, events, views, registrations, cancellations, profiles,
-  onAdd, onUpdate, onDelete, onAddEvent, onDeleteEvent, onReplaceEventsForOpportunity,
+  onAdd, onUpdate, onDelete, onAddEvent, onDeleteEvent, onReplaceEventsForOpportunity, showToast,
 }) {
   const isAr = lang === 'ar';
+  const isAdmin = currentUser.role === 'Admin';
   const [mode, setMode] = useState(null); // null | 'add' | opp object
-  const [tab, setTab] = useState('opps'); // opps | stats | events
+  const [tab, setTab] = useState('opps'); // opps | events | stats | users
   const [eventForm, setEventForm] = useState({ title: '', titleAr: '', organizationId: '', city: '', startsAt: '' });
   const [eventToDelete, setEventToDelete] = useState(null);
 
   const manageable = filterManageable(currentUser, opportunities);
-  const stats = computeStats({ opportunities, views, registrations, cancellations, profiles });
 
   const handleSave = (opp, calendarEvents) => {
     if (mode === 'add') {
@@ -65,11 +66,16 @@ function StaffPanel({
       <p className="text-gray-500 text-sm mb-6">{t(`שלום ${currentUser.name}`, `مرحباً ${currentUser.name}`)}</p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {['opps', 'events', 'stats'].map(key => (
+        {[
+          { key: 'opps',   labelHe: 'הזדמנויות',    labelAr: 'الفرص'       },
+          { key: 'events', labelHe: 'אירועים',       labelAr: 'الأحداث'    },
+          { key: 'stats',  labelHe: 'סטטיסטיקות',   labelAr: 'إحصائيات'   },
+          ...(isAdmin ? [{ key: 'users', labelHe: 'משתמשים 👤', labelAr: 'المستخدمون 👤' }] : []),
+        ].map(({ key, labelHe, labelAr }) => (
           <button key={key} onClick={() => setTab(key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition
               ${tab === key ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-emerald-50'}`}>
-            {key === 'opps' ? t('הזדמנויות', 'الفرص') : key === 'events' ? t('אירועים', 'الأحداث') : t('סטטיסטיקות', 'إحصائيات')}
+            {isAr ? labelAr : labelHe}
           </button>
         ))}
       </div>
@@ -138,46 +144,23 @@ function StaffPanel({
       )}
 
       {tab === 'stats' && (
-        <div>
-          {/* Mobile: one KPI per row; md: four columns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            {[
-              { n: stats.userCount, l: t('משתמשים', 'المستخدمون') },
-              { n: stats.totalViews, l: t('צפיות', 'المشاهدات') },
-              { n: stats.totalRegistrations, l: t('הרשמות', 'التسجيلات') },
-              { n: opportunities.length, l: t('הזדמנויות', 'الفرص') },
-            ].map((s, i) => (
-              <div key={i} className="bg-white rounded-xl p-4 border text-center">
-                <p className="text-2xl font-black text-emerald-700">{s.n}</p>
-                <p className="text-xs text-gray-500">{s.l}</p>
-              </div>
-            ))}
-          </div>
-          <h3 className="font-bold text-gray-700 mb-2">{t('מובילות לפי הרשמות', 'الأكثر تسجيلاً')}</h3>
-          {/* Mobile: horizontal scroll for wide table */}
-          <div className="bg-white rounded-xl border overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <table className="w-full text-sm min-w-[480px]">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="text-right p-2">{t('פעילות', 'النشاط')}</th>
-                  <th className="p-2">{t('הרשמות', 'تسجيل')}</th>
-                  <th className="p-2">{t('ביטולים', 'إلغاءات')}</th>
-                  <th className="p-2">{t('צפיות', 'مشاهدة')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.topOpps.map(row => (
-                  <tr key={row.id} className="border-t">
-                    <td className="p-2">{row.title}</td>
-                    <td className="p-2 text-center">{row.registrations}</td>
-                    <td className="p-2 text-center">{row.cancellations}</td>
-                    <td className="p-2 text-center">{row.views}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <StatsDashboard
+          opportunities={opportunities}
+          registrations={registrations}
+          cancellations={cancellations}
+          views={views}
+          profiles={profiles}
+          lang={lang}
+          showToast={showToast}
+        />
+      )}
+
+      {tab === 'users' && isAdmin && (
+        <UserManagement
+          lang={lang}
+          currentUser={currentUser}
+          showToast={showToast}
+        />
       )}
 
       {eventToDelete && (
