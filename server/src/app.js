@@ -29,4 +29,16 @@ app.use('/api', profilesRouter);
 app.use('/api', usersRouter);
 app.use('/api', statsRouter);
 
+// Global error handler — 4-argument signature is required by Express.
+// Catches any error forwarded via next(err) from route handlers and ensures
+// every request always receives a response instead of hanging.
+app.use((err, req, res, next) => {
+  console.error(
+    '[server] unhandled error  method=%s  path=%s  error=%s',
+    req.method, req.path, err.message,
+  );
+  if (res.headersSent) return next(err);
+  return res.status(500).json({ error: 'server_error' });
+});
+
 export default app;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { api, apiEnabled } from '../../services/api';
 import { ORGANIZATIONS } from '../../data/organizations';
 import { pick } from '../../i18n/i18n';
@@ -141,7 +141,7 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
                   value={form.organizationId}
                   onChange={e => set('organizationId', e.target.value)}
                 >
-                  <option value="">{t('— בחר ארגון —', '— اختر منظمة —')}</option>
+                  <option value="">{t('- בחר ארגון -', '- اختر منظمة -')}</option>
                   {ORGANIZATIONS.map(o => (
                     <option key={o.id} value={o.id}>
                       {isAr ? o.nameAr : o.nameHe}
@@ -213,7 +213,7 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
           value={filterRole}
           onChange={e => onChange('filterRole', e.target.value)}
         >
-          <option value="">{t('— כל התפקידים —', '— جميع الأدوار —')}</option>
+          <option value="">{t('- כל התפקידים -', '- جميع الأدوار -')}</option>
           <option value="Admin">{t('מנהל', 'مسؤول')}</option>
           <option value="Staff">{t('סגל', 'طاقم')}</option>
           <option value="User">{t('נוער', 'شباب')}</option>
@@ -223,7 +223,7 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
           value={filterOrg}
           onChange={e => onChange('filterOrg', e.target.value)}
         >
-          <option value="">{t('— כל הארגונים —', '— جميع المنظمات —')}</option>
+          <option value="">{t('- כל הארגונים -', '- جميع المنظمات -')}</option>
           {ORGANIZATIONS.map(o => (
             <option key={o.id} value={o.id}>
               {isAr ? o.nameAr : o.nameHe}
@@ -260,10 +260,8 @@ export default function UserManagement({ lang, currentUser, showToast }) {
   const [filterRole,    setFilterRole   ] = useState('');
   const [filterOrg,     setFilterOrg    ] = useState('');
 
-  /* ── Load from API ──
-     BUG FIX: useEffect now guards with apiEnabled() so it never fires
-     when the API is unavailable, preventing a spurious error toast. */
-  const loadUsers = async () => {
+  /* Load users only when the API is enabled to avoid false errors in local mode. */
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
     try {
@@ -272,22 +270,21 @@ export default function UserManagement({ lang, currentUser, showToast }) {
     } catch (e) {
       /* Preserve the real error so we can show it in the UI */
       setLoadError(e);
-      showToast(t('שגיאה בטעינת המשתמשים', 'خطأ في تحميل المستخدمين'), 'error');
+      showToast(pick(isAr, 'שגיאה בטעינת המשתמשים', 'خطأ في تحميل المستخدمين'), 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAr, showToast]);
 
   useEffect(() => {
-    /* Only run when the API is reachable — prevents false error toasts
+    /* Only run when the API is reachable - prevents false error toasts
        in localStorage-mode where there is no backend to call.           */
     if (!apiEnabled()) return;
-    loadUsers();
-  // loadUsers is stable within this mount — no deps needed
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const id = setTimeout(loadUsers, 0);
+    return () => clearTimeout(id);
+  }, [loadUsers]);
 
-  /* Filtered view — computed from full users array */
+  /* Filtered view - computed from full users array */
   const filteredUsers = useMemo(() => {
     const nameLo     = searchName.toLowerCase();
     const usernameLo = searchUsername.toLowerCase();
@@ -344,7 +341,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
 
   const orgLabel = (orgId) => {
     const org = ORGANIZATIONS.find(o => o.id === orgId);
-    return org ? (isAr ? org.nameAr : org.nameHe) : '—';
+    return org ? (isAr ? org.nameAr : org.nameHe) : '-';
   };
 
   /* ── API unavailable (localStorage mode) ── */

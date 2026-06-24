@@ -8,6 +8,20 @@ export const CITY_ORG = {
   'נחף': 'youth-nahaf',
 };
 
+export const CITY_AR = {
+  'משגב': 'مسغاف',
+  'כרמיאל': 'كرميئيل',
+  'בענה': 'البعنة',
+  'דיר אלאסד': 'دير الأسد',
+  "סח'נין": 'سخنين',
+  'ראמה': 'الرامة',
+  'נחף': 'نحف',
+};
+
+export function getCityName(city, isAr) {
+  return isAr ? (CITY_AR[city] || city) : city;
+}
+
 export const OPPORTUNITIES_BY_CITY = {
   'משגב': [
     'התעמלות', 'כדור סל', 'להקות', 'מחול', 'טניס', 'קונסרבטוריון', 'כדורגל', 'שחיה',
@@ -201,14 +215,15 @@ function buildOpportunity(id, city, title) {
     type,
     scope: 'יישובי',
     city,
+    cityAr: getCityName(city, true),
     organizationId: CITY_ORG[city],
     ageMin: 10,
     ageMax: 18,
     days: 'לפי לוח השנה',
     daysAr: 'حسب الجدول',
     time: 'לפי לוח השנה',
-    description: `${title} — פעילות נוער ב${city}. לפרטים נוספים פנו לרשות הנוער.`,
-    descriptionAr: `${titleAr} — نشاط شباب في ${city}. للمزيد تواصلوا مع سلطة الشباب.`,
+    description: `${title} - פעילות נוער ב${city}. לפרטים נוספים פנו לרשות הנוער.`,
+    descriptionAr: `${titleAr} - نشاط شباب في ${getCityName(city, true)}. للمزيد تواصلوا مع سلطة الشباب.`,
     contact: 'רשות הנוער',
     phone: '',
     registration: 'טלפון',

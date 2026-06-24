@@ -6,7 +6,6 @@ export function useT(lang) {
   return (key) => translations[key] ?? key;
 }
 
-// נשמר לתאימות עם קוד ישן
 export function pick(isAr, he, ar) {
   return isAr ? ar : he;
 }

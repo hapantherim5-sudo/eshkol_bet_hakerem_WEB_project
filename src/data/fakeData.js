@@ -41,7 +41,7 @@ export const STATUSES = ['פתוח', 'מקומות אחרונים', 'נסגר ב
 
 export const INITIAL_OPPORTUNITIES = buildInitialOpportunities();
 
-// Seed events — sample from first opportunity per city
+// Seed events - sample from first opportunity per city
 const y = new Date().getFullYear();
 const m = String(new Date().getMonth() + 1).padStart(2, '0');
 const sampleByCity = {};

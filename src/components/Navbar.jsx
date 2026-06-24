@@ -50,32 +50,34 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
     return (
       <button
         onClick={() => { onNavigate(link.screen); setMenuOpen(false); }}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-150
+        aria-label={t(link.key)}
+        title={t(link.key)}
+        className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all duration-150
           ${active
             ? isAdmin
-              ? 'bg-violet-600 text-white shadow-md'
+              ? 'bg-sky-700 text-white shadow-sm shadow-slate-950/10'
               : 'bg-gradient-to-l from-emerald-500 to-teal-500 text-white shadow-md nav-glow'
             : isDark
               ? 'text-gray-300 hover:bg-slate-700/70 hover:text-white'
               : isAdmin
-                ? 'text-violet-600 hover:bg-violet-50'
+                ? 'text-sky-700 hover:bg-sky-50 hover:text-sky-800'
                 : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-700'}`}>
         <span className="text-sm">{link.icon}</span>
-        <span className="hidden lg:inline">{t(link.key)}</span>
+        <span className="hidden xl:inline">{t(link.key)}</span>
       </button>
     );
   };
 
   return (
     <div ref={navRef} className="fixed top-0 right-0 left-0 z-50 px-3 pt-3">
-      <nav className={`max-w-6xl mx-auto transition-all duration-300 rounded-2xl border
+      <nav className={`max-w-[1440px] mx-auto transition-all duration-300 rounded-2xl border
         ${isDark
           ? 'bg-slate-900/95 border-slate-700/60 text-white'
           : 'bg-white/95 border-gray-100/80 text-gray-900'}
         backdrop-blur-xl
         ${scrolled ? 'shadow-xl shadow-black/10' : 'shadow-lg shadow-black/5'}`}>
 
-        <div className="flex items-center justify-between px-4 py-2.5 gap-3">
+        <div className="flex min-h-[70px] items-center justify-between px-4 py-2.5 gap-3">
 
           <button
             onClick={() => { onNavigate('home'); setMenuOpen(false); }}
@@ -87,16 +89,16 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 ring-2 ring-transparent group-hover:ring-emerald-300 transition-all duration-200"
             />
             <div className="hidden sm:block">
-              <p className={`text-sm font-black leading-none ${isDark ? 'text-white' : 'text-gray-800'}`}>
+              <p className={`text-base font-black leading-none ${isDark ? 'text-white' : 'text-gray-800'}`}>
                 {t('nav_brand_title')}
               </p>
-              <p className="text-[10px] text-emerald-500 font-semibold mt-0.5 leading-none">
+              <p className="text-[12px] text-emerald-500 font-semibold mt-0.5 leading-none">
                 {t('nav_brand_subtitle')}
               </p>
             </div>
           </button>
 
-          <div className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
+          <div className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto scrollbar-hide py-0.5">
             {PUBLIC_LINKS.map(link => <NavBtn key={link.screen} link={link} />)}
             {extraLinks.map(link => <NavBtn key={link.screen} link={link} />)}
           </div>
@@ -104,7 +106,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
           <div className="flex items-center gap-1.5 shrink-0">
 
             <button onClick={onToggleLang}
-              className={`h-8 w-8 flex items-center justify-center text-xs font-black rounded-xl border-2 transition-all duration-150
+              className={`h-8 w-8 flex items-center justify-center text-sm font-black rounded-xl border-2 transition-all duration-150
                 ${isDark
                   ? 'border-emerald-500 text-emerald-400 hover:bg-slate-700'
                   : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
@@ -125,13 +127,13 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                     flex items-center justify-center text-white text-xs font-black shrink-0">
                     {currentUser.name?.[0] ?? '?'}
                   </div>
-                  <span className={`text-xs font-semibold max-w-[72px] truncate
+                  <span className={`text-sm font-semibold max-w-[72px] truncate
                     ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
                     {currentUser.name}
                   </span>
                 </div>
                 <button onClick={onLogout}
-                  className="h-8 px-2.5 text-xs font-semibold border border-red-200 text-red-500
+                  className="h-8 px-2.5 text-sm font-semibold border border-red-200 text-red-500
                     rounded-xl hover:bg-red-50 transition-all duration-150">
                   {t('nav_logout')}
                 </button>
@@ -139,7 +141,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             ) : (
               <button onClick={() => onNavigate('login')}
                 className="h-8 px-4 bg-gradient-to-l from-emerald-600 to-teal-500
-                  hover:from-emerald-700 hover:to-teal-600 text-white text-xs font-black
+                  hover:from-emerald-700 hover:to-teal-600 text-white text-sm font-black
                   rounded-xl transition-all duration-150 shadow-md hover:shadow-emerald-200
                   hover:scale-105 active:scale-95">
                 {t('nav_login_btn')}
@@ -185,12 +187,12 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                     min-h-[44px] transition-all duration-150
                     ${active
                       ? isAdmin
-                        ? 'bg-violet-600 text-white'
+                        ? 'bg-sky-700 text-white'
                         : 'bg-gradient-to-l from-emerald-500 to-teal-500 text-white shadow-md'
                       : isDark
                         ? 'text-gray-200 hover:bg-slate-800'
                         : isAdmin
-                          ? 'text-violet-700 hover:bg-violet-50'
+                          ? 'text-sky-700 hover:bg-sky-50 hover:text-sky-800'
                           : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'}`}>
                   <span className="text-base">{link.icon}</span>
                   <span>{t(link.key)}</span>

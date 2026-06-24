@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { STATUS_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 import { formatIsraeliDate } from '../utils/israeliDate';
 
@@ -27,7 +29,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
     : null;
 
   const rows = [
-    { icon: '📍', label: t('modal_city'),         val: o.city },
+    { icon: '📍', label: t('modal_city'),         val: getCityName(o.city, isAr) },
     { icon: '🏢', label: t('modal_org'),          val: getOrgName(o.organizationId, isAr) },
     { icon: '🎂', label: t('modal_age'),          val: `${o.ageMin}–${o.ageMax}` },
     ...(dateVal ? [{ icon: '📅', label: t('modal_date'), val: dateVal }] : []),
@@ -36,9 +38,23 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
     { icon: '📝', label: t('modal_registration'), val: isAr && o.registrationAr ? o.registrationAr : o.registration },
   ];
 
+  const closeModal = (event) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    onClose();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
     <div
-      onClick={onClose}
+      onClick={closeModal}
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div
         onClick={e => e.stopPropagation()}
@@ -47,8 +63,10 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
 
         <div className={`relative bg-gradient-to-br ${headerGradient} text-white px-5 pt-8 pb-6 rounded-t-3xl sm:rounded-t-3xl`}>
           <button
-            onClick={onClose}
-            className="absolute top-4 left-4 w-9 h-9 flex items-center justify-center
+            type="button"
+            aria-label={isAr ? 'إغلاق' : 'סגירה'}
+            onClick={closeModal}
+            className="absolute z-10 top-4 left-4 w-9 h-9 flex items-center justify-center
               bg-white/20 hover:bg-white/30 rounded-full text-white text-lg transition-all
               hover:scale-110 active:scale-95">
             ✕
@@ -101,7 +119,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
           ) : (
             <button
               onClick={onRegisterClick}
-              className="w-full py-3.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white
+              className="modal-register-btn w-full py-3.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white
                 font-black rounded-2xl transition-all duration-150 hover:scale-[1.02] active:scale-95
                 shadow-lg shadow-emerald-100 text-base">
               {t('modal_register_btn')}

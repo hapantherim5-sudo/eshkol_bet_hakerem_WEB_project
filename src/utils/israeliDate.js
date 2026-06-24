@@ -1,5 +1,3 @@
-/** תאריך בפורמט ישראלי DD/MM/YYYY (ערך פנימי: YYYY-MM-DD) */
-
 const ISO_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export function isoToDisplay(iso) {
@@ -20,7 +18,6 @@ export function displayToIso(display) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-/** מסכה בזמן הקלדה: DD/MM/YYYY */
 export function maskIsraeliDateInput(raw) {
   const digits = (raw || '').replace(/\D/g, '').slice(0, 8);
   if (digits.length <= 2) return digits;

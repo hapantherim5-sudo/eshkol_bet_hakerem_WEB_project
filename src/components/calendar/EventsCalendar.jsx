@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getMonthGrid, dateKey, eventsOnDay } from '../../utils/calendar';
 import { getOrgName } from '../../data/organizations';
+import { getCityName } from '../../data/opportunitiesSeed';
 import { pick } from '../../i18n/i18n';
 import { formatIsraeliDate } from '../../utils/israeliDate';
 
@@ -109,8 +110,8 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp, currentUser, r
           <h2 className="font-black text-gray-700 mb-4 text-sm sm:text-base flex items-center gap-2">
             <span className="text-base">📆</span>
             {t(
-              `אירועים — ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
-              `أحداث — ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
+              `אירועים - ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
+              `أحداث - ${formatIsraeliDate(dateKey(year, month, selectedDay))}`,
             )}
           </h2>
 
@@ -136,7 +137,7 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp, currentUser, r
                         <p className="text-xs text-gray-500 mt-1 flex items-center gap-1.5 flex-wrap">
                           <span>🕐 {ev.startsAt?.slice(11, 16)}</span>
                           <span>·</span>
-                          <span>📍 {ev.city}</span>
+                          <span>📍 {getCityName(ev.city, isAr)}</span>
                           <span>·</span>
                           <span>{getOrgName(ev.organizationId, isAr)}</span>
                         </p>
