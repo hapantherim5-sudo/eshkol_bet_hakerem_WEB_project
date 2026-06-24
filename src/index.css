@@ -8,12 +8,6 @@
   font-size: 18px;
 }
 
-/* Heebo Black for Hebrew */
-:root:lang(he),
-:root:lang(he) * {
-  font-weight: 900 !important;
-}
-
 /* Safe area: keep content clear of notched phone edges */
 body {
   padding-left: env(safe-area-inset-left);
@@ -204,6 +198,64 @@ button:disabled,
   background: rgba(30, 41, 59, 0.88);
 }
 
+.app-dark .admin-toolbar {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #475569;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Statistics: keep the conversion metrics dark and readable. */
+.app-dark .stats-conversion-views {
+  background-color: #302a43;
+}
+
+.app-dark .stats-conversion-registrations {
+  background-color: #15362b;
+}
+
+.app-dark .stats-conversion-views .text-violet-700 { color: #c4b5fd; }
+.app-dark .stats-conversion-views .text-violet-500 { color: #a78bfa; }
+.app-dark .stats-conversion-registrations .text-emerald-700 { color: #6ee7b7; }
+.app-dark .stats-conversion-registrations .text-emerald-500 { color: #86efac; }
+.app-dark .stats-conversion-rate { color: #60a5fa; }
+.app-dark .stats-conversion-track { background-color: #334155; }
+.app-dark .stats-conversion-note { color: #94a3b8; }
+
+/* Statistics KPI strip: one calm accent and crisp, non-emoji icons. */
+.stats-kpi-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.app-dark .stats-kpi-card {
+  background-color: #1e293b;
+  border-color: #475569;
+  box-shadow: none;
+}
+
+.app-dark .stats-kpi-icon {
+  background-color: #15362b;
+  color: #5eead4;
+}
+
+.app-dark .stats-kpi-value { color: #f8fafc; }
+.app-dark .stats-kpi-label { color: #cbd5e1; }
+
+.stats-kpi-card--success .stats-kpi-icon { background-color: #ecfdf5; color: #059669; }
+.stats-kpi-card--success .stats-kpi-value { color: #047857; }
+.stats-kpi-card--danger .stats-kpi-icon { background-color: #fff1f2; color: #e11d48; }
+.stats-kpi-card--danger .stats-kpi-value { color: #be123c; }
+.stats-kpi-card--teal .stats-kpi-icon { background-color: #ecfeff; color: #0891b2; }
+.stats-kpi-card--teal .stats-kpi-value { color: #0e7490; }
+
+.app-dark .stats-kpi-card--neutral .stats-kpi-icon { background-color: #334155; color: #cbd5e1; }
+.app-dark .stats-kpi-card--success .stats-kpi-icon { background-color: #15362b; color: #6ee7b7; }
+.app-dark .stats-kpi-card--success .stats-kpi-value { color: #6ee7b7; }
+.app-dark .stats-kpi-card--danger .stats-kpi-icon { background-color: #3b1d28; color: #fda4af; }
+.app-dark .stats-kpi-card--danger .stats-kpi-value { color: #fda4af; }
+.app-dark .stats-kpi-card--teal .stats-kpi-icon { background-color: #15343a; color: #67e8f9; }
+.app-dark .stats-kpi-card--teal .stats-kpi-value { color: #67e8f9; }
+
 /* Keep the community-benefit cards readable and colorful in dark mode. */
 .app-dark .community-perk {
   border-color: #334155;
@@ -241,6 +293,30 @@ button:disabled,
 
 .app-dark .login-submit {
   box-shadow: none;
+}
+
+/* Keep the Demo credentials easy to scan against the dark login card. */
+.app-dark .login-demo-toggle {
+  color: #6ee7b7;
+}
+
+.app-dark .login-demo-toggle:hover {
+  color: #a7f3d0;
+}
+
+.app-dark .login-demo-panel {
+  background-color: #172b2a;
+  border-color: #246b5a;
+  color: #d1fae5;
+}
+
+.app-dark .login-demo-code {
+  background-color: #334155;
+  color: #ecfdf5;
+}
+
+.app-dark .login-demo-staff {
+  color: #86efac;
 }
 
 .app-dark .modal-register-btn {
@@ -299,8 +375,12 @@ button:disabled,
   background: linear-gradient(135deg, #93411f, #a14c26, #7c3626);
 }
 
+.about-hero {
+  background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
+}
+
 .app-dark .about-hero {
-  background: linear-gradient(135deg, #37345b, #4a3864, #5d426d);
+  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
 }
 
 .app-dark .about-info-card,
@@ -315,20 +395,16 @@ button:disabled,
   box-shadow: none;
 }
 
-/* A calmer purple palette for the regular theme. */
-.home-featured-card {
+/* One muted plum accent shared throughout the site. */
+.plum-gradient,
+.home-featured-card,
+.home-login-cta {
   background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
 }
 
-.home-login-cta {
-  background: linear-gradient(90deg, #69539a, #4b6a94);
-}
-
-/* Softer purple surfaces for the dark theme. */
-.app-dark .home-featured-card {
-  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
-}
-
+/* Keep that same accent family restrained in dark mode. */
+.app-dark .plum-gradient,
+.app-dark .home-featured-card,
 .app-dark .home-login-cta {
-  background: linear-gradient(90deg, #493b69, #35466b);
+  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
 }

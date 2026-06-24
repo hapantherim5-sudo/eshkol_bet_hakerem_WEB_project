@@ -31,8 +31,9 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
     ? ORGANIZATIONS.filter(o => o.id === user.organizationId)
     : ORGANIZATIONS;
 
-  const handleSubmit = () => {
-    if (!form.title || !form.titleAr || !form.organizationId || !form.city) {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!form.title.trim() || !form.titleAr.trim() || !form.organizationId || !form.city.trim()) {
       setErr(pick(isAr, 'יש למלא שדות חובה', 'يرجى ملء الحقول المطلوبة'));
       return;
     }
@@ -56,20 +57,24 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   const label = (he, ar) => pick(isAr, he, ar);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      {err && <p className="text-sm text-red-600 mb-3">{err}</p>}
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <p className="mb-4 text-xs text-gray-500">
+        <span className="font-black text-red-500" aria-hidden="true">*</span>{' '}
+        {label('שדות המסומנים בכוכבית הם שדות חובה. כל שאר השדות אופציונליים.', 'الحقول المعلّمة بنجمة مطلوبة. جميع الحقول الأخرى اختيارية.')}
+      </p>
+      {err && <p role="alert" className="text-sm text-red-600 mb-3">{err}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label className="text-xs text-gray-500">{label('כותרת (עברית)', 'العنوان (عبري)')}</label>
-          <input className={inputClass} value={form.title} onChange={e => set('title', e.target.value)} />
+          <label htmlFor="opportunity-title" className="text-xs text-gray-500">{label('כותרת (עברית)', 'العنوان (عبري)')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <input id="opportunity-title" required className={inputClass} value={form.title} onChange={e => set('title', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('כותרת (ערבית)', 'العنوان (عربي)')}</label>
-          <input className={inputClass} value={form.titleAr} onChange={e => set('titleAr', e.target.value)} dir="rtl" />
+          <label htmlFor="opportunity-title-ar" className="text-xs text-gray-500">{label('כותרת (ערבית)', 'العنوان (عربي)')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <input id="opportunity-title-ar" required className={inputClass} value={form.titleAr} onChange={e => set('titleAr', e.target.value)} dir="rtl" />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('ארגון מפעיל', 'الجهة المشغلة')}</label>
-          <select className={inputClass} value={form.organizationId} onChange={e => set('organizationId', e.target.value)}
+          <label htmlFor="opportunity-organization" className="text-xs text-gray-500">{label('ארגון מפעיל', 'الجهة المشغلة')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <select id="opportunity-organization" required className={inputClass} value={form.organizationId} onChange={e => set('organizationId', e.target.value)}
             disabled={user.role === 'Staff'}>
             <option value="">{label('בחר', 'اختر')}</option>
             {orgOptions.map(o => (
@@ -78,8 +83,8 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('יישוב', 'البلدة')}</label>
-          <input className={inputClass} value={form.city} onChange={e => set('city', e.target.value)} />
+          <label htmlFor="opportunity-city" className="text-xs text-gray-500">{label('יישוב', 'البلدة')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <input id="opportunity-city" required className={inputClass} value={form.city} onChange={e => set('city', e.target.value)} />
         </div>
         <div>
           <label className="text-xs text-gray-500">{label('קטגוריה', 'الفئة')}</label>
@@ -133,11 +138,11 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
           <textarea className={inputClass} rows={2} value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
         <div className="md:col-span-2">
-          <label className="text-xs text-gray-500">{label('תיאור בערבית (אופציונלי)', 'الوصف بالعربية (اختياري)')}</label>
+          <label className="text-xs text-gray-500">{label('תיאור בערבית', 'الوصف بالعربية')}</label>
           <textarea className={inputClass} rows={2} dir="rtl" value={form.descriptionAr} onChange={e => set('descriptionAr', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('אימוג׳י (אופציונלי)', 'رمز تعبيري (اختياري)')}</label>
+          <label className="text-xs text-gray-500">{label('אימוג׳י', 'رمز تعبيري')}</label>
           <div className="flex items-center gap-2">
             <span className="text-2xl leading-none">{form.icon || '✨'}</span>
             <input className={inputClass} maxLength={2} value={form.icon}
@@ -154,14 +159,14 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
         </div>
       </div>
       <div className="flex gap-2 mt-4 justify-end">
-        <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+        <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
           {label('ביטול', 'إلغاء')}
         </button>
-        <button onClick={handleSubmit} className="px-4 py-2 text-sm bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700">
+        <button type="submit" className="px-4 py-2 text-sm bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700">
           {label('שמור', 'حفظ')}
         </button>
       </div>
-    </div>
+    </form>
   );
 }
 

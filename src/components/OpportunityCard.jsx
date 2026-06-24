@@ -1,5 +1,6 @@
 import { STATUS_AR, TYPE_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 
 const CAT_STYLE = {
   sport:     { bar: 'bg-orange-400', shadow: 'hover:shadow-orange-100' },
@@ -52,7 +53,7 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
             {getOrgName(o.organizationId, isAr)}
           </span>
           <span className="opportunity-city-badge text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg font-medium">
-            📍 {o.city}
+            📍 {getCityName(o.city, isAr)}
           </span>
           <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg">
             {typeText}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { STATUS_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 import { formatIsraeliDate } from '../utils/israeliDate';
 
@@ -28,7 +29,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
     : null;
 
   const rows = [
-    { icon: '📍', label: t('modal_city'),         val: o.city },
+    { icon: '📍', label: t('modal_city'),         val: getCityName(o.city, isAr) },
     { icon: '🏢', label: t('modal_org'),          val: getOrgName(o.organizationId, isAr) },
     { icon: '🎂', label: t('modal_age'),          val: `${o.ageMin}–${o.ageMax}` },
     ...(dateVal ? [{ icon: '📅', label: t('modal_date'), val: dateVal }] : []),

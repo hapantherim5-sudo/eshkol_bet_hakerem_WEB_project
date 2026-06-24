@@ -14,8 +14,8 @@ const MISSION_CARDS = [
     titleAr: 'المجتمع والانتماء',
     textHe: 'יוצרים מרחב בטוח ומכיל שבו כל צעיר מרגיש שייך, נשמע ומוערך.',
     textAr: 'نخلق مساحة آمنة وشاملة حيث يشعر كل شاب بالانتماء والاستماع والتقدير.',
-    gradient: 'from-violet-400 to-purple-500',
-    bg: 'bg-violet-50',
+    gradient: 'plum-gradient',
+    bg: 'bg-[#f2eef7]',
   },
   {
     icon: '🚀',
@@ -37,7 +37,7 @@ const VALUES = [
 
 const TEAM = [
   { name: 'ירה עבאס דאהר', nameAr: 'يرح عباس داهر', role: 'מנהלת אשכול', roleAr: 'مدير العنقود', emoji: '👩‍💼', color: 'from-emerald-400 to-teal-500' },
-  { name: 'מוחמד עלי',     nameAr: 'محمد علي',        role: 'רכז נוער',    roleAr: 'منسق الشباب',  emoji: '👨‍🏫', color: 'from-violet-400 to-purple-500' },
+  { name: 'מוחמד עלי',     nameAr: 'محمد علي',        role: 'רכז נוער',    roleAr: 'منسق الشباب',  emoji: '👨‍🏫', color: 'plum-gradient' },
   { name: 'רותם שלום',     nameAr: 'روتم شالوم',      role: 'מנחת סדנאות', roleAr: 'مشرفة ورش عمل', emoji: '👩‍🎨', color: 'from-amber-400 to-orange-500' },
   { name: 'סמיר חוסיין',   nameAr: 'سمير حسين',       role: 'מדריך ספורט', roleAr: 'مدرب رياضي',   emoji: '🏅', color: 'from-blue-400 to-cyan-500' },
 ];
@@ -56,9 +56,9 @@ function AboutPage({ lang }) {
     <div className="animate-fade-in">
 
       {/* ── Hero ── */}
-      <div className="about-hero relative overflow-hidden bg-gradient-to-bl from-indigo-700 via-violet-600 to-purple-500 text-white">
+      <div className="about-hero relative overflow-hidden text-white">
         <div className="pointer-events-none absolute -top-20 -right-16 w-72 h-72 rounded-full bg-white/5 animate-blob" />
-        <div className="pointer-events-none absolute -bottom-12 -left-10 w-56 h-56 rounded-full bg-indigo-900/20 animate-blob" style={{ animationDelay: '3s' }} />
+        <div className="pointer-events-none absolute -bottom-12 -left-10 w-56 h-56 rounded-full bg-slate-950/10 animate-blob" style={{ animationDelay: '3s' }} />
 
         <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center">
           <div className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-semibold border border-white/30">
@@ -70,7 +70,7 @@ function AboutPage({ lang }) {
             {isAr ? 'عنقود بيت هكيريم' : 'אשכול בית הכרם'}
           </h1>
 
-          <p className="text-indigo-100 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-10">
+          <p className="text-white/75 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-10">
             {isAr
               ? 'مبادرة شبابية مجتمعية تهدف إلى توفير الفرص والإمكانات لكل شاب وشابة في المنطقة'
               : 'יוזמה קהילתית-נוענית שמטרתה להנגיש הזדמנויות ולשחרר את הפוטנציאל של כל צעיר וצעירה באזור'}
@@ -109,7 +109,7 @@ function AboutPage({ lang }) {
         {/* ── Who We Are ── */}
         <section>
           <div className="text-center mb-8">
-            <span className="inline-block px-4 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold mb-3">
+            <span className="inline-block px-4 py-1 bg-[#f2eef7] text-[#6c4e9b] rounded-full text-xs font-bold mb-3">
               {isAr ? '✨ هويتنا' : '✨ הזהות שלנו'}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-gray-800">
@@ -143,7 +143,7 @@ function AboutPage({ lang }) {
                 { icon: '👥', labelHe: 'קהילה גדלה',    labelAr: 'مجتمع متنامي' },
                 { icon: '🌐', labelHe: 'דו-לשוני',       labelAr: 'ثنائي اللغة' },
               ].map((item, i) => (
-                <div key={i} className="about-info-card bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-4 text-center border border-indigo-100">
+                <div key={i} className="about-info-card bg-[#f2eef7] rounded-2xl p-4 text-center border border-[#dfd2eb]">
                   <div className="text-3xl mb-2">{item.icon}</div>
                   <p className="text-xs font-bold text-gray-700">{isAr ? item.labelAr : item.labelHe}</p>
                 </div>

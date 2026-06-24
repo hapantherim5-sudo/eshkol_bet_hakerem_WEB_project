@@ -68,17 +68,17 @@ function LoginPage({ lang, onLogin, onNavigate }) {
 
           <div className="px-6 py-6">
             <details className="mb-5 group">
-              <summary className="text-xs font-bold text-emerald-700 cursor-pointer select-none
+              <summary className="login-demo-toggle text-xs font-bold text-emerald-700 cursor-pointer select-none
                 flex items-center gap-1.5 list-none hover:text-emerald-800 transition">
                 <span className="text-base">👤</span>
                 {t('login_demo_label')}
                 <span className="text-gray-400 mr-auto text-xs group-open:rotate-180 transition-transform">▼</span>
               </summary>
-              <div className="mt-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
-                <p>Admin: <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+              <div className="login-demo-panel mt-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
+                <p>Admin: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
                 <p>{t('login_staff_label')} ({t('login_password_label')}: 1234):</p>
-                <p className="text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
-                <p className="mt-1">User: <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">user1</code> / <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <p className="login-demo-staff text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
+                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">user1</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
               </div>
             </details>
 

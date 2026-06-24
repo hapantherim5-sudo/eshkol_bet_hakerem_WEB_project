@@ -1,6 +1,7 @@
 import { useT } from '../i18n/i18n';
 import { CATEGORIES } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 
 const CAT_GRADIENT = {
   sport:     'from-orange-400 to-red-500',
@@ -89,7 +90,7 @@ function FeaturedCard({ opp, isAr, onOpenModal, t }) {
             🏢 {orgName}
           </span>
           <span className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-xl text-xs font-semibold">
-            📍 {opp.city}
+            📍 {getCityName(opp.city, isAr)}
           </span>
           <span className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-xl text-xs font-semibold">
             🎂 {isAr ? `${opp.ageMin}–${opp.ageMax} سنة` : `גיל ${opp.ageMin}–${opp.ageMax}`}
@@ -134,7 +135,7 @@ function HotCard({ opp, badge, isAr, onOpenModal, t }) {
 
       <h3 className="font-black text-gray-800 text-sm mb-1 leading-snug">{title}</h3>
       <p className="text-xs text-gray-500 font-medium mb-3">
-        🏢 {orgName} · 📍 {opp.city}
+        🏢 {orgName} · 📍 {getCityName(opp.city, isAr)}
       </p>
 
       <div className="flex items-center justify-between">

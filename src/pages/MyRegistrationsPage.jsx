@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TYPE_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 
 function formatDate(iso, locale) {
@@ -64,7 +65,7 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
 
                   <h3 className="font-bold text-gray-800 text-base mb-1 leading-snug">{title}</h3>
                   <p className="text-xs text-gray-500 mb-1 font-medium">
-                    {getOrgName(o.organizationId, isAr)} · {o.city} · {typeText}
+                    {getOrgName(o.organizationId, isAr)} · {getCityName(o.city, isAr)} · {typeText}
                   </p>
                   <p className="text-xs text-gray-400 mb-4 flex items-center gap-1">
                     <span>🗓️</span>

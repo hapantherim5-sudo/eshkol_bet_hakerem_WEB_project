@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getMonthGrid, dateKey, eventsOnDay } from '../../utils/calendar';
 import { getOrgName } from '../../data/organizations';
+import { getCityName } from '../../data/opportunitiesSeed';
 import { pick } from '../../i18n/i18n';
 import { formatIsraeliDate } from '../../utils/israeliDate';
 
@@ -136,7 +137,7 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp, currentUser, r
                         <p className="text-xs text-gray-500 mt-1 flex items-center gap-1.5 flex-wrap">
                           <span>🕐 {ev.startsAt?.slice(11, 16)}</span>
                           <span>·</span>
-                          <span>📍 {ev.city}</span>
+                          <span>📍 {getCityName(ev.city, isAr)}</span>
                           <span>·</span>
                           <span>{getOrgName(ev.organizationId, isAr)}</span>
                         </p>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import OpportunityCard from '../components/OpportunityCard';
 import { CATEGORIES, TYPE_AR } from '../data/fakeData';
 import { ORGANIZATIONS, getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 
 const CAT_ACTIVE = {
@@ -82,6 +83,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
     const orgName = getOrgName(o.organizationId, isAr);
     if (q && !o.title.toLowerCase().includes(q) && !o.titleAr.includes(q) &&
         !o.description.toLowerCase().includes(q) && !o.city.includes(q) &&
+        !getCityName(o.city, true).includes(q) &&
         !orgName.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -208,7 +210,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
                 open={openFilter === 'city'}
                 onToggle={() => setOpenFilter(openFilter === 'city' ? null : 'city')}
                 onChange={(value) => { setFilterCity(value); setOpenFilter(null); }}
-                options={[{ value: '', label: t('all') }, ...cities.map(c => ({ value: c, label: c }))]}
+                options={[{ value: '', label: t('all') }, ...cities.map(c => ({ value: c, label: getCityName(c, isAr) }))]}
               />
             </div>
             <div>

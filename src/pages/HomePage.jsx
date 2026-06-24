@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ORGANIZATIONS } from '../data/organizations';
 import { CATEGORIES } from '../data/fakeData';
+import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 
 const ROTATION_MS = 5000;
@@ -26,20 +27,20 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
   const QUICK_LINKS = [
     { screen: 'opportunities', icon: '🔍', label: t('home_quick_explore'), gradient: 'from-emerald-400 to-teal-500',  shadow: 'hover:shadow-emerald-200' },
     { screen: 'hot-this-week', icon: '🔥', label: t('home_quick_hot'),     gradient: 'from-orange-400 to-red-500',    shadow: 'hover:shadow-orange-200' },
-    { screen: 'calendar',      icon: '📅', label: t('home_quick_calendar'),gradient: 'from-violet-400 to-purple-500', shadow: 'hover:shadow-violet-200' },
+    { screen: 'calendar',      icon: '📅', label: t('home_quick_calendar'),gradient: 'plum-gradient',                  shadow: 'hover:shadow-[#cdb7dc]' },
     { screen: 'gallery',       icon: '📸', label: t('home_quick_gallery'), gradient: 'from-cyan-400 to-teal-500',     shadow: 'hover:shadow-cyan-200'   },
   ];
 
   const COMMUNITY_PERKS = [
     { icon: '🏆', title: t('home_perks_selfdev_title'),    text: t('home_perks_selfdev_text'),    color: 'text-amber-600',   bg: 'bg-amber-50' },
     { icon: '🤝', title: t('home_perks_friends_title'),    text: t('home_perks_friends_text'),    color: 'text-pink-600',    bg: 'bg-pink-50'  },
-    { icon: '🚀', title: t('home_perks_experience_title'), text: t('home_perks_experience_text'), color: 'text-violet-600',  bg: 'bg-violet-50' },
+    { icon: '🚀', title: t('home_perks_experience_title'), text: t('home_perks_experience_text'), color: 'text-[#6c4e9b]',  bg: 'bg-[#f2eef7]' },
     { icon: '🌍', title: t('home_perks_community_title'),  text: t('home_perks_community_text'),  color: 'text-emerald-600', bg: 'bg-emerald-50' },
   ];
 
   const statItems = [
     { num: store.opportunities.length, label: t('home_stat_opportunities'), icon: '🎯', gradient: 'from-emerald-400 to-teal-500' },
-    { num: ORGANIZATIONS.length,       label: t('home_stat_organizations'), icon: '🏢', gradient: 'from-violet-400 to-purple-500' },
+    { num: ORGANIZATIONS.length,       label: t('home_stat_organizations'), icon: '🏢', gradient: 'plum-gradient' },
     { num: CATEGORIES.length,          label: t('home_stat_categories'),    icon: '✨', gradient: 'from-amber-400 to-orange-500' },
   ];
 
@@ -184,11 +185,11 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
 
             <div
               onClick={() => handleNavigate('opportunities')}
-              className="home-featured-card relative overflow-hidden bg-gradient-to-bl from-indigo-600 via-violet-600 to-purple-500
+              className="home-featured-card relative overflow-hidden
                 rounded-3xl p-6 sm:p-8 text-white cursor-pointer
-                hover:shadow-2xl hover:shadow-violet-200 hover:-translate-y-1 transition-all duration-300">
+                hover:shadow-2xl hover:shadow-[#cdb7dc] hover:-translate-y-1 transition-all duration-300">
               <div className="pointer-events-none absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5 animate-blob" />
-              <div className="pointer-events-none absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-indigo-900/15 animate-blob" style={{ animationDelay: '2s' }} />
+              <div className="pointer-events-none absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-slate-950/10 animate-blob" style={{ animationDelay: '2s' }} />
 
               <div className="relative" style={{ transition: `opacity ${FADE_MS}ms ease`, opacity: visible ? 1 : 0 }}>
                 <div className="flex items-center gap-5">
@@ -204,13 +205,13 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
                         </span>
                       )}
                       <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-semibold border border-white/25">
-                        📍 {featuredOpp.city}
+                        📍 {getCityName(featuredOpp.city, isAr)}
                       </span>
                     </div>
                     <h3 className="text-lg sm:text-2xl font-black leading-tight mb-1">
                       {isAr ? featuredOpp.titleAr : featuredOpp.title}
                     </h3>
-                    <p className="text-indigo-200 text-sm line-clamp-2">
+                    <p className="text-white/75 text-sm line-clamp-2">
                       {isAr && featuredOpp.descriptionAr ? featuredOpp.descriptionAr : featuredOpp.description}
                     </p>
                   </div>
@@ -301,16 +302,16 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
           </section>
         ) : !currentUser ? (
           <section>
-            <div className="home-login-cta relative overflow-hidden bg-gradient-to-l from-violet-600 to-indigo-600
+            <div className="home-login-cta relative overflow-hidden
               rounded-2xl p-6 text-white">
               <div className="pointer-events-none absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5 animate-blob" />
               <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
                 <div>
                   <p className="font-black text-xl mb-1">{t('home_cta_title')}</p>
-                  <p className="text-violet-200 text-sm">{t('home_cta_subtitle')}</p>
+                  <p className="text-white/75 text-sm">{t('home_cta_subtitle')}</p>
                 </div>
                 <button onClick={() => handleNavigate('login')}
-                  className="home-cta-login shrink-0 px-7 py-3 bg-white text-violet-700 font-black
+                  className="home-cta-login shrink-0 px-7 py-3 bg-white text-[#6c4e9b] font-black
                     rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg text-sm">
                   {t('home_cta_login_btn')}
                 </button>
