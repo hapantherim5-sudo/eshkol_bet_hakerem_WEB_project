@@ -1,20 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { isStaffRole } from '../utils/permissions';
+import { useT } from '../i18n/i18n';
 
 const PUBLIC_LINKS = [
-  { screen: 'home',          labelHe: 'בית',        labelAr: 'الرئيسية',      icon: '🏠' },
-  { screen: 'opportunities', labelHe: 'הזדמנויות',  labelAr: 'الفرص',         icon: '🔍' },
-  { screen: 'calendar',      labelHe: 'לוח שנה',    labelAr: 'التقويم',       icon: '📅' },
-  { screen: 'hot-this-week', labelHe: 'חם השבוע',   labelAr: 'الأكثر رواجاً', icon: '🔥' },
-  { screen: 'gallery',       labelHe: 'גלריה',      labelAr: 'معرض',          icon: '📸' },
-  { screen: 'about',         labelHe: 'אודות',      labelAr: 'معلومات',       icon: '📖' },
+  { screen: 'home',          key: 'nav_home',          icon: '🏠' },
+  { screen: 'opportunities', key: 'nav_opportunities',  icon: '🔍' },
+  { screen: 'calendar',      key: 'nav_calendar',       icon: '📅' },
+  { screen: 'hot-this-week', key: 'nav_hot_this_week',  icon: '🔥' },
+  { screen: 'gallery',       key: 'nav_gallery',        icon: '📸' },
+  { screen: 'about',         key: 'nav_about',          icon: '📖' },
 ];
 
 function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggleLang, onNavigate, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navRef = useRef(null);
-  const isAr = lang === 'ar';
+  const t = useT(lang);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -33,10 +34,10 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
 
   const extraLinks = [
     ...(currentUser?.role === 'User'
-      ? [{ screen: 'my-registrations', labelHe: 'ההרשמות שלי', labelAr: 'فرصي المسجلة', icon: '✅' }]
+      ? [{ screen: 'my-registrations', key: 'nav_my_registrations', icon: '✅' }]
       : []),
     ...(isStaffRole(currentUser)
-      ? [{ screen: 'admin', labelHe: 'ניהול', labelAr: 'إدارة', icon: '⚙️' }]
+      ? [{ screen: 'admin', key: 'nav_admin', icon: '⚙️' }]
       : []),
   ];
 
@@ -60,7 +61,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 ? 'text-violet-600 hover:bg-violet-50'
                 : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-700'}`}>
         <span className="text-sm">{link.icon}</span>
-        <span className="hidden lg:inline">{isAr ? link.labelAr : link.labelHe}</span>
+        <span className="hidden lg:inline">{t(link.key)}</span>
       </button>
     );
   };
@@ -76,7 +77,6 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
 
         <div className="flex items-center justify-between px-4 py-2.5 gap-3">
 
-          {/* ── Logo + Brand ── */}
           <button
             onClick={() => { onNavigate('home'); setMenuOpen(false); }}
             className="flex items-center gap-2.5 shrink-0 group text-right">
@@ -88,40 +88,35 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             />
             <div className="hidden sm:block">
               <p className={`text-sm font-black leading-none ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                {isAr ? 'عنقود بيت هكيريم' : 'אשכול בית הכרם'}
+                {t('nav_brand_title')}
               </p>
               <p className="text-[10px] text-emerald-500 font-semibold mt-0.5 leading-none">
-                {isAr ? 'منصة الشباب' : 'פלטפורמת הנוער'}
+                {t('nav_brand_subtitle')}
               </p>
             </div>
           </button>
 
-          {/* ── Desktop Nav Links ── */}
           <div className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
             {PUBLIC_LINKS.map(link => <NavBtn key={link.screen} link={link} />)}
             {extraLinks.map(link => <NavBtn key={link.screen} link={link} />)}
           </div>
 
-          {/* ── Action Buttons ── */}
           <div className="flex items-center gap-1.5 shrink-0">
 
-            {/* Language */}
             <button onClick={onToggleLang}
               className={`h-8 w-8 flex items-center justify-center text-xs font-black rounded-xl border-2 transition-all duration-150
                 ${isDark
                   ? 'border-emerald-500 text-emerald-400 hover:bg-slate-700'
                   : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
-              {isAr ? 'ע' : 'ع'}
+              {t('nav_lang_toggle')}
             </button>
 
-            {/* Dark mode */}
             <button onClick={onToggleDark}
               className={`h-8 w-8 flex items-center justify-center text-base rounded-xl transition-all duration-150
                 ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gray-100 hover:bg-gray-200'}`}>
               {isDark ? '☀️' : '🌙'}
             </button>
 
-            {/* User / Login */}
             {currentUser ? (
               <div className="hidden md:flex items-center gap-1.5">
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl
@@ -138,7 +133,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 <button onClick={onLogout}
                   className="h-8 px-2.5 text-xs font-semibold border border-red-200 text-red-500
                     rounded-xl hover:bg-red-50 transition-all duration-150">
-                  {isAr ? 'خروج' : 'יציאה'}
+                  {t('nav_logout')}
                 </button>
               </div>
             ) : (
@@ -147,11 +142,10 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                   hover:from-emerald-700 hover:to-teal-600 text-white text-xs font-black
                   rounded-xl transition-all duration-150 shadow-md hover:shadow-emerald-200
                   hover:scale-105 active:scale-95">
-                {isAr ? 'دخول' : 'כניסה →'}
+                {t('nav_login_btn')}
               </button>
             )}
 
-            {/* Hamburger */}
             <button
               onClick={() => setMenuOpen(prev => !prev)}
               className={`md:hidden h-8 w-8 flex items-center justify-center rounded-xl transition-all duration-150
@@ -161,7 +155,6 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
           </div>
         </div>
 
-        {/* ── Mobile Menu ── */}
         {menuOpen && (
           <div className={`md:hidden border-t px-3 py-3 flex flex-col gap-1 animate-fade-in
             ${isDark ? 'border-slate-700' : 'border-gray-100'}`}>
@@ -200,7 +193,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                           ? 'text-violet-700 hover:bg-violet-50'
                           : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'}`}>
                   <span className="text-base">{link.icon}</span>
-                  <span>{isAr ? link.labelAr : link.labelHe}</span>
+                  <span>{t(link.key)}</span>
                 </button>
               );
             })}
@@ -211,7 +204,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 className="flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-sm font-semibold
                   min-h-[44px] text-red-600 border border-red-100 hover:bg-red-50 transition-all mt-1">
                 <span className="text-base">🚪</span>
-                <span>{isAr ? 'خروج' : 'יציאה'}</span>
+                <span>{t('nav_logout')}</span>
               </button>
             )}
           </div>

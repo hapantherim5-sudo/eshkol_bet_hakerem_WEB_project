@@ -16,7 +16,7 @@ import HotThisWeekPage from './pages/HotThisWeekPage';
 import { useDataStore } from './hooks/useDataStore';
 import { loadSession, saveSession } from './hooks/useLocalStore';
 
-import { setDocumentLang, pick } from './i18n/i18n';
+import { setDocumentLang, useT } from './i18n/i18n';
 import { isStaffRole } from './utils/permissions';
 
 function App() {
@@ -28,9 +28,9 @@ function App() {
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [showRegModal, setShowRegModal] = useState(false);
   const [toast,     setToast    ] = useState('');
-  const [toastType, setToastType] = useState('success'); // 'success' | 'error'
+  const [toastType, setToastType] = useState('success');
 
-  const isAr = lang === 'ar';
+  const t = useT(lang);
 
   useEffect(() => setDocumentLang(lang), [lang]);
 
@@ -60,7 +60,7 @@ function App() {
     if (screen === 'my-registrations') {
       if (!currentUser || currentUser.role !== 'User') {
         setCurrentScreen('login');
-        showToast(pick(isAr, 'יש להתחבר כמשתמש נוער', 'يجب تسجيل الدخول كشاب'));
+        showToast(t('toast_youth_login'));
         return;
       }
     }
@@ -76,11 +76,11 @@ function App() {
     if (!currentUser) {
       setSelectedOpp(null);
       setCurrentScreen('login');
-      showToast(pick(isAr, 'יש להתחבר כדי להירשם', 'يجب تسجيل الدخول للتسجيل'));
+      showToast(t('toast_login_required'));
       return;
     }
     if (currentUser.role !== 'User') {
-      showToast(pick(isAr, 'הרשמה זמינה למשתמשי נוער בלבד', 'التسجيل للشباب فقط'));
+      showToast(t('toast_staff_only'));
       return;
     }
     setShowRegModal(true);
@@ -91,12 +91,12 @@ function App() {
       const result = await store.register(currentUser.id, selectedOpp.id, profilePatch);
       setShowRegModal(false);
       if (result.ok) {
-        showToast(pick(isAr, 'נרשמת בהצלחה!', 'تم التسجيل بنجاح!'));
+        showToast(t('toast_registered'));
       } else if (result.reason === 'duplicate') {
-        showToast(pick(isAr, 'כבר נרשמת לפעילות זו', 'مسجل بالفعل'));
+        showToast(t('toast_already_reg'));
       }
     } catch {
-      showToast(pick(isAr, 'שגיאה בהרשמה, נסה שוב', 'خطأ في التسجيل، حاول مرة أخرى'));
+      showToast(t('toast_reg_error'), 'error');
     }
   };
 
@@ -107,11 +107,11 @@ function App() {
     try {
       const result = await store.unregister(currentUser.id, oppId);
       if (result.ok) {
-        showToast(pick(isAr, 'ההרשמה בוטלה', 'تم إلغاء التسجيل'));
+        showToast(t('toast_unreg'));
         if (selectedOpp?.id === oppId) setSelectedOpp(null);
       }
     } catch {
-      showToast(pick(isAr, 'שגיאה בביטול ההרשמה', 'خطأ في إلغاء التسجيل'));
+      showToast(t('toast_unreg_error'), 'error');
     }
   };
 
@@ -120,7 +120,7 @@ function App() {
       <div dir="rtl" className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50">
         <div className="w-12 h-12 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin mb-4" />
         <p className="text-emerald-700 font-semibold text-sm">
-          {isAr ? 'جاري التحميل...' : 'טוען נתונים...'}
+          {t('loading')}
         </p>
       </div>
     );
@@ -155,7 +155,7 @@ function App() {
           <HomePage
             store={store}
             currentUser={currentUser}
-            isAr={isAr}
+            lang={lang}
             handleNavigate={handleNavigate}
           />
         )}
@@ -178,6 +178,8 @@ function App() {
             lang={lang}
             opportunities={store.opportunities}
             onOpenOpp={openOppModal}
+            currentUser={currentUser}
+            registrations={store.registrations}
           />
         )}
 

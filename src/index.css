@@ -4,6 +4,12 @@
   --font-sans: 'Heebo', system-ui, sans-serif;
 }
 
+/* Heebo Black for Hebrew */
+:root:lang(he),
+:root:lang(he) * {
+  font-weight: 900 !important;
+}
+
 /* Safe area: keep content clear of notched phone edges */
 body {
   padding-left: env(safe-area-inset-left);

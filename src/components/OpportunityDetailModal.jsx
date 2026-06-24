@@ -1,6 +1,7 @@
 import { STATUS_AR } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
-import { pick } from '../i18n/i18n';
+import { useT } from '../i18n/i18n';
+import { formatIsraeliDate } from '../utils/israeliDate';
 
 const CAT_HEADER = {
   sport:     'from-orange-400 to-amber-500',
@@ -12,21 +13,27 @@ const CAT_HEADER = {
 };
 
 function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRegisterClick, onCancelRegistration }) {
+  const t = useT(lang);
   const isAr = lang === 'ar';
   const o = opportunity;
-  const t = (he, ar) => pick(isAr, he, ar);
 
   const headerGradient = CAT_HEADER[o.category] ?? 'from-emerald-500 to-teal-600';
   const statusText = isAr ? (STATUS_AR[o.status] || o.status) : o.status;
 
+  const dateVal = o.startDate
+    ? (o.endDate && o.endDate !== o.startDate
+        ? `${formatIsraeliDate(o.startDate)} – ${formatIsraeliDate(o.endDate)}`
+        : formatIsraeliDate(o.startDate))
+    : null;
+
   const rows = [
-    { icon: '📍', labelHe: 'יישוב',     labelAr: 'البلدة',        val: o.city },
-    { icon: '🏢', labelHe: 'ארגון',     labelAr: 'الجهة',         val: getOrgName(o.organizationId, isAr) },
-    { icon: '🎂', labelHe: 'גיל',       labelAr: 'العمر',         val: `${o.ageMin}–${o.ageMax}` },
-    { icon: '📅', labelHe: 'ימים',      labelAr: 'الأيام',        val: isAr && o.daysAr ? o.daysAr : o.days },
-    { icon: '🕐', labelHe: 'שעות',      labelAr: 'الوقت',         val: o.time },
-    { icon: '👤', labelHe: 'איש קשר',   labelAr: 'جهة الاتصال',  val: o.contact },
-    { icon: '📝', labelHe: 'הרשמה',     labelAr: 'التسجيل',       val: isAr && o.registrationAr ? o.registrationAr : o.registration },
+    { icon: '📍', label: t('modal_city'),         val: o.city },
+    { icon: '🏢', label: t('modal_org'),          val: getOrgName(o.organizationId, isAr) },
+    { icon: '🎂', label: t('modal_age'),          val: `${o.ageMin}–${o.ageMax}` },
+    ...(dateVal ? [{ icon: '📅', label: t('modal_date'), val: dateVal }] : []),
+    { icon: '🕐', label: t('modal_time'),         val: o.time },
+    { icon: '👤', label: t('modal_contact'),      val: o.contact },
+    { icon: '📝', label: t('modal_registration'), val: isAr && o.registrationAr ? o.registrationAr : o.registration },
   ];
 
   return (
@@ -38,7 +45,6 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
         className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full shadow-2xl
           max-h-[92dvh] overflow-y-auto animate-slide-up">
 
-        {/* Colored header */}
         <div className={`relative bg-gradient-to-br ${headerGradient} text-white px-5 pt-8 pb-6 rounded-t-3xl sm:rounded-t-3xl`}>
           <button
             onClick={onClose}
@@ -60,40 +66,35 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
         </div>
 
         <div className="p-5">
-          {/* Description */}
           <p className="text-gray-600 text-sm leading-relaxed mb-5 bg-gray-50 rounded-2xl p-4">
             {isAr && o.descriptionAr ? o.descriptionAr : o.description}
           </p>
 
-          {/* Info rows */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
             {rows.map((item, i) => (
               <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-xl p-3">
                 <span className="text-lg leading-none mt-0.5">{item.icon}</span>
                 <div className="min-w-0">
-                  <p className="text-xs text-gray-400 font-medium mb-0.5">
-                    {isAr ? item.labelAr : item.labelHe}
-                  </p>
+                  <p className="text-xs text-gray-400 font-medium mb-0.5">{item.label}</p>
                   <p className="text-sm font-semibold text-gray-800 break-words">{item.val}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Action buttons */}
           {isRegistered ? (
             <div className="space-y-2.5">
               <div className="w-full py-3.5 text-center font-semibold bg-emerald-50 text-emerald-700
                 rounded-2xl border border-emerald-200 flex items-center justify-center gap-2">
                 <span className="text-base">✓</span>
-                {t('נרשמת לפעילות זו', 'مسجل في هذا النشاط')}
+                {t('modal_registered_msg')}
               </div>
               {onCancelRegistration && (
                 <button
                   onClick={onCancelRegistration}
                   className="w-full py-3.5 min-h-[44px] border border-red-200 text-red-600 font-bold
                     rounded-2xl hover:bg-red-50 transition-all duration-150 active:scale-95">
-                  {t('ביטול הרשמה', 'إلغاء التسجيل')}
+                  {t('modal_cancel_reg_btn')}
                 </button>
               )}
             </div>
@@ -103,7 +104,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
               className="w-full py-3.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white
                 font-black rounded-2xl transition-all duration-150 hover:scale-[1.02] active:scale-95
                 shadow-lg shadow-emerald-100 text-base">
-              {t('הרשמה לפעילות ←', 'سجّل الآن ←')}
+              {t('modal_register_btn')}
             </button>
           )}
         </div>

@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { filterManageable, canManageOpportunity } from '../../utils/permissions';
 import { getOrgName } from '../../data/organizations';
 import { pick } from '../../i18n/i18n';
-import { formatIsraeliDateTime } from '../../utils/israeliDate';
-import ConfirmModal from '../ConfirmModal';
 import OpportunityForm from './OpportunityForm';
 import UserManagement from './UserManagement';
 import StatsDashboard from './StatsDashboard';
@@ -15,10 +13,7 @@ function StaffPanel({
   const isAr = lang === 'ar';
   const isAdmin = currentUser.role === 'Admin';
   const [mode, setMode] = useState(null); // null | 'add' | opp object
-  const [tab, setTab] = useState('opps'); // opps | events | stats | users
-  const [eventForm, setEventForm] = useState({ title: '', titleAr: '', organizationId: '', city: '', startsAt: '' });
-  const [eventToDelete, setEventToDelete] = useState(null);
-
+  const [tab, setTab] = useState('opps'); // opps | stats | users
   const manageable = filterManageable(currentUser, opportunities);
 
   const handleSave = (opp, calendarEvents) => {
@@ -38,26 +33,6 @@ function StaffPanel({
     if (window.confirm(pick(isAr, 'למחוק הזדמנות זו?', 'حذف هذه الفرصة؟'))) onDelete(opp.id);
   };
 
-  const confirmDeleteEvent = () => {
-    if (!eventToDelete) return;
-    onDeleteEvent(eventToDelete.id);
-    setEventToDelete(null);
-  };
-
-  const staffEvents = currentUser.role === 'Admin'
-    ? events
-    : events.filter(e => e.organizationId === currentUser.organizationId);
-
-  const addStandaloneEvent = () => {
-    if (!eventForm.title || !eventForm.startsAt) return;
-    onAddEvent({
-      ...eventForm,
-      organizationId: eventForm.organizationId || currentUser.organizationId,
-      startsAt: new Date(eventForm.startsAt).toISOString(),
-    });
-    setEventForm({ title: '', titleAr: '', organizationId: '', city: '', startsAt: '' });
-  };
-
   const t = (he, ar) => pick(isAr, he, ar);
 
   return (
@@ -68,7 +43,6 @@ function StaffPanel({
       <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: 'opps',   labelHe: 'הזדמנויות',    labelAr: 'الفرص'       },
-          { key: 'events', labelHe: 'אירועים',       labelAr: 'الأحداث'    },
           { key: 'stats',  labelHe: 'סטטיסטיקות',   labelAr: 'إحصائيات'   },
           ...(isAdmin ? [{ key: 'users', labelHe: 'משתמשים 👤', labelAr: 'المستخدمون 👤' }] : []),
         ].map(({ key, labelHe, labelAr }) => (
@@ -121,27 +95,6 @@ function StaffPanel({
         </>
       )}
 
-      {tab === 'events' && (
-        <div>
-          <div className="bg-white rounded-xl border p-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input placeholder={t('כותרת', 'العنوان')} className="px-3 py-2 border rounded-lg text-sm"
-              value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} />
-            <input type="datetime-local" className="px-3 py-2 border rounded-lg text-sm"
-              value={eventForm.startsAt} onChange={e => setEventForm(f => ({ ...f, startsAt: e.target.value }))} />
-            <input placeholder={t('יישוב', 'البلدة')} className="px-3 py-2 border rounded-lg text-sm"
-              value={eventForm.city} onChange={e => setEventForm(f => ({ ...f, city: e.target.value }))} />
-            <button onClick={addStandaloneEvent} className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-lg">
-              + {t('הוסף אירוע', 'أضف حدث')}
-            </button>
-          </div>
-          {staffEvents.map(e => (
-            <div key={e.id} className="bg-white rounded-xl border p-3 mb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <span className="text-sm">{isAr ? e.titleAr : e.title} — {formatIsraeliDateTime(e.startsAt)}</span>
-              <button onClick={() => setEventToDelete(e)} className="text-xs text-red-600 min-h-[44px] sm:min-h-0 self-start sm:self-center">{t('מחק', 'حذف')}</button>
-            </div>
-          ))}
-        </div>
-      )}
 
       {tab === 'stats' && (
         <StatsDashboard
@@ -163,20 +116,6 @@ function StaffPanel({
         />
       )}
 
-      {eventToDelete && (
-        <ConfirmModal
-          lang={lang}
-          titleHe="מחיקת אירוע"
-          titleAr="حذف الحدث"
-          messageHe={`האם אתה בטוח שברצונך למחוק את האירוע "${eventToDelete.title}"?`}
-          messageAr={`هل أنت متأكد أنك تريد حذف الحدث "${eventToDelete.titleAr || eventToDelete.title}"؟`}
-          confirmHe="כן, מחק"
-          confirmAr="نعم، حذف"
-          danger
-          onConfirm={confirmDeleteEvent}
-          onClose={() => setEventToDelete(null)}
-        />
-      )}
     </div>
   );
 }

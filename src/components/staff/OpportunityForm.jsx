@@ -8,10 +8,10 @@ import DateInputIL from '../DateInputIL';
 const empty = (defaults = {}) => ({
   icon: '✨', title: '', titleAr: '', category: 'sport', categoryLabel: 'ספורט',
   type: 'חוג', scope: 'יישובי', city: '', organizationId: '',
-  ageMin: 12, ageMax: 18, days: '', daysAr: '', time: '',
+  ageMin: 12, ageMax: 18, time: '',
   description: '', descriptionAr: '', contact: '', phone: '',
   registration: 'טלפון', registrationAr: 'هاتف', status: 'פתוח',
-  addToCalendar: true, startDate: '', endDate: '',
+  startDate: '', endDate: '',
   ...defaults,
 });
 
@@ -20,7 +20,6 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   const [form, setForm] = useState(() => empty({
     organizationId: user.role === 'Staff' ? user.organizationId : (initial?.organizationId || ''),
     ...initial,
-    addToCalendar: true,
     startDate: initial?.startDate || '',
     endDate: initial?.endDate || '',
   }));
@@ -38,24 +37,15 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
       return;
     }
     const cat = CATEGORIES.find(c => c.id === form.category);
-    const { addToCalendar, ...opp } = form;
-    const payload = { ...opp, categoryLabel: cat?.label || opp.categoryLabel };
+    const payload = { ...form, categoryLabel: cat?.label || form.categoryLabel };
 
-    if (addToCalendar) {
-      if (!form.startDate || !form.endDate) {
-        setErr(pick(isAr, 'יש למלא תאריך התחלה ותאריך סיום', 'يرجى ملء تاريخ البداية والنهاية'));
-        return;
-      }
-      if (form.endDate < form.startDate) {
+    if (form.startDate) {
+      if (form.endDate && form.endDate < form.startDate) {
         setErr(pick(isAr, 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה', 'يجب أن يكون تاريخ النهاية بعد البداية'));
         return;
       }
       const calendarEvents = buildCalendarEvents(payload);
-      if (!calendarEvents.length) {
-        setErr(pick(isAr, 'לא נמצאו מפגשים בטווח — בדקו ימים ותאריכים', 'لم يُعثر على لقاءات في النطاق — تحققوا من الأيام والتواريخ'));
-        return;
-      }
-      onSave(payload, calendarEvents);
+      onSave(payload, calendarEvents.length ? calendarEvents : null);
       return;
     }
 
@@ -125,30 +115,34 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
           <input type="number" className={inputClass} value={form.ageMax} onChange={e => set('ageMax', +e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('ימים', 'الأيام')}</label>
-          <input className={inputClass} value={form.days} onChange={e => set('days', e.target.value)} />
+          <label className="text-xs text-gray-500">{label('שעת התחלה', 'وقت البداية')}</label>
+          <input type="time" className={inputClass} value={form.time} onChange={e => set('time', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('שעות', 'الوقت')}</label>
-          <input className={inputClass} value={form.time} onChange={e => set('time', e.target.value)} />
+          <label className="text-xs text-gray-500">{label('תאריך התחלה', 'تاريخ البداية')}</label>
+          <DateInputIL lang={lang} className={inputClass} value={form.startDate}
+            onChange={v => set('startDate', v)} />
         </div>
-        {form.addToCalendar && (
-          <>
-            <div>
-              <label className="text-xs text-gray-500">{label('תאריך התחלה', 'تاريخ البداية')}</label>
-              <DateInputIL lang={lang} className={inputClass} value={form.startDate}
-                onChange={v => set('startDate', v)} />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500">{label('תאריך סיום', 'تاريخ النهاية')}</label>
-              <DateInputIL lang={lang} className={inputClass} value={form.endDate}
-                onChange={v => set('endDate', v)} />
-            </div>
-          </>
-        )}
+        <div>
+          <label className="text-xs text-gray-500">{label('תאריך סיום', 'تاريخ النهاية')}</label>
+          <DateInputIL lang={lang} className={inputClass} value={form.endDate}
+            onChange={v => set('endDate', v)} />
+        </div>
         <div className="md:col-span-2">
           <label className="text-xs text-gray-500">{label('תיאור', 'الوصف')}</label>
           <textarea className={inputClass} rows={2} value={form.description} onChange={e => set('description', e.target.value)} />
+        </div>
+        <div className="md:col-span-2">
+          <label className="text-xs text-gray-500">{label('תיאור בערבית (אופציונלי)', 'الوصف بالعربية (اختياري)')}</label>
+          <textarea className={inputClass} rows={2} dir="rtl" value={form.descriptionAr} onChange={e => set('descriptionAr', e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500">{label('אימוג׳י (אופציונלי)', 'رمز تعبيري (اختياري)')}</label>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl leading-none">{form.icon || '✨'}</span>
+            <input className={inputClass} maxLength={2} value={form.icon}
+              placeholder="✨" onChange={e => set('icon', e.target.value)} />
+          </div>
         </div>
         <div>
           <label className="text-xs text-gray-500">{label('איש קשר', 'جهة الاتصال')}</label>
@@ -157,10 +151,6 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
         <div>
           <label className="text-xs text-gray-500">{label('טלפון', 'الهاتف')}</label>
           <input className={inputClass} value={form.phone} onChange={e => set('phone', e.target.value)} />
-        </div>
-        <div className="md:col-span-2 flex items-center gap-2">
-          <input type="checkbox" id="cal" checked={form.addToCalendar} onChange={e => set('addToCalendar', e.target.checked)} />
-          <label htmlFor="cal" className="text-sm text-gray-600">{label('הוסף לאירוע בלוח שנה', 'أضف إلى التقويم')}</label>
         </div>
       </div>
       <div className="flex gap-2 mt-4 justify-end">

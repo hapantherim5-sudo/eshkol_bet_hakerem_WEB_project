@@ -2,6 +2,7 @@ import { useState } from 'react';
 import OpportunityCard from '../components/OpportunityCard';
 import { CATEGORIES, TYPE_AR } from '../data/fakeData';
 import { ORGANIZATIONS, getOrgName } from '../data/organizations';
+import { useT } from '../i18n/i18n';
 
 const CAT_ACTIVE = {
   sport:     'bg-orange-500 text-white border-orange-500 shadow-orange-100',
@@ -13,8 +14,8 @@ const CAT_ACTIVE = {
 };
 
 function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
+  const t = useT(lang);
   const isAr = lang === 'ar';
-  const ALL  = isAr ? 'الكل' : 'הכל';
 
   const [searchText,  setSearchText]  = useState('');
   const [filterCity,  setFilterCity]  = useState('');
@@ -38,7 +39,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
     if (filterAge && (parseInt(filterAge) < o.ageMin || parseInt(filterAge) > o.ageMax)) return false;
     const orgName = getOrgName(o.organizationId, isAr);
     if (q && !o.title.toLowerCase().includes(q) && !o.titleAr.includes(q) &&
-        !o.description.includes(q) && !o.city.includes(q) &&
+        !o.description.toLowerCase().includes(q) && !o.city.includes(q) &&
         !orgName.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -56,40 +57,33 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 animate-fade-in">
 
-      {/* ── Page header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-800">
-            {isAr ? 'لوح الفرص' : 'לוח ההזדמנויות'}
-          </h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-800">{t('board_title')}</h1>
           <p className="text-sm text-gray-500 mt-0.5 font-medium">
-            {isAr
-              ? `${filtered.length} فرصة متاحة`
-              : `${filtered.length} הזדמנויות זמינות`}
+            {filtered.length} {t('board_count')}
             {hasActiveFilters && (
               <button onClick={clearFilters}
                 className="mr-2 text-xs text-red-500 hover:text-red-600 underline transition">
-                ({isAr ? 'مسح الفلاتر' : 'נקה פילטרים'})
+                ({t('board_clear_filters')})
               </button>
             )}
           </p>
         </div>
 
-        {/* Search */}
         <div className="relative w-full sm:w-72">
           <span className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-400 text-sm pointer-events-none">🔍</span>
           <input
             type="text"
             value={searchText}
             onChange={e => setSearchText(e.target.value)}
-            placeholder={isAr ? 'بحث...' : 'חיפוש...'}
+            placeholder={t('search_placeholder')}
             className="w-full pr-9 pl-4 py-2.5 border border-gray-200 bg-white rounded-xl
               focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-800 text-sm
               shadow-sm transition" />
         </div>
       </div>
 
-      {/* ── Category chips ── */}
       <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide mb-4">
         <button
           onClick={() => setFilterCat('')}
@@ -98,7 +92,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
             ${!filterCat
               ? 'bg-gray-800 text-white border-gray-800 shadow-gray-200'
               : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'}`}>
-          ⭐ {isAr ? 'الكل' : 'הכל'}
+          ⭐ {t('all')}
         </button>
         {CATEGORIES.map(cat => {
           const active = filterCat === cat.id;
@@ -117,14 +111,13 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
         })}
       </div>
 
-      {/* ── Additional filters ── */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
         <button
           type="button"
           onClick={() => setFiltersOpen(o => !o)}
           className="w-full flex items-center justify-between py-1 text-sm font-semibold text-gray-600
             hover:text-emerald-700 transition md:hidden">
-          <span>{isAr ? '🔽 فلاتر إضافية' : '🔽 פילטרים נוספים'}</span>
+          <span>{t('board_filters_toggle')}</span>
           <span className="text-gray-400 text-xs">{filtersOpen ? '▲' : '▼'}</span>
         </button>
 
@@ -132,10 +125,10 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
-                🏢 {isAr ? 'الجهة' : 'ארגון'}
+                🏢 {t('board_filter_org')}
               </label>
               <select value={filterOrg} onChange={e => setFilterOrg(e.target.value)} className={selectClass}>
-                <option value="">{ALL}</option>
+                <option value="">{t('all')}</option>
                 {ORGANIZATIONS.map(o => (
                   <option key={o.id} value={o.id}>{isAr ? o.nameAr : o.nameHe}</option>
                 ))}
@@ -143,48 +136,47 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
-                📍 {isAr ? 'البلدة' : 'יישוב'}
+                📍 {t('board_filter_city')}
               </label>
               <select value={filterCity} onChange={e => setFilterCity(e.target.value)} className={selectClass}>
-                <option value="">{ALL}</option>
+                <option value="">{t('all')}</option>
                 {cities.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
-                🔖 {isAr ? 'النوع' : 'סוג'}
+                🔖 {t('board_filter_type')}
               </label>
               <select value={filterType} onChange={e => setFilterType(e.target.value)} className={selectClass}>
-                <option value="">{ALL}</option>
-                {types.map(t => <option key={t} value={t}>{isAr ? (TYPE_AR[t] || t) : t}</option>)}
+                <option value="">{t('all')}</option>
+                {types.map(tp => <option key={tp} value={tp}>{isAr ? (TYPE_AR[tp] || tp) : tp}</option>)}
               </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
-                🗺️ {isAr ? 'النطاق' : 'היקף'}
+                🗺️ {t('board_filter_scope')}
               </label>
               <select value={filterScope} onChange={e => setFilterScope(e.target.value)} className={selectClass}>
-                <option value="">{ALL}</option>
-                <option value="יישובי">{isAr ? 'بلدي'   : 'יישובי'}</option>
-                <option value="אזורי"> {isAr ? 'إقليمي' : 'אזורי'} </option>
+                <option value="">{t('all')}</option>
+                <option value="יישובי">{t('board_scope_local')}</option>
+                <option value="אזורי">{t('board_scope_regional')}</option>
               </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
-                🎂 {isAr ? 'العمر' : 'גיל'}
+                🎂 {t('board_filter_age')}
               </label>
               <input
                 type="number"
                 value={filterAge}
                 onChange={e => setFilterAge(e.target.value)}
-                placeholder={isAr ? 'כל الأعمار' : 'כל גיל'}
+                placeholder={t('board_age_placeholder')}
                 className={selectClass} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Results grid ── */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((o, i) => (
@@ -196,17 +188,13 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
       ) : (
         <div className="text-center py-24 text-gray-400">
           <p className="text-6xl mb-4 animate-float inline-block">🔍</p>
-          <p className="text-xl font-bold text-gray-500 mb-2">
-            {isAr ? 'لم يتم العثور على فرص' : 'לא נמצאו הזדמנויות'}
-          </p>
-          <p className="text-sm text-gray-400 mb-5">
-            {isAr ? 'جرّب تعديل الفلاتر أو البحث' : 'נסה לשנות את הפילטרים או החיפוש'}
-          </p>
+          <p className="text-xl font-bold text-gray-500 mb-2">{t('board_empty_title')}</p>
+          <p className="text-sm text-gray-400 mb-5">{t('board_empty_subtitle')}</p>
           {hasActiveFilters && (
             <button onClick={clearFilters}
               className="px-5 py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700
                 transition shadow-md text-sm">
-              {isAr ? 'مسح جميع الفلاتر' : 'נקה את כל הפילטרים'}
+              {t('board_clear_all')}
             </button>
           )}
         </div>

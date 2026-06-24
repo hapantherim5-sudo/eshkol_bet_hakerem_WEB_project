@@ -7,7 +7,7 @@ import { formatIsraeliDate } from '../../utils/israeliDate';
 const WEEK_HE = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
 const WEEK_AR = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
 
-function EventsCalendar({ events, lang, opportunities, onOpenOpp }) {
+function EventsCalendar({ events, lang, opportunities, onOpenOpp, currentUser, registrations }) {
   const isAr = lang === 'ar';
   const t = (he, ar) => pick(isAr, he, ar);
   const now = new Date();
@@ -15,10 +15,17 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp }) {
   const [month,       setMonth]       = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState(now.getDate());
 
+  const registeredOppIds = new Set(
+    (registrations ?? [])
+      .filter(r => r.userId === currentUser?.id)
+      .map(r => r.opportunityId)
+  );
+  const userEvents = events.filter(e => e.opportunityId && registeredOppIds.has(e.opportunityId));
+
   const grid       = getMonthGrid(year, month);
   const monthLabel = new Date(year, month).toLocaleDateString(isAr ? 'ar' : 'he', { month: 'long', year: 'numeric' });
   const key        = selectedDay ? dateKey(year, month, selectedDay) : null;
-  const dayEvents  = key ? eventsOnDay(events, key) : [];
+  const dayEvents  = key ? eventsOnDay(userEvents, key) : [];
   const isToday    = day => year === now.getFullYear() && month === now.getMonth() && day === now.getDate();
 
   const shiftMonth = delta => {
@@ -72,7 +79,7 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp }) {
             {grid.map((day, i) => {
               if (!day) return <div key={`e-${i}`} />;
               const dk    = dateKey(year, month, day);
-              const has   = eventsOnDay(events, dk).length > 0;
+              const has   = eventsOnDay(userEvents, dk).length > 0;
               const sel   = day === selectedDay;
               const today = isToday(day);
               return (
@@ -110,7 +117,7 @@ function EventsCalendar({ events, lang, opportunities, onOpenOpp }) {
           {dayEvents.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
               <p className="text-4xl mb-3">🗓️</p>
-              <p className="text-sm font-medium">{t('אין אירועים ביום זה', 'لا أحداث في هذا اليوم')}</p>
+              <p className="text-sm font-medium">{t('אין לך אירועים רשומים ביום זה', 'لا أحداث مسجلة لك في هذا اليوم')}</p>
             </div>
           ) : (
             <ul className="space-y-3">
