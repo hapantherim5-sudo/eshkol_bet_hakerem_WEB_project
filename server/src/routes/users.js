@@ -45,7 +45,9 @@ router.post('/users', async (req, res, next) => {
       ...(organizationId ? { organizationId } : {}),
     };
     await db.collection(COLLECTIONS.users).insertOne(user);
-    const { password: _pw, _id, ...safe } = user;
+    const safe = Object.fromEntries(
+      Object.entries(user).filter(([key]) => key !== 'password' && key !== '_id')
+    );
     res.status(201).json(safe);
   } catch (err) {
     next(err);

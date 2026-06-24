@@ -4,16 +4,26 @@
   --font-sans: 'Heebo', system-ui, sans-serif;
 }
 
-/* Heebo Black for Hebrew */
-:root:lang(he),
-:root:lang(he) * {
-  font-weight: 900 !important;
+:root {
+  font-size: 18px;
 }
 
 /* Safe area: keep content clear of notched phone edges */
 body {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+/* Make every actionable button clearly feel clickable. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed !important;
 }
 
 /* ── Animations ── */
@@ -112,4 +122,289 @@ body {
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+
+/* Dark theme overrides for components that use fixed light utility classes. */
+.app-dark {
+  color-scheme: dark;
+}
+
+.app-dark .bg-white,
+.app-dark .bg-gray-50 {
+  background-color: #1e293b;
+}
+
+.app-dark .bg-gray-100,
+.app-dark .bg-gray-200 {
+  background-color: #334155;
+}
+
+.app-dark .bg-gray-300 {
+  background-color: #475569;
+}
+
+.app-dark .text-gray-900,
+.app-dark .text-gray-800 {
+  color: #f8fafc;
+}
+
+.app-dark .text-gray-700,
+.app-dark .text-gray-600 {
+  color: #e2e8f0;
+}
+
+.app-dark .text-gray-500,
+.app-dark .text-gray-400 {
+  color: #cbd5e1;
+}
+
+.app-dark .text-gray-300,
+.app-dark .text-gray-200 {
+  color: #e2e8f0;
+}
+
+.app-dark .border-gray-50,
+.app-dark .border-gray-100,
+.app-dark .border-gray-200,
+.app-dark .border-gray-400 {
+  border-color: #475569;
+}
+
+.app-dark input,
+.app-dark select,
+.app-dark textarea {
+  background-color: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+.app-dark input::placeholder,
+.app-dark textarea::placeholder {
+  color: #94a3b8;
+}
+
+.app-dark select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+.app-dark .hover\:bg-gray-50:hover,
+.app-dark .hover\:bg-gray-100:hover,
+.app-dark .hover\:bg-gray-200:hover {
+  background-color: #475569;
+}
+
+.app-dark .glass-card {
+  background: rgba(30, 41, 59, 0.88);
+}
+
+.app-dark .admin-toolbar {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #475569;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Statistics: keep the conversion metrics dark and readable. */
+.app-dark .stats-conversion-views {
+  background-color: #302a43;
+}
+
+.app-dark .stats-conversion-registrations {
+  background-color: #15362b;
+}
+
+.app-dark .stats-conversion-views .text-violet-700 { color: #c4b5fd; }
+.app-dark .stats-conversion-views .text-violet-500 { color: #a78bfa; }
+.app-dark .stats-conversion-registrations .text-emerald-700 { color: #6ee7b7; }
+.app-dark .stats-conversion-registrations .text-emerald-500 { color: #86efac; }
+.app-dark .stats-conversion-rate { color: #60a5fa; }
+.app-dark .stats-conversion-track { background-color: #334155; }
+.app-dark .stats-conversion-note { color: #94a3b8; }
+
+/* Statistics KPI strip: one calm accent and crisp, non-emoji icons. */
+.stats-kpi-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.app-dark .stats-kpi-card {
+  background-color: #1e293b;
+  border-color: #475569;
+  box-shadow: none;
+}
+
+.app-dark .stats-kpi-icon {
+  background-color: #15362b;
+  color: #5eead4;
+}
+
+.app-dark .stats-kpi-value { color: #f8fafc; }
+.app-dark .stats-kpi-label { color: #cbd5e1; }
+
+.stats-kpi-card--success .stats-kpi-icon { background-color: #ecfdf5; color: #059669; }
+.stats-kpi-card--success .stats-kpi-value { color: #047857; }
+.stats-kpi-card--danger .stats-kpi-icon { background-color: #fff1f2; color: #e11d48; }
+.stats-kpi-card--danger .stats-kpi-value { color: #be123c; }
+.stats-kpi-card--teal .stats-kpi-icon { background-color: #ecfeff; color: #0891b2; }
+.stats-kpi-card--teal .stats-kpi-value { color: #0e7490; }
+
+.app-dark .stats-kpi-card--neutral .stats-kpi-icon { background-color: #334155; color: #cbd5e1; }
+.app-dark .stats-kpi-card--success .stats-kpi-icon { background-color: #15362b; color: #6ee7b7; }
+.app-dark .stats-kpi-card--success .stats-kpi-value { color: #6ee7b7; }
+.app-dark .stats-kpi-card--danger .stats-kpi-icon { background-color: #3b1d28; color: #fda4af; }
+.app-dark .stats-kpi-card--danger .stats-kpi-value { color: #fda4af; }
+.app-dark .stats-kpi-card--teal .stats-kpi-icon { background-color: #15343a; color: #67e8f9; }
+.app-dark .stats-kpi-card--teal .stats-kpi-value { color: #67e8f9; }
+
+/* Keep the community-benefit cards readable and colorful in dark mode. */
+.app-dark .community-perk {
+  border-color: #334155;
+}
+
+.app-dark .community-perk:nth-child(1) { background-color: #352c16; }
+.app-dark .community-perk:nth-child(2) { background-color: #351f2b; }
+.app-dark .community-perk:nth-child(3) { background-color: #2d2648; }
+.app-dark .community-perk:nth-child(4) { background-color: #15362b; }
+
+.app-dark .community-perk:nth-child(1) .community-perk-title { color: #fcd34d; }
+.app-dark .community-perk:nth-child(2) .community-perk-title { color: #f9a8d4; }
+.app-dark .community-perk:nth-child(3) .community-perk-title { color: #c4b5fd; }
+.app-dark .community-perk:nth-child(4) .community-perk-title { color: #6ee7b7; }
+
+.app-dark .community-perk-description {
+  color: #cbd5e1;
+}
+
+.app-dark .home-cta-login {
+  color: #ffffff;
+}
+
+.app-dark .home-hero-explore {
+  color: #ffffff;
+}
+
+.app-dark .login-page {
+  background: linear-gradient(135deg, #0f172a, #111827, #0f172a);
+}
+
+.app-dark .login-page > .pointer-events-none {
+  opacity: 0.15;
+}
+
+.app-dark .login-submit {
+  box-shadow: none;
+}
+
+/* Keep the Demo credentials easy to scan against the dark login card. */
+.app-dark .login-demo-toggle {
+  color: #6ee7b7;
+}
+
+.app-dark .login-demo-toggle:hover {
+  color: #a7f3d0;
+}
+
+.app-dark .login-demo-panel {
+  background-color: #172b2a;
+  border-color: #246b5a;
+  color: #d1fae5;
+}
+
+.app-dark .login-demo-code {
+  background-color: #334155;
+  color: #ecfdf5;
+}
+
+.app-dark .login-demo-staff {
+  color: #86efac;
+}
+
+.app-dark .modal-register-btn {
+  box-shadow: none;
+}
+
+.app-dark .opportunity-org-badge,
+.app-dark .opportunity-city-badge {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+.app-dark .filter-dropdown-options {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.app-dark .filter-dropdown-option {
+  color: #e2e8f0;
+}
+
+.app-dark .filter-dropdown-option:hover {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+.app-dark .filter-dropdown-option[aria-selected="true"] {
+  background-color: #065f46;
+  color: #ecfdf5;
+}
+
+.app-dark .hot-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+.app-dark .hot-card-age {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+.app-dark .hot-card .text-violet-600 {
+  color: #c4b5fd;
+}
+
+.app-dark .hot-board-cta {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.app-dark .hot-hero {
+  background: linear-gradient(135deg, #8a3f16, #9a421d, #743222);
+}
+
+.app-dark .hot-featured-gradient {
+  background: linear-gradient(135deg, #93411f, #a14c26, #7c3626);
+}
+
+.about-hero {
+  background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
+}
+
+.app-dark .about-hero {
+  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
+}
+
+.app-dark .about-info-card,
+.app-dark .about-mission-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.app-dark .about-email-chip {
+  background-color: #0f766e;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* One muted plum accent shared throughout the site. */
+.plum-gradient,
+.home-featured-card,
+.home-login-cta {
+  background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
+}
+
+/* Keep that same accent family restrained in dark mode. */
+.app-dark .plum-gradient,
+.app-dark .home-featured-card,
+.app-dark .home-login-cta {
+  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
 }

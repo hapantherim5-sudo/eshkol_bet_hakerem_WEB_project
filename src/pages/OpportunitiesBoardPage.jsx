@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import OpportunityCard from '../components/OpportunityCard';
 import { CATEGORIES, TYPE_AR } from '../data/fakeData';
 import { ORGANIZATIONS, getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 
 const CAT_ACTIVE = {
@@ -12,6 +13,46 @@ const CAT_ACTIVE = {
   community: 'bg-pink-500   text-white border-pink-500   shadow-pink-100',
   workshops: 'bg-amber-500  text-white border-amber-500  shadow-amber-100',
 };
+
+function FilterDropdown({ id, label, value, options, open, onToggle, onChange }) {
+  const selectedLabel = options.find(option => option.value === value)?.label ?? options[0]?.label;
+
+  return (
+    <div className="relative">
+      {label && <label className="block text-xs font-semibold text-gray-500 mb-1">{label}</label>}
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={`${id}-options`}
+        onClick={onToggle}
+        className="w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-sm cursor-pointer
+          flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500
+          text-gray-800 transition">
+        <span className="truncate">{selectedLabel}</span>
+        <span className={`text-xs text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {open && (
+        <div id={`${id}-options`} role="listbox"
+          className="filter-dropdown-options absolute z-20 mt-1 w-full max-h-56 overflow-y-auto rounded-xl border border-gray-200
+            bg-white shadow-lg py-1">
+          {options.map(option => (
+            <button key={option.value || 'all'} type="button" role="option"
+              aria-selected={value === option.value}
+              onClick={() => onChange(option.value)}
+              className={`filter-dropdown-option w-full px-3 py-2 text-right text-sm cursor-pointer transition
+                ${value === option.value
+                  ? 'bg-emerald-100 text-emerald-800 font-bold'
+                  : 'text-gray-700 hover:bg-emerald-50'}`}>
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
   const t = useT(lang);
@@ -25,6 +66,8 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
   const [filterScope, setFilterScope] = useState('');
   const [filterAge,   setFilterAge]   = useState('');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [openFilter, setOpenFilter] = useState(null);
+  const filtersRef = useRef(null);
 
   const cities = [...new Set(opportunities.map(o => o.city))].sort();
   const types  = [...new Set(opportunities.map(o => o.type))].sort();
@@ -40,6 +83,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
     const orgName = getOrgName(o.organizationId, isAr);
     if (q && !o.title.toLowerCase().includes(q) && !o.titleAr.includes(q) &&
         !o.description.toLowerCase().includes(q) && !o.city.includes(q) &&
+        !getCityName(o.city, true).includes(q) &&
         !orgName.toLowerCase().includes(q)) return false;
     return true;
   });
@@ -53,6 +97,22 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
 
   const selectClass = `w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-xl text-sm
     focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-800 transition`;
+
+  useEffect(() => {
+    if (!openFilter) return undefined;
+    const closeOnOutsideClick = (event) => {
+      if (!filtersRef.current?.contains(event.target)) setOpenFilter(null);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setOpenFilter(null);
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [openFilter]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 animate-fade-in">
@@ -111,7 +171,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
         })}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+      <div ref={filtersRef} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
         <button
           type="button"
           onClick={() => setFiltersOpen(o => !o)}
@@ -127,40 +187,65 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 🏢 {t('board_filter_org')}
               </label>
-              <select value={filterOrg} onChange={e => setFilterOrg(e.target.value)} className={selectClass}>
-                <option value="">{t('all')}</option>
-                {ORGANIZATIONS.map(o => (
-                  <option key={o.id} value={o.id}>{isAr ? o.nameAr : o.nameHe}</option>
-                ))}
-              </select>
+              <FilterDropdown
+                id="filter-org"
+                label={null}
+                value={filterOrg}
+                open={openFilter === 'org'}
+                onToggle={() => setOpenFilter(openFilter === 'org' ? null : 'org')}
+                onChange={(value) => { setFilterOrg(value); setOpenFilter(null); }}
+                options={[{ value: '', label: t('all') }, ...ORGANIZATIONS.map(o => ({
+                  value: o.id, label: isAr ? o.nameAr : o.nameHe,
+                }))]}
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 📍 {t('board_filter_city')}
               </label>
-              <select value={filterCity} onChange={e => setFilterCity(e.target.value)} className={selectClass}>
-                <option value="">{t('all')}</option>
-                {cities.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <FilterDropdown
+                id="filter-city"
+                label={null}
+                value={filterCity}
+                open={openFilter === 'city'}
+                onToggle={() => setOpenFilter(openFilter === 'city' ? null : 'city')}
+                onChange={(value) => { setFilterCity(value); setOpenFilter(null); }}
+                options={[{ value: '', label: t('all') }, ...cities.map(c => ({ value: c, label: getCityName(c, isAr) }))]}
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 🔖 {t('board_filter_type')}
               </label>
-              <select value={filterType} onChange={e => setFilterType(e.target.value)} className={selectClass}>
-                <option value="">{t('all')}</option>
-                {types.map(tp => <option key={tp} value={tp}>{isAr ? (TYPE_AR[tp] || tp) : tp}</option>)}
-              </select>
+              <FilterDropdown
+                id="filter-type"
+                label={null}
+                value={filterType}
+                open={openFilter === 'type'}
+                onToggle={() => setOpenFilter(openFilter === 'type' ? null : 'type')}
+                onChange={(value) => { setFilterType(value); setOpenFilter(null); }}
+                options={[{ value: '', label: t('all') }, ...types.map(tp => ({
+                  value: tp, label: isAr ? (TYPE_AR[tp] || tp) : tp,
+                }))]}
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">
                 🗺️ {t('board_filter_scope')}
               </label>
-              <select value={filterScope} onChange={e => setFilterScope(e.target.value)} className={selectClass}>
-                <option value="">{t('all')}</option>
-                <option value="יישובי">{t('board_scope_local')}</option>
-                <option value="אזורי">{t('board_scope_regional')}</option>
-              </select>
+              <FilterDropdown
+                id="filter-scope"
+                label={null}
+                value={filterScope}
+                open={openFilter === 'scope'}
+                onToggle={() => setOpenFilter(openFilter === 'scope' ? null : 'scope')}
+                onChange={(value) => { setFilterScope(value); setOpenFilter(null); }}
+                options={[
+                  { value: '', label: t('all') },
+                  { value: 'יישובי', label: t('board_scope_local') },
+                  { value: 'אזורי', label: t('board_scope_regional') },
+                ]}
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">

@@ -184,3 +184,19 @@ export function saveSession(user) {
   if (user) save(KEYS.session, user);
   else localStorage.removeItem(KEYS.session);
 }
+
+export function loadTheme() {
+  return load(KEYS.theme, '');
+}
+
+export function saveTheme(theme) {
+  save(KEYS.theme, theme);
+}
+
+export function loadCurrentScreen() {
+  return load(KEYS.currentScreen, 'home');
+}
+
+export function saveCurrentScreen(screen) {
+  save(KEYS.currentScreen, screen);
+}

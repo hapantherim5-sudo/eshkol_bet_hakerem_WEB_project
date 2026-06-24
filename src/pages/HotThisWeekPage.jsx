@@ -1,6 +1,7 @@
 import { useT } from '../i18n/i18n';
 import { CATEGORIES } from '../data/fakeData';
 import { getOrgName } from '../data/organizations';
+import { getCityName } from '../data/opportunitiesSeed';
 
 const CAT_GRADIENT = {
   sport:     'from-orange-400 to-red-500',
@@ -62,7 +63,7 @@ function FeaturedCard({ opp, isAr, onOpenModal, t }) {
       className="relative overflow-hidden rounded-3xl cursor-pointer glow-hot animate-card-in
         hover:-translate-y-1 transition-all duration-300 group">
 
-      <div className={`absolute inset-0 bg-gradient-to-bl ${gradient} opacity-90`} />
+      <div className={`hot-featured-gradient absolute inset-0 bg-gradient-to-bl ${gradient} opacity-90`} />
       <div className="pointer-events-none absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/10 animate-blob" />
       <div className="pointer-events-none absolute -bottom-8 -left-8 w-36 h-36 rounded-full bg-black/10 animate-blob" style={{ animationDelay: '3s' }} />
 
@@ -89,7 +90,7 @@ function FeaturedCard({ opp, isAr, onOpenModal, t }) {
             🏢 {orgName}
           </span>
           <span className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-xl text-xs font-semibold">
-            📍 {opp.city}
+            📍 {getCityName(opp.city, isAr)}
           </span>
           <span className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-xl text-xs font-semibold">
             🎂 {isAr ? `${opp.ageMin}–${opp.ageMax} سنة` : `גיל ${opp.ageMin}–${opp.ageMax}`}
@@ -115,7 +116,7 @@ function HotCard({ opp, badge, isAr, onOpenModal, t }) {
   return (
     <div
       onClick={() => onOpenModal(opp)}
-      className={`relative overflow-hidden ${bgClass} rounded-2xl border cursor-pointer
+      className={`hot-card relative overflow-hidden ${bgClass} rounded-2xl border cursor-pointer
         hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 animate-card-in p-5`}>
 
       <div className={`absolute top-0 right-0 left-0 h-1 bg-gradient-to-l ${gradient}`} />
@@ -123,7 +124,7 @@ function HotCard({ opp, badge, isAr, onOpenModal, t }) {
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-3xl">{opp.icon}</span>
-          <span className={`inline-flex items-center px-2.5 py-1 ${badge.bg} text-white text-[10px] font-black rounded-lg`}>
+          <span className={`inline-flex items-center px-2.5 py-1 ${badge.bg} text-white text-[12px] font-black rounded-lg`}>
             {isAr ? badge.labelAr : badge.labelHe}
           </span>
         </div>
@@ -134,11 +135,11 @@ function HotCard({ opp, badge, isAr, onOpenModal, t }) {
 
       <h3 className="font-black text-gray-800 text-sm mb-1 leading-snug">{title}</h3>
       <p className="text-xs text-gray-500 font-medium mb-3">
-        🏢 {orgName} · 📍 {opp.city}
+        🏢 {orgName} · 📍 {getCityName(opp.city, isAr)}
       </p>
 
       <div className="flex items-center justify-between">
-        <span className="text-xs bg-white/70 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
+        <span className="hot-card-age text-xs bg-white/70 text-gray-600 px-2 py-0.5 rounded-lg font-medium">
           🎂 {isAr ? `${opp.ageMin}–${opp.ageMax}` : `גיל ${opp.ageMin}–${opp.ageMax}`}
         </span>
         <span className={`text-xs font-bold ${accentClass}`}>
@@ -160,7 +161,7 @@ function HotThisWeekPage({ opportunities, lang, onOpenModal }) {
   return (
     <div className="animate-fade-in">
 
-      <div className="relative overflow-hidden bg-gradient-to-bl from-red-600 via-orange-500 to-amber-400 text-white">
+      <div className="hot-hero relative overflow-hidden bg-gradient-to-bl from-red-600 via-orange-500 to-amber-400 text-white">
         <div className="pointer-events-none absolute -top-16 -right-12 w-60 h-60 rounded-full bg-white/5 animate-blob" />
         <div className="pointer-events-none absolute -bottom-10 -left-8 w-44 h-44 rounded-full bg-red-900/20 animate-blob" style={{ animationDelay: '3s' }} />
 
@@ -223,7 +224,7 @@ function HotThisWeekPage({ opportunities, lang, onOpenModal }) {
             )}
 
             <div className="mt-10 text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-l from-orange-50 to-amber-50
+              <div className="hot-board-cta inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-l from-orange-50 to-amber-50
                 border border-orange-100 rounded-2xl">
                 <span className="text-2xl">🎯</span>
                 <p className="text-sm font-bold text-gray-700">

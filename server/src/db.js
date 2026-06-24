@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Windows / some ISPs fail SRV lookup for mongodb+srv:// — use public DNS
+// Windows / some ISPs fail SRV lookup for mongodb+srv:// - use public DNS
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,7 +62,7 @@ export async function closeDb() {
   }
 }
 
-/** Collection names — match the app’s localStorage keys conceptually */
+/** Collection names - match the app’s localStorage keys conceptually */
 export const COLLECTIONS = {
   organizations: 'organizations',
   users: 'users',

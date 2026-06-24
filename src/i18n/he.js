@@ -1,7 +1,6 @@
 
 const he = {
 
-  // ── ניווט (Navbar) ──────────────────────────────────────────────
   nav_home:              'בית',
   nav_opportunities:     'הזדמנויות',
   nav_calendar:          'לוח שנה',
@@ -16,7 +15,6 @@ const he = {
   nav_logout:            'יציאה',
   nav_lang_toggle:       'ع',
 
-  // ── כללי ────────────────────────────────────────────────────────
   loading:               'טוען נתונים...',
   all:                   'הכל',
   close:                 'סגור',
@@ -28,10 +26,9 @@ const he = {
   coming_soon:           'בקרוב',
   error_server:          'שגיאת שרת, נסה שוב',
 
-  // ── דף הבית (HomePage) ──────────────────────────────────────────
   home_platform_badge:   'הפלטפורמה לבני הנוער',
   home_hero_title:       'גלה את ההזדמנות שלך',
-  home_hero_subtitle:    'התנדבות, ספורט, אמנות, קהילה — כל ההזדמנויות של אשכול בית הכרם במקום אחד',
+  home_hero_subtitle:    'התנדבות, ספורט, אמנות, קהילה - כל ההזדמנויות של אשכול בית הכרם במקום אחד',
   home_explore_btn:      '🔍 גלה הזדמנויות',
   home_hot_btn:          '🔥 חם השבוע',
   home_stat_opportunities: 'הזדמנויות',
@@ -62,7 +59,6 @@ const he = {
   home_cta_subtitle:           'התחבר כדי לעקוב אחרי ההרשמות שלך ולהירשם להזדמנויות',
   home_cta_login_btn:          'כניסה עכשיו →',
 
-  // ── לוח הזדמנויות (OpportunitiesBoardPage) ──────────────────────
   board_title:           'לוח ההזדמנויות',
   board_count:           'הזדמנויות זמינות',
   board_clear_filters:   'נקה פילטרים',
@@ -79,10 +75,8 @@ const he = {
   board_empty_subtitle:  'נסה לשנות את הפילטרים או החיפוש',
   board_clear_all:       'נקה את כל הפילטרים',
 
-  // ── כרטיס הזדמנות (OpportunityCard) ─────────────────────────────
   card_age_label:        'גיל',
 
-  // ── מודל פרטי הזדמנות (OpportunityDetailModal) ───────────────────
   modal_city:            'יישוב',
   modal_org:             'ארגון',
   modal_age:             'גיל',
@@ -94,7 +88,6 @@ const he = {
   modal_register_btn:    'הרשמה לפעילות ←',
   modal_cancel_reg_btn:  'ביטול הרשמה',
 
-  // ── מודל הרשמה (RegistrationModal) ──────────────────────────────
   reg_modal_title:       'אישור הרשמה',
   reg_city_label:        'יישוב מגורים',
   reg_city_placeholder:  'הכנס יישוב...',
@@ -102,7 +95,6 @@ const he = {
   reg_cancel_btn:        'ביטול',
   reg_confirm_btn:       'אשר הרשמה ✓',
 
-  // ── ההרשמות שלי (MyRegistrationsPage) ───────────────────────────
   my_reg_title:          'ההרשמות שלי',
   my_reg_count:          'פעילויות פעילות',
   my_reg_badge:          'רשום',
@@ -115,9 +107,8 @@ const he = {
   my_reg_empty_subtitle: 'גלה הזדמנויות מעניינות ובחר את מה שמתאים לך',
   my_reg_explore_btn:    '🔍 גלה הזדמנויות',
 
-  // ── כניסה (LoginPage) ────────────────────────────────────────────
   login_title:           'כניסה למערכת',
-  login_subtitle:        'מרכז ההזדמנויות — אשכול בית הכרם',
+  login_subtitle:        'מרכז ההזדמנויות - אשכול בית הכרם',
   login_demo_label:      'משתמשי Demo (לחץ לפתוח)',
   login_staff_label:     'צוות',
   login_password_label:  'סיסמה',
@@ -132,12 +123,10 @@ const he = {
   login_err_credentials: 'שם משתמש או סיסמה שגויים',
   login_err_server:      'שגיאת שרת, נסה שוב',
 
-  // ── גלריה (GalleryPage) ──────────────────────────────────────────
   gallery_title:         'גלריית התמונות',
   gallery_subtitle:      'הרגעים שלנו',
   gallery_empty:         'אין תמונות בקטגוריה זו',
 
-  // ── חם השבוע (HotThisWeekPage) ───────────────────────────────────
   hot_title:             '🔥 הכי חם השבוע',
   hot_featured_badge:    '🔥 פופולרי',
   hot_top_title:         'הבולטת השבוע',
@@ -147,7 +136,6 @@ const he = {
   hot_empty:             'אין הזדמנויות זמינות כרגע',
   hot_board_link:        ' לוח ההזדמנויות',
 
-  // ── אודות (AboutPage) ────────────────────────────────────────────
   about_badge:           'מי אנחנו',
   about_title:           'אשכול בית הכרם',
   about_subtitle:        'יוזמה קהילתית-נוענית שמטרתה להנגיש הזדמנויות ולשחרר את הפוטנציאל של כל צעיר וצעירה באזור',
@@ -177,7 +165,6 @@ const he = {
   about_contact_email:   '📧 info@bkerem.org.il',
   about_contact_location:'📍 אזור הגליל, ישראל',
 
-  // ── Toast הודעות ─────────────────────────────────────────────────
   toast_registered:      'נרשמת בהצלחה!',
   toast_already_reg:     'כבר נרשמת לפעילות זו',
   toast_reg_error:       'שגיאה בהרשמה, נסה שוב',
@@ -187,7 +174,6 @@ const he = {
   toast_staff_only:      'הרשמה זמינה למשתמשי נוער בלבד',
   toast_youth_login:     'יש להתחבר כמשתמש נוער',
 
-  // ── לוח שנה (EventsCalendar) ─────────────────────────────────────
   calendar_date_locale:  'he-IL',
 };
 

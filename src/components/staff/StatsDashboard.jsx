@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, CartesianGrid,
 } from 'recharts';
 import { api, apiEnabled } from '../../services/api';
 import { pick } from '../../i18n/i18n';
+import { getCityName } from '../../data/opportunitiesSeed';
 
 const PALETTE = [
   '#10b981','#06b6d4','#3b82f6','#8b5cf6',
@@ -98,35 +99,41 @@ function computeLocalStats(opportunities, registrations, cancellations, views) {
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 const KPI_META = [
-  { key: 'totalUsers',          icon: '👥', color: 'emerald', labelHe: 'משתמשים',        labelAr: 'المستخدمون'   },
-  { key: 'totalOpportunities',  icon: '📋', color: 'cyan',    labelHe: 'הזדמנויות',       labelAr: 'الفرص'        },
-  { key: 'totalRegistrations',  icon: '✅', color: 'blue',    labelHe: 'הרשמות',          labelAr: 'التسجيلات'   },
-  { key: 'totalCancellations',  icon: '❌', color: 'rose',    labelHe: 'ביטולים',         labelAr: 'الإلغاءات'   },
-  { key: 'totalViews',          icon: '👁️', color: 'violet',  labelHe: 'צפיות',           labelAr: 'المشاهدات'   },
-  { key: 'activeOrganizations', icon: '🏢', color: 'amber',   labelHe: 'ארגונים פעילים',  labelAr: 'منظمات نشطة' },
+  { key: 'totalUsers',          icon: 'users',     tone: 'neutral', labelHe: 'משתמשים',       labelAr: 'المستخدمون'   },
+  { key: 'totalOpportunities',  icon: 'clipboard', tone: 'neutral', labelHe: 'הזדמנויות',      labelAr: 'الفرص'        },
+  { key: 'totalRegistrations',  icon: 'check',     tone: 'success', labelHe: 'הרשמות',         labelAr: 'التسجيلات'   },
+  { key: 'totalCancellations',  icon: 'close',     tone: 'danger',  labelHe: 'ביטולים',        labelAr: 'الإلغاءات'   },
+  { key: 'totalViews',          icon: 'eye',       tone: 'teal',    labelHe: 'צפיות',          labelAr: 'المشاهدات'   },
+  { key: 'activeOrganizations', icon: 'building',  tone: 'neutral', labelHe: 'ארגונים פעילים', labelAr: 'منظمات نشطة' },
 ];
 
-const KPI_COLORS = {
-  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', num: 'text-emerald-700' },
-  cyan:    { bg: 'bg-cyan-50',    text: 'text-cyan-700',    num: 'text-cyan-700'    },
-  blue:    { bg: 'bg-blue-50',    text: 'text-blue-700',    num: 'text-blue-700'    },
-  rose:    { bg: 'bg-rose-50',    text: 'text-rose-600',    num: 'text-rose-600'    },
-  violet:  { bg: 'bg-violet-50',  text: 'text-violet-700',  num: 'text-violet-700'  },
-  amber:   { bg: 'bg-amber-50',   text: 'text-amber-700',   num: 'text-amber-700'   },
-};
+function KpiIcon({ type }) {
+  const paths = {
+    users: <><circle cx="9" cy="7" r="3" /><circle cx="17" cy="8" r="2.5" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0M14.5 20a4 4 0 0 1 5.5-3.7" /></>,
+    clipboard: <><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3" /></>,
+    check: <><rect x="4" y="4" width="16" height="16" rx="3" /><path d="m8 12 2.5 2.5L16.5 9" /></>,
+    close: <><circle cx="12" cy="12" r="8" /><path d="m9 9 6 6m0-6-6 6" /></>,
+    eye: <><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" /><circle cx="12" cy="12" r="2.5" /></>,
+    building: <><path d="M4 21h16M6 21V5l6-2v18M18 21V9l-6-2M9 8h.01M9 12h.01M9 16h.01M13 8h.01M13 12h.01M13 16h.01" /></>,
+  };
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {paths[type]}
+    </svg>
+  );
+}
 
-function KpiCard({ icon, value, labelHe, labelAr, color, isAr }) {
-  const c = KPI_COLORS[color];
+function KpiCard({ icon, tone, value, labelHe, labelAr, isAr }) {
   const label = isAr ? labelAr : labelHe;
   return (
-    <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg mb-3 ${c.bg}`}>
-        {icon}
+    <div className={`stats-kpi-card stats-kpi-card--${tone} bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5`}>
+      <div className="stats-kpi-icon w-10 h-10 rounded-xl flex items-center justify-center text-emerald-600 bg-emerald-50 mb-3">
+        <KpiIcon type={icon} />
       </div>
-      <div className={`text-2xl sm:text-3xl font-black tabular-nums ${c.num}`}>
-        {value !== null && value !== undefined ? value.toLocaleString() : '—'}
+      <div className="stats-kpi-value text-2xl sm:text-3xl font-black tabular-nums text-slate-800">
+        {value !== null && value !== undefined ? value.toLocaleString() : '-'}
       </div>
-      <div className="text-xs text-gray-500 mt-1 font-medium">{label}</div>
+      <div className="stats-kpi-label text-xs text-gray-500 mt-1 font-medium">{label}</div>
     </div>
   );
 }
@@ -186,16 +193,24 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
   const empty = t('אין נתונים להצגה', 'لا توجد بيانات');
 
   const [apiStats, setApiStats] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => apiEnabled());
+  const showToastRef = useRef(showToast);
+
+  useEffect(() => {
+    showToastRef.current = showToast;
+  }, [showToast]);
 
   useEffect(() => {
     if (!apiEnabled()) return;
-    setLoading(true);
+    let isActive = true;
     api.getStats()
-      .then(setApiStats)
-      .catch(() => showToast(t('שגיאה בטעינת נתוני הדשבורד', 'خطأ في تحميل بيانات لوحة التحكم'), 'error'))
-      .finally(() => setLoading(false));
-  }, []);
+      .then(stats => { if (isActive) setApiStats(stats); })
+      .catch(() => {
+        if (isActive) showToastRef.current(pick(isAr, 'שגיאה בטעינת נתוני הדשבורד', 'خطأ في تحميل بيانات لوحة التحكم'), 'error');
+      })
+      .finally(() => { if (isActive) setLoading(false); });
+    return () => { isActive = false; };
+  }, [isAr]);
 
   const localStats = useMemo(
     () => computeLocalStats(opportunities, registrations, cancellations, views),
@@ -215,20 +230,24 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
 
   // Horizontal bar chart height scales with item count
   const topBarH = Math.max(220, (topOpportunities?.length ?? 0) * 40 + 40);
+  const cityChartData = (registrationsByCity ?? []).map(item => ({
+    ...item,
+    city: getCityName(item.city, isAr),
+  }));
 
   return (
     <div className="space-y-5 pb-4">
 
       {/* ── Section 1: KPI cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {KPI_META.map(({ key, icon, color, labelHe, labelAr }) => (
+        {KPI_META.map(({ key, icon, tone, labelHe, labelAr }) => (
           <KpiCard
             key={key}
             icon={icon}
+            tone={tone}
             value={kpis[key]}
             labelHe={labelHe}
             labelAr={labelAr}
-            color={color}
             isAr={isAr}
           />
         ))}
@@ -242,8 +261,8 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={registrationsByMonth} margin={{ top: 4, right: 4, left: -24, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#94a3b8' }} interval={1} />
-                  <YAxis tick={{ fontSize: 9, fill: '#94a3b8' }} allowDecimals={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} interval={1} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
                   <Tooltip content={<BarTip />} cursor={{ fill: '#f0fdf4' }} />
                   <Bar dataKey="count" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={36} />
                 </BarChart>
@@ -258,8 +277,8 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={cancellationsByMonth} margin={{ top: 4, right: 4, left: -24, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#94a3b8' }} interval={1} />
-                  <YAxis tick={{ fontSize: 9, fill: '#94a3b8' }} allowDecimals={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#94a3b8' }} interval={1} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
                   <Tooltip content={<BarTip />} cursor={{ fill: '#fff1f2' }} />
                   <Bar dataKey="count" fill="#f43f5e" radius={[5, 5, 0, 0]} maxBarSize={36} />
                 </BarChart>
@@ -272,12 +291,12 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
       {/* ── Section 4 + 5: Pie charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard title={t('הרשמות לפי עיר', 'التسجيلات حسب المدينة')}>
-          {loading ? <Skeleton /> : !registrationsByCity?.length ? <Empty label={empty} /> : (
+        {loading ? <Skeleton /> : !cityChartData.length ? <Empty label={empty} /> : (
             <div dir="ltr">
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie
-                    data={registrationsByCity}
+                    data={cityChartData}
                     dataKey="count"
                     nameKey="city"
                     cx="50%" cy="46%"
@@ -286,13 +305,13 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                     label={({ name, percent }) => percent > 0.06 ? name : ''}
                     labelLine={false}
                   >
-                    {registrationsByCity.map((_, i) => (
+                    {cityChartData.map((_, i) => (
                       <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
                     ))}
                   </Pie>
                   <Tooltip content={<PieTip />} />
                   <Legend
-                    formatter={val => <span style={{ fontSize: 11, color: '#4b5563' }}>{val}</span>}
+                    formatter={val => <span style={{ fontSize: 13, color: '#4b5563' }}>{val}</span>}
                     iconSize={8}
                     wrapperStyle={{ paddingTop: 4 }}
                   />
@@ -323,7 +342,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                   </Pie>
                   <Tooltip content={<PieTip />} />
                   <Legend
-                    formatter={val => <span style={{ fontSize: 11, color: '#4b5563' }}>{val}</span>}
+                    formatter={val => <span style={{ fontSize: 13, color: '#4b5563' }}>{val}</span>}
                     iconSize={8}
                     wrapperStyle={{ paddingTop: 4 }}
                   />
@@ -345,12 +364,12 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                 margin={{ top: 4, right: 24, left: 0, bottom: 4 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} allowDecimals={false} />
+                <XAxis type="number" tick={{ fontSize: 12, fill: '#94a3b8' }} allowDecimals={false} />
                 <YAxis
                   type="category"
                   dataKey="title"
                   width={140}
-                  tick={{ fontSize: 10, fill: '#374151' }}
+                  tick={{ fontSize: 12, fill: '#374151' }}
                   tickFormatter={v => v?.length > 22 ? v.slice(0, 21) + '…' : v}
                 />
                 <Tooltip content={<BarTip />} cursor={{ fill: '#f8fafc' }} />
@@ -378,8 +397,8 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                   : 0;
                 return (
                   <div key={item.city} className="flex items-center gap-3 group">
-                    <span className="w-5 text-[11px] font-bold text-gray-300 text-center shrink-0">{i + 1}</span>
-                    <span className="text-sm font-semibold text-gray-700 w-20 shrink-0">{item.city}</span>
+                    <span className="w-5 text-[13px] font-bold text-gray-300 text-center shrink-0">{i + 1}</span>
+                    <span className="text-sm font-semibold text-gray-700 w-20 shrink-0">{getCityName(item.city, isAr)}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-2">
                       <div
                         className="h-2 rounded-full transition-all duration-700"
@@ -398,11 +417,11 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
         <SectionCard title={t('המרה: צפיות להרשמות', 'معدل التحويل: المشاهدات → التسجيلات')}>
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-violet-50 rounded-xl p-4 text-center">
+              <div className="stats-conversion-views bg-violet-50 rounded-xl p-4 text-center">
                 <div className="text-2xl font-black text-violet-700">{viewsTotal.toLocaleString()}</div>
                 <div className="text-xs text-violet-500 mt-1">{t('צפיות', 'مشاهدات')}</div>
               </div>
-              <div className="bg-emerald-50 rounded-xl p-4 text-center">
+              <div className="stats-conversion-registrations bg-emerald-50 rounded-xl p-4 text-center">
                 <div className="text-2xl font-black text-emerald-700">{regsTotal.toLocaleString()}</div>
                 <div className="text-xs text-emerald-500 mt-1">{t('הרשמות', 'تسجيلات')}</div>
               </div>
@@ -410,16 +429,16 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-semibold text-gray-600">{t('שיעור המרה', 'معدل التحويل')}</span>
-                <span className="text-2xl font-black text-blue-600">{convRate}%</span>
+                <span className="stats-conversion-rate text-2xl font-black text-blue-600">{convRate}%</span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+              <div className="stats-conversion-track w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                 <div
                   className="h-3 rounded-full bg-gradient-to-l from-blue-500 to-emerald-500 transition-all duration-1000"
                   style={{ width: `${Math.min(convRate, 100)}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-2 text-center">
-                {t('מתוך כל הצפיות — כמה הפכו להרשמות', 'من إجمالي المشاهدات — كم تحولت إلى تسجيلات')}
+              <p className="stats-conversion-note text-xs text-gray-400 mt-2 text-center">
+                {t('מתוך כל הצפיות - כמה הפכו להרשמות', 'من إجمالي المشاهدات - كم تحولت إلى تسجيلات')}
               </p>
             </div>
           </div>

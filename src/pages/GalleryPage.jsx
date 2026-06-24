@@ -53,7 +53,7 @@ function GalleryItem({ item, isAr }) {
           ? 'bg-gradient-to-t from-black/70 via-black/20 to-transparent'
           : 'bg-gradient-to-t from-black/30 to-transparent'}`}>
 
-        <span className={`self-start mb-2 px-2.5 py-1 ${item.tagColor} text-white text-[10px] font-black rounded-lg shadow-md`}>
+        <span className={`self-start mb-2 px-2.5 py-1 ${item.tagColor} text-white text-[12px] font-black rounded-lg shadow-md`}>
           {isAr ? item.tagLabelAr : item.tagLabelHe}
         </span>
 

@@ -31,6 +31,8 @@ function LoginPage({ lang, onLogin, onNavigate }) {
       console.error('[login] failed  status=%s  message=%s', e.status, e.message);
       if (e.status === 401) {
         setError(t('login_err_credentials'));
+      } else if (e.status === 408) {
+        setError(lang === 'ar' ? 'انتهت المهلة، حاول مجدداً' : 'פסק זמן, נסה שוב');
       } else {
         setError(t('login_err_server'));
       }
@@ -41,7 +43,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4
+    <div className="login-page min-h-screen flex items-center justify-center px-4
       bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 relative overflow-hidden">
 
       <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72
@@ -66,17 +68,17 @@ function LoginPage({ lang, onLogin, onNavigate }) {
 
           <div className="px-6 py-6">
             <details className="mb-5 group">
-              <summary className="text-xs font-bold text-emerald-700 cursor-pointer select-none
+              <summary className="login-demo-toggle text-xs font-bold text-emerald-700 cursor-pointer select-none
                 flex items-center gap-1.5 list-none hover:text-emerald-800 transition">
                 <span className="text-base">👤</span>
                 {t('login_demo_label')}
                 <span className="text-gray-400 mr-auto text-xs group-open:rotate-180 transition-transform">▼</span>
               </summary>
-              <div className="mt-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
-                <p>Admin: <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+              <div className="login-demo-panel mt-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
+                <p>Admin: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
                 <p>{t('login_staff_label')} ({t('login_password_label')}: 1234):</p>
-                <p className="text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
-                <p className="mt-1">User: <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">user1</code> / <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <p className="login-demo-staff text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
+                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">user1</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
               </div>
             </details>
 
@@ -133,7 +135,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-l from-emerald-600 to-teal-500
+              className="login-submit w-full py-3.5 bg-gradient-to-l from-emerald-600 to-teal-500
                 hover:from-emerald-700 hover:to-teal-600 text-white font-black rounded-2xl
                 transition-all duration-200 shadow-lg shadow-emerald-100
                 hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed
