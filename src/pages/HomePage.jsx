@@ -6,8 +6,8 @@ import { useT } from '../i18n/i18n';
 const ROTATION_MS = 5000;
 const FADE_MS     = 280;
 
-function calcCd(isoDate) {
-  const diff = Math.max(0, new Date(isoDate).getTime() - Date.now());
+function calcCd(isoDate, now) {
+  const diff = Math.max(0, new Date(isoDate).getTime() - now);
   const s    = Math.floor(diff / 1000);
   return {
     days:    Math.floor(s / 86400),
@@ -21,6 +21,7 @@ const p2 = (n) => String(n).padStart(2, '0');
 function HomePage({ store, currentUser, lang, handleNavigate }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
+  const [currentTime, setCurrentTime] = useState(Date.now);
 
   const QUICK_LINKS = [
     { screen: 'opportunities', icon: '🔍', label: t('home_quick_explore'), gradient: 'from-emerald-400 to-teal-500',  shadow: 'hover:shadow-emerald-200' },
@@ -47,30 +48,27 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
       o => o.status === 'פתוח' || o.status === 'מקומות אחרונים'
     );
     const pool = (open.length >= 3 ? open : store.opportunities).slice(0, 5);
-    const now  = Date.now();
     return pool.map(opp => {
       const ev = (store.events ?? [])
-        .filter(e => e.opportunityId === opp.id && e.startsAt && new Date(e.startsAt).getTime() > now)
+        .filter(e => e.opportunityId === opp.id && e.startsAt && new Date(e.startsAt).getTime() > currentTime)
         .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
       return { opp, eventDate: ev?.startsAt ?? null };
     });
-  }, [store.opportunities, store.events]);
+  }, [store.opportunities, store.events, currentTime]);
 
   const [idx,     setIdx    ] = useState(0);
   const [visible, setVisible] = useState(true);
-  const [cd,      setCd     ] = useState(null);
 
   const safeIdx     = carouselItems.length > 0 ? Math.min(idx, carouselItems.length - 1) : 0;
   const currentItem = carouselItems[safeIdx];
   const featuredOpp = currentItem?.opp ?? store.opportunities[0];
   const eventDate   = currentItem?.eventDate ?? null;
+  const cd = eventDate ? calcCd(eventDate, currentTime) : null;
 
   useEffect(() => {
-    if (!eventDate) { setCd(null); return; }
-    setCd(calcCd(eventDate));
-    const id = setInterval(() => setCd(calcCd(eventDate)), 1000);
+    const id = setInterval(() => setCurrentTime(Date.now()), 1000);
     return () => clearInterval(id);
-  }, [eventDate]);
+  }, []);
 
   useEffect(() => {
     if (carouselItems.length <= 1) return;

@@ -1,11 +1,10 @@
 /**
- * ملف الترجمات - العربية
- * لإضافة كلمة جديدة: أضف المفتاح هنا وفي he.js
+ * Arabic UI translation strings.
+ * Keep keys in sync with he.js when adding a translation.
  */
 
 const ar = {
 
-  // ── ناف-بار (Navbar) ────────────────────────────────────────────
   nav_home:              'الرئيسية',
   nav_opportunities:     'الفرص',
   nav_calendar:          'التقويم',
@@ -20,7 +19,6 @@ const ar = {
   nav_logout:            'خروج',
   nav_lang_toggle:       'ע',
 
-  // ── عام ──────────────────────────────────────────────────────────
   loading:               'جاري التحميل...',
   all:                   'الكل',
   close:                 'إغلاق',
@@ -32,7 +30,6 @@ const ar = {
   coming_soon:           'قريباً',
   error_server:          'خطأ في الخادم، حاول مجدداً',
 
-  // ── الصفحة الرئيسية (HomePage) ──────────────────────────────────
   home_platform_badge:   'منصة الشباب',
   home_hero_title:       'اكتشف فرصتك',
   home_hero_subtitle:    'تطوع، رياضة، فنون، مجتمع - جميع فرص شباب عنقود بيت هكيريم في مكان واحد',
@@ -66,7 +63,6 @@ const ar = {
   home_cta_subtitle:           'سجّل دخولك لمتابعة نشاطاتك والتسجيل في الفرص',
   home_cta_login_btn:          'سجّل الدخول الآن',
 
-  // ── لوحة الفرص (OpportunitiesBoardPage) ────────────────────────
   board_title:           'لوح الفرص',
   board_count:           'فرصة متاحة',
   board_clear_filters:   'مسح الفلاتر',
@@ -83,10 +79,8 @@ const ar = {
   board_empty_subtitle:  'جرّب تعديل الفلاتر أو البحث',
   board_clear_all:       'مسح جميع الفلاتر',
 
-  // ── بطاقة الفرصة (OpportunityCard) ──────────────────────────────
   card_age_label:        'سنة',
 
-  // ── نافذة تفاصيل الفرصة (OpportunityDetailModal) ────────────────
   modal_city:            'البلدة',
   modal_org:             'الجهة',
   modal_age:             'العمر',
@@ -98,7 +92,6 @@ const ar = {
   modal_register_btn:    'سجّل الآن ←',
   modal_cancel_reg_btn:  'إلغاء التسجيل',
 
-  // ── نافذة التسجيل (RegistrationModal) ───────────────────────────
   reg_modal_title:       'تأكيد التسجيل',
   reg_city_label:        'بلدة السكن',
   reg_city_placeholder:  'أدخل البلدة...',
@@ -106,7 +99,6 @@ const ar = {
   reg_cancel_btn:        'إلغاء',
   reg_confirm_btn:       'أكد التسجيل ✓',
 
-  // ── نشاطاتي المسجلة (MyRegistrationsPage) ───────────────────────
   my_reg_title:          'فرصي المسجلة',
   my_reg_count:          'نشاط مسجل',
   my_reg_badge:          'مسجل',
@@ -119,7 +111,6 @@ const ar = {
   my_reg_empty_subtitle: 'تصفح الفرص المتاحة واختر ما يناسبك',
   my_reg_explore_btn:    '🔍 استكشف الفرص',
 
-  // ── تسجيل الدخول (LoginPage) ─────────────────────────────────────
   login_title:           'تسجيل الدخول',
   login_subtitle:        'مركز الفرص - عنقود بيت هكيريم',
   login_demo_label:      'بيانات Demo (انقر للعرض)',
@@ -136,12 +127,10 @@ const ar = {
   login_err_credentials: 'اسم المستخدم أو كلمة المرور غير صحيحة',
   login_err_server:      'خطأ في الخادم، حاول مجدداً',
 
-  // ── معرض الصور (GalleryPage) ─────────────────────────────────────
   gallery_title:         'معرض الصور',
   gallery_subtitle:      'لحظاتنا المميزة',
   gallery_empty:         'لا توجد صور في هذا القسم',
 
-  // ── الأكثر رواجاً (HotThisWeekPage) ─────────────────────────────
   hot_title:             '🔥 الأكثر رواجاً هذا الأسبوع',
   hot_featured_badge:    '🔥 رائج',
   hot_top_title:         'الأبرز هذا الأسبوع',
@@ -151,7 +140,6 @@ const ar = {
   hot_empty:             'لا توجد فرص متاحة حالياً',
   hot_board_link:        ' لوح الفرص',
 
-  // ── من نحن (AboutPage) ───────────────────────────────────────────
   about_badge:           'من نحن',
   about_title:           'عنقود بيت هكيريم',
   about_subtitle:        'مبادرة شبابية مجتمعية تهدف إلى توفير الفرص والإمكانات لكل شاب وشابة في المنطقة',
@@ -181,7 +169,6 @@ const ar = {
   about_contact_email:   '📧 info@bkerem.org.il',
   about_contact_location:'📍 منطقة الجليل، إسرائيل',
 
-  // ── رسائل Toast ──────────────────────────────────────────────────
   toast_registered:      'تم التسجيل بنجاح!',
   toast_already_reg:     'مسجل بالفعل',
   toast_reg_error:       'خطأ في التسجيل، حاول مرة أخرى',
@@ -191,7 +178,6 @@ const ar = {
   toast_staff_only:      'التسجيل للشباب فقط',
   toast_youth_login:     'يجب تسجيل الدخول كشاب',
 
-  // ── التقويم (EventsCalendar) ─────────────────────────────────────
   calendar_date_locale:  'ar-IL',
 };
 

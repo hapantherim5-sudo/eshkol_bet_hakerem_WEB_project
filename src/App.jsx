@@ -14,7 +14,9 @@ import GalleryPage from './pages/GalleryPage';
 import HotThisWeekPage from './pages/HotThisWeekPage';
 
 import { useDataStore } from './hooks/useDataStore';
-import { loadSession, saveSession, loadTheme, saveTheme } from './hooks/useLocalStore';
+import {
+  loadSession, saveSession, loadTheme, saveTheme, loadCurrentScreen, saveCurrentScreen,
+} from './hooks/useLocalStore';
 
 import { setDocumentLang, useT } from './i18n/i18n';
 import { isStaffRole } from './utils/permissions';
@@ -22,7 +24,7 @@ import { isStaffRole } from './utils/permissions';
 function App() {
   const store = useDataStore();
   // Screen state replaces a routing library in this single-page application.
-  const [currentScreen, setCurrentScreen] = useState('home');
+  const [currentScreen, setCurrentScreen] = useState(() => loadCurrentScreen());
   const [currentUser, setCurrentUser] = useState(() => loadSession());
   const [theme, setTheme] = useState(() => loadTheme());
   const [lang, setLang] = useState('he');
@@ -34,6 +36,7 @@ function App() {
   const t = useT(lang);
 
   useEffect(() => setDocumentLang(lang), [lang]);
+  useEffect(() => saveCurrentScreen(currentScreen), [currentScreen]);
 
   const showToast = (msg, type = 'success') => {
     setToast(msg);

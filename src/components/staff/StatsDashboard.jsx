@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, CartesianGrid,
@@ -186,16 +186,24 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
   const empty = t('אין נתונים להצגה', 'لا توجد بيانات');
 
   const [apiStats, setApiStats] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => apiEnabled());
+  const showToastRef = useRef(showToast);
+
+  useEffect(() => {
+    showToastRef.current = showToast;
+  }, [showToast]);
 
   useEffect(() => {
     if (!apiEnabled()) return;
-    setLoading(true);
+    let isActive = true;
     api.getStats()
-      .then(setApiStats)
-      .catch(() => showToast(t('שגיאה בטעינת נתוני הדשבורד', 'خطأ في تحميل بيانات لوحة التحكم'), 'error'))
-      .finally(() => setLoading(false));
-  }, []);
+      .then(stats => { if (isActive) setApiStats(stats); })
+      .catch(() => {
+        if (isActive) showToastRef.current(pick(isAr, 'שגיאה בטעינת נתוני הדשבורד', 'خطأ في تحميل بيانات لوحة التحكم'), 'error');
+      })
+      .finally(() => { if (isActive) setLoading(false); });
+    return () => { isActive = false; };
+  }, [isAr]);
 
   const localStats = useMemo(
     () => computeLocalStats(opportunities, registrations, cancellations, views),

@@ -7,6 +7,7 @@ export const KEYS = {
   session:       'eshkol_session',
   profiles:      'eshkol_profiles',
   theme:         'eshkol_theme',
+  currentScreen: 'eshkol_current_screen',
 };
 
 export function load(key, fallback) {

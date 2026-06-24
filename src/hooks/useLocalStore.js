@@ -192,3 +192,11 @@ export function loadTheme() {
 export function saveTheme(theme) {
   save(KEYS.theme, theme);
 }
+
+export function loadCurrentScreen() {
+  return load(KEYS.currentScreen, 'home');
+}
+
+export function saveCurrentScreen(screen) {
+  save(KEYS.currentScreen, screen);
+}

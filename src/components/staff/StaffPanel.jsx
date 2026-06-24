@@ -7,8 +7,8 @@ import UserManagement from './UserManagement';
 import StatsDashboard from './StatsDashboard';
 
 function StaffPanel({
-  lang, currentUser, opportunities, events, views, registrations, cancellations, profiles,
-  onAdd, onUpdate, onDelete, onAddEvent, onDeleteEvent, onReplaceEventsForOpportunity, showToast,
+  lang, currentUser, opportunities, views, registrations, cancellations, profiles,
+  onAdd, onUpdate, onDelete, onReplaceEventsForOpportunity, showToast,
 }) {
   const isAr = lang === 'ar';
   const isAdmin = currentUser.role === 'Admin';
