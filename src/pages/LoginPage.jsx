@@ -19,18 +19,25 @@ function LoginPage({ lang, onLogin, onNavigate }) {
       setError(t('login_err_fields'));
       return;
     }
+    console.log('[login] attempt  username=%s', username);
+    setError('');
     setLoading(true);
     try {
+      console.log('[login] calling api.login...');
       const user = await api.login(username, password);
-      setError('');
+      console.log('[login] success  username=%s  role=%s', user?.username, user?.role);
       onLogin(user);
     } catch (e) {
+      console.error('[login] failed  status=%s  message=%s', e.status, e.message);
       if (e.status === 401) {
         setError(t('login_err_credentials'));
+      } else if (e.status === 408) {
+        setError(lang === 'ar' ? 'انتهت المهلة، حاول مجدداً' : 'פסק זמן, נסה שוב');
       } else {
         setError(t('login_err_server'));
       }
     } finally {
+      console.log('[login] request done, loading reset');
       setLoading(false);
     }
   };
