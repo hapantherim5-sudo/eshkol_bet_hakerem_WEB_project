@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ORGANIZATIONS } from '../data/organizations';
+import { ORGANIZATIONS, getCityName } from '../data/organizations';
 import { CATEGORIES } from '../data/fakeData';
-import { getCityName } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
 
 const ROTATION_MS = 5000;
@@ -310,11 +309,19 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
                   <p className="font-black text-xl mb-1">{t('home_cta_title')}</p>
                   <p className="text-white/75 text-sm">{t('home_cta_subtitle')}</p>
                 </div>
-                <button onClick={() => handleNavigate('login')}
-                  className="home-cta-login shrink-0 px-7 py-3 bg-white text-[#6c4e9b] font-black
-                    rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg text-sm">
-                  {t('home_cta_login_btn')}
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                  <button onClick={() => handleNavigate('register')}
+                    className="px-7 py-3 bg-white/15 border border-white/40 text-white font-bold
+                      rounded-xl transition-all hover:bg-white/25 hover:scale-105 active:scale-95
+                      backdrop-blur-sm text-sm">
+                    {t('home_cta_register_btn')}
+                  </button>
+                  <button onClick={() => handleNavigate('login')}
+                    className="home-cta-login px-7 py-3 bg-white text-[#6c4e9b] font-black
+                      rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg text-sm">
+                    {t('home_cta_login_btn')}
+                  </button>
+                </div>
               </div>
             </div>
           </section>

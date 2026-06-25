@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { api, apiEnabled } from '../../services/api';
 import { pick } from '../../i18n/i18n';
-import { getCityName } from '../../data/opportunitiesSeed';
+import { getCityName } from '../../data/organizations';
 
 const PALETTE = [
   '#10b981','#06b6d4','#3b82f6','#8b5cf6',

@@ -1,6 +1,6 @@
 import { STATUS_AR, TYPE_AR } from '../data/fakeData';
-import { getOrgName } from '../data/organizations';
-import { getCityName } from '../data/opportunitiesSeed';
+import { getOrgName, getCityName } from '../data/organizations';
+import { formatIsraeliDate } from '../utils/israeliDate';
 
 const CAT_STYLE = {
   sport:     { bar: 'bg-orange-400', shadow: 'hover:shadow-orange-100' },
@@ -62,6 +62,22 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
             🎂 {ageLabel}
           </span>
         </div>
+
+        {o.eventDate && (
+          <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-3
+            text-xs text-gray-500 font-medium">
+            <span className="flex items-center gap-1">
+              <span>📅</span>
+              <span>{formatIsraeliDate(o.eventDate)}</span>
+            </span>
+            {o.startTime && (
+              <span className="flex items-center gap-1">
+                <span>🕐</span>
+                <span>{o.startTime}{o.endTime ? `–${o.endTime}` : ''}</span>
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

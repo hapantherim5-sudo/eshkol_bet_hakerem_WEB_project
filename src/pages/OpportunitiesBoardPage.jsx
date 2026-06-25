@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import OpportunityCard from '../components/OpportunityCard';
 import { CATEGORIES, TYPE_AR } from '../data/fakeData';
-import { ORGANIZATIONS, getOrgName } from '../data/organizations';
-import { getCityName } from '../data/opportunitiesSeed';
+import { ORGANIZATIONS, getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
 
 const CAT_ACTIVE = {

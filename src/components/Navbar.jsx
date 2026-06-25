@@ -139,13 +139,23 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 </button>
               </div>
             ) : (
-              <button onClick={() => onNavigate('login')}
-                className="h-8 px-4 bg-gradient-to-l from-emerald-600 to-teal-500
-                  hover:from-emerald-700 hover:to-teal-600 text-white text-sm font-black
-                  rounded-xl transition-all duration-150 shadow-md hover:shadow-emerald-200
-                  hover:scale-105 active:scale-95">
-                {t('nav_login_btn')}
-              </button>
+              <div className="hidden md:flex items-center gap-1.5">
+                <button onClick={() => onNavigate('register')}
+                  className={`h-8 px-3 text-sm font-bold rounded-xl border-2 transition-all duration-150
+                    hover:scale-105 active:scale-95
+                    ${isDark
+                      ? 'border-emerald-500 text-emerald-400 hover:bg-slate-700'
+                      : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
+                  {t('nav_register_btn')}
+                </button>
+                <button onClick={() => onNavigate('login')}
+                  className="h-8 px-4 bg-gradient-to-l from-emerald-600 to-teal-500
+                    hover:from-emerald-700 hover:to-teal-600 text-white text-sm font-black
+                    rounded-xl transition-all duration-150 shadow-md hover:shadow-emerald-200
+                    hover:scale-105 active:scale-95">
+                  {t('nav_login_btn')}
+                </button>
+              </div>
             )}
 
             <button
@@ -200,7 +210,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
               );
             })}
 
-            {currentUser && (
+            {currentUser ? (
               <button
                 onClick={() => { onLogout(); setMenuOpen(false); }}
                 className="flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-sm font-semibold
@@ -208,6 +218,27 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                 <span className="text-base">🚪</span>
                 <span>{t('nav_logout')}</span>
               </button>
+            ) : (
+              <div className="flex flex-col gap-2 mt-1">
+                <button
+                  onClick={() => { onNavigate('register'); setMenuOpen(false); }}
+                  className={`flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-sm font-bold
+                    min-h-[44px] border-2 transition-all
+                    ${isDark
+                      ? 'border-emerald-500 text-emerald-400'
+                      : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
+                  <span className="text-base">✍️</span>
+                  <span>{t('nav_register_btn')}</span>
+                </button>
+                <button
+                  onClick={() => { onNavigate('login'); setMenuOpen(false); }}
+                  className="flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-sm font-black
+                    min-h-[44px] bg-gradient-to-l from-emerald-600 to-teal-500 text-white
+                    shadow-md transition-all">
+                  <span className="text-base">🔑</span>
+                  <span>{t('nav_login_btn')}</span>
+                </button>
+              </div>
             )}
           </div>
         )}

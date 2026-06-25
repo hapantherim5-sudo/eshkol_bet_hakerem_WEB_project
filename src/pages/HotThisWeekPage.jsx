@@ -1,7 +1,6 @@
 import { useT } from '../i18n/i18n';
 import { CATEGORIES } from '../data/fakeData';
-import { getOrgName } from '../data/organizations';
-import { getCityName } from '../data/opportunitiesSeed';
+import { getOrgName, getCityName } from '../data/organizations';
 
 const CAT_GRADIENT = {
   sport:     'from-orange-400 to-red-500',
