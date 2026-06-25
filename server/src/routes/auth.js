@@ -16,6 +16,7 @@ router.post('/auth/login', async (req, res, next) => {
     console.log('[auth] login success  username=%s  role=%s', user.username, user.role);
     const safe = { ...user };
     delete safe.password;
+    delete safe._id;
     res.json(safe);
     console.log('[auth] response sent  username=%s', username);
   } catch (err) {

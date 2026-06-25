@@ -78,7 +78,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
                 <p>Admin: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
                 <p>{t('login_staff_label')} ({t('login_password_label')}: 1234):</p>
                 <p className="login-demo-staff text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
-                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">user1</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">youth</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
               </div>
             </details>
 
