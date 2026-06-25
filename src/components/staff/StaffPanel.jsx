@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { filterManageable, canManageOpportunity } from '../../utils/permissions';
-import { getOrgName } from '../../data/organizations';
-import { getCityName } from '../../data/opportunitiesSeed';
+import { getOrgName, getCityName } from '../../data/organizations';
 import { pick } from '../../i18n/i18n';
 import OpportunityForm from './OpportunityForm';
 import UserManagement from './UserManagement';

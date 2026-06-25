@@ -14,6 +14,3 @@ export function dateKey(year, month, day) {
   return `${year}-${m}-${d}`;
 }
 
-export function eventsOnDay(events, key) {
-  return events.filter(e => (e.startsAt || '').slice(0, 10) === key);
-}

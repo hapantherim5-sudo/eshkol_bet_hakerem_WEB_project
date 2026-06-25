@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { TYPE_AR } from '../data/fakeData';
-import { getOrgName } from '../data/organizations';
-import { getCityName } from '../data/opportunitiesSeed';
+import { getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
 
 function formatDate(iso, locale) {
@@ -11,7 +10,7 @@ function formatDate(iso, locale) {
   });
 }
 
-function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, onOpenModal, onCancel }) {
+function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, onOpenModal, onCancel, onNavigate }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
   const [confirmCancelId, setConfirmCancelId] = useState(null);
@@ -121,7 +120,7 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
             {t('my_reg_empty_subtitle')}
           </p>
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'opportunities' }))}
+            onClick={() => onNavigate('opportunities')}
             className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold
               rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
             {t('my_reg_explore_btn')}

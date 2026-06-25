@@ -60,6 +60,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ username, password }),
     }),
+  registerUser: (name, username, password) =>
+    request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, username, password }),
+    }),
   addOpportunity: body =>
     request('/api/opportunities', { method: 'POST', body: JSON.stringify(body) }),
   updateOpportunity: opp =>

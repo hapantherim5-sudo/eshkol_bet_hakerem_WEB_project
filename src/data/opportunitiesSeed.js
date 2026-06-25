@@ -1,3 +1,5 @@
+﻿import { getCityName } from './organizations.js';
+
 export const CITY_ORG = {
   'משגב': 'youth-misgav',
   'כרמיאל': 'youth-karmiel',
@@ -7,20 +9,6 @@ export const CITY_ORG = {
   'ראמה': 'youth-rama',
   'נחף': 'youth-nahaf',
 };
-
-export const CITY_AR = {
-  'משגב': 'مسغاف',
-  'כרמיאל': 'كرميئيل',
-  'בענה': 'البعنة',
-  'דיר אלאסד': 'دير الأسد',
-  "סח'נין": 'سخنين',
-  'ראמה': 'الرامة',
-  'נחף': 'نحف',
-};
-
-export function getCityName(city, isAr) {
-  return isAr ? (CITY_AR[city] || city) : city;
-}
 
 export const OPPORTUNITIES_BY_CITY = {
   'משגב': [
