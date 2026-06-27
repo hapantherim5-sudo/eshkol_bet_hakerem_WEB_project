@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../utils/israeliDate';
-import { pick } from '../i18n/i18n';
+import { useT } from '../i18n/i18n';
 
 function DateInputIL({ value, onChange, lang, className, id }) {
-  const isAr = lang === 'ar';
+  const t = useT(lang);
   const [text, setText] = useState(() => isoToDisplay(value));
 
   // Sync display text when the parent resets the ISO value (e.g. clearing the form)
@@ -32,8 +32,8 @@ function DateInputIL({ value, onChange, lang, className, id }) {
       autoComplete="off"
       dir="ltr"
       className={className}
-      placeholder={pick(isAr, 'יום/חודש/שנה', 'يوم/شهر/سنة')}
-      title={pick(isAr, 'פורמט: יום/חודש/שנה (למשל 31/05/2026)', 'التنسيق: يوم/شهر/سنة')}
+      placeholder={t('date_input_placeholder')}
+      title={t('date_input_title')}
       value={text}
       onChange={e => {
         const masked = maskIsraeliDateInput(e.target.value);

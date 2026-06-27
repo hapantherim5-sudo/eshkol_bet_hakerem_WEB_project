@@ -1,27 +1,26 @@
 import { useState, useCallback, useEffect } from 'react';
-import { api, apiEnabled } from '../services/api';
-import { INITIAL_OPPORTUNITIES, INITIAL_EVENTS } from '../data/fakeData';
+import { api } from '../services/api';
 
 /**
- * Same interface as useLocalStore, backed by MongoDB via Express API.
- * Enable with VITE_USE_API=true (same-origin /api) or VITE_API_URL in .env at project root.
+ * Application data store backed exclusively by MongoDB through the Express API.
  */
 export function useApiStore() {
-  const [ready, setReady] = useState(!apiEnabled());
-  const [opportunities, setOpportunities] = useState(INITIAL_OPPORTUNITIES);
-  const [events, setEvents] = useState(INITIAL_EVENTS);
+  const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+  const [opportunities, setOpportunities] = useState([]);
+  const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [cancellations, setCancellations] = useState([]);
   const [views, setViews] = useState([]);
   const [profiles, setProfiles] = useState({});
 
   useEffect(() => {
-    if (!apiEnabled()) return;
     let cancelled = false;
     (async () => {
       try {
         const data = await api.bootstrap();
         if (cancelled) return;
+        setLoadError(null);
         setOpportunities(data.opportunities);
         setEvents(data.events);
         setRegistrations(data.registrations);
@@ -29,7 +28,8 @@ export function useApiStore() {
         setViews(data.views);
         setProfiles(data.profiles || {});
       } catch (e) {
-        console.error('API bootstrap failed, using local seed:', e);
+        if (!cancelled) setLoadError(e);
+        console.error('API bootstrap failed:', e);
       } finally {
         if (!cancelled) setReady(true);
       }
@@ -118,6 +118,7 @@ export function useApiStore() {
 
   return {
     ready,
+    loadError,
     opportunities,
     events,
     registrations,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CATEGORIES } from '../data/fakeData';
+import { CATEGORIES } from '../data/opportunityOptions';
 import { useT } from '../i18n/i18n';
 import { formatIsraeliDate } from '../utils/israeliDate';
 
@@ -83,7 +83,7 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
                         ${interests.includes(c.id)
                           ? 'bg-emerald-600 border-emerald-600 text-white shadow-md'
                           : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-emerald-300 hover:text-emerald-700'}`}>
-                      {c.icon} {isAr ? c.labelAr : c.label}
+                      {c.icon} {t(c.labelKey)}
                     </button>
                   ))}
                 </div>

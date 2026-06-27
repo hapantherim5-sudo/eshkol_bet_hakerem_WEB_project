@@ -1,17 +1,14 @@
 import { useState } from 'react';
 import { getMonthGrid, dateKey } from '../../utils/calendar';
 import { getOrgName, getCityName } from '../../data/organizations';
-import { pick } from '../../i18n/i18n';
+import { useT } from '../../i18n/i18n';
 import { formatIsraeliDate } from '../../utils/israeliDate';
-
-const WEEK_HE = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
-const WEEK_AR = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
 
 const FEW_THRESHOLD = 3;
 
 function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUser, registrations }) {
   const isAr = lang === 'ar';
-  const t    = (he, ar) => pick(isAr, he, ar);
+  const t    = useT(lang);
   const now  = new Date();
 
   const [year,        setYear       ] = useState(now.getFullYear());
@@ -56,20 +53,17 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
   /* ═══ EMPTY STATE: not logged in ═══ */
   if (!currentUser) {
     return (
-      <EmptyShell isAr={isAr} t={t} currentUser={null}>
+      <EmptyShell t={t} currentUser={null}>
         <div className="text-center">
           <p className="text-7xl mb-5">🔐</p>
           <h2 className="text-2xl font-black text-gray-800 mb-3">
-            {t('הלוח שלך ממתין לך', 'تقويمك بانتظارك')}
+            {t('calendar_login_title')}
           </h2>
           <p className="text-gray-500 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
-            {t(
-              'התחבר כדי לראות את הלוח האישי שלך עם כל הפעילויות שנרשמת אליהן',
-              'سجّل دخولك لرؤية تقويمك الشخصي مع كل الأنشطة التي سجلت فيها',
-            )}
+            {t('calendar_login_description')}
           </p>
           <CtaBtn onClick={() => onNavigate?.('login')}>
-            🔑 {t('כניסה', 'تسجيل الدخول')}
+            🔑 {t('calendar_login_button')}
           </CtaBtn>
         </div>
       </EmptyShell>
@@ -79,23 +73,20 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
   /* ═══ EMPTY STATE: logged in but no registered opportunities with dates ═══ */
   if (userOpps.length === 0) {
     return (
-      <EmptyShell isAr={isAr} t={t} currentUser={currentUser}>
+      <EmptyShell t={t} currentUser={currentUser}>
         <div className="text-center">
           <p className="text-7xl mb-5">🌱</p>
           <h2 className="text-2xl font-black text-gray-800 mb-3">
-            {t('הלוח שלך עדיין ריק', 'تقويمك لا يزال فارغاً')}
+            {t('calendar_empty_title')}
           </h2>
           <p className="text-gray-600 font-semibold mb-2">
-            {t('התחל לאסוף חוויות חדשות!', 'ابدأ بجمع تجارب جديدة!')}
+            {t('calendar_empty_encouragement')}
           </p>
           <p className="text-gray-400 text-sm mb-8 leading-relaxed max-w-xs mx-auto">
-            {t(
-              'הירשם לפעילויות והזדמנויות כדי למלא את הלוח האישי שלך',
-              'سجّل في الأنشطة والفرص لملء تقويمك الشخصي',
-            )}
+            {t('calendar_empty_description')}
           </p>
           <CtaBtn onClick={() => onNavigate?.('opportunities')}>
-            🔍 {t('גלה הזדמנויות', 'استكشف الفرص')}
+            🔍 {t('calendar_explore')}
           </CtaBtn>
 
           {/* Ghost placeholder cards */}
@@ -120,20 +111,17 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
       {/* Personal header */}
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-black text-gray-800 mb-2">
-          📅 {t(
-            `הלוח האישי של ${currentUser.name}`,
-            `التقويم الشخصي لـ ${currentUser.name}`,
-          )}
+          📅 {t('calendar_personal_title', { name: currentUser.name })}
         </h1>
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1
             bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">
-            ✅ {userOpps.length} {t('פעילויות רשומות', 'نشاط مسجل')}
+            ✅ {userOpps.length} {t('calendar_registered_count')}
           </span>
           {upcomingN > 0 && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1
               bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-100">
-              ⏳ {upcomingN} {t('קרובות', 'قادمة')}
+              ⏳ {upcomingN} {t('calendar_upcoming_count')}
             </span>
           )}
         </div>
@@ -148,7 +136,7 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
               onClick={() => shiftMonth(-1)}
               className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-gray-600
                 bg-gray-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition min-h-[40px]">
-              {t('◄ קודם', '◄ السابق')}
+              {t('calendar_previous')}
             </button>
             <span className="font-black text-gray-800 text-sm sm:text-base text-center px-2">
               {monthLabel}
@@ -157,12 +145,12 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
               onClick={() => shiftMonth(1)}
               className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-gray-600
                 bg-gray-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-xl transition min-h-[40px]">
-              {t('הבא ►', 'التالي ►')}
+              {t('calendar_next')}
             </button>
           </div>
 
           <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-center mb-2">
-            {(isAr ? WEEK_AR : WEEK_HE).map(d => (
+            {t('calendar_weekdays_short').map(d => (
               <span key={d} className="text-xs font-bold text-gray-400 py-1">{d}</span>
             ))}
           </div>
@@ -208,17 +196,14 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
             lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
             <h2 className="font-black text-gray-700 mb-4 text-sm sm:text-base flex items-center gap-2">
               <span className="text-base">📆</span>
-              {t(
-                `פעילויות – ${formatIsraeliDate(selKey)}`,
-                `نشاطات – ${formatIsraeliDate(selKey)}`,
-              )}
+              {t('calendar_day_title', { date: formatIsraeliDate(selKey) })}
             </h2>
 
             {dayOpps.length === 0 ? (
               <div className="text-center py-10 text-gray-400">
                 <p className="text-4xl mb-3">🗓️</p>
                 <p className="text-sm font-medium">
-                  {t('אין לך פעילויות ביום זה', 'لا نشاطات لك في هذا اليوم')}
+                  {t('calendar_no_events_day')}
                 </p>
               </div>
             ) : (
@@ -247,7 +232,7 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
                           className="mt-2 text-xs font-bold text-emerald-700 bg-emerald-50
                             hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition min-h-[36px]
                             inline-flex items-center gap-1">
-                          {t('פרטי הזדמנות', 'تفاصيل الفرصة')} →
+                          {t('calendar_opportunity_details')} →
                         </button>
                       </div>
                     </div>
@@ -264,23 +249,17 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
                 rounded-full bg-white/5 animate-blob" />
               <div className="relative">
                 <p className="font-black text-base mb-1">
-                  🚀 {t(
-                    `יש לך ${userOpps.length} ${userOpps.length === 1 ? 'פעילות' : 'פעילויות'} בלוח`,
-                    `لديك ${userOpps.length} ${userOpps.length === 1 ? 'نشاط' : 'أنشطة'} في التقويم`,
-                  )}
+                  🚀 {t(userOpps.length === 1 ? 'calendar_few_summary_one' : 'calendar_few_summary_many', { count: userOpps.length })}
                 </p>
                 <p className="text-white/80 text-sm mb-4 leading-relaxed">
-                  {t(
-                    'גלה עוד הזדמנויות וצבור חוויות בלתי נשכחות!',
-                    'استكشف المزيد من الفرص واجمع تجارب لا تُنسى!',
-                  )}
+                  {t('calendar_few_description')}
                 </p>
                 <button
                   onClick={() => onNavigate?.('opportunities')}
                   className="inline-flex items-center gap-1.5 px-5 py-2.5
                     bg-white text-[#6c4e9b] font-black rounded-xl text-sm
                     hover:scale-105 active:scale-95 transition-all shadow-lg">
-                  🔍 {t('גלה הזדמנויות', 'استكشف الفرص')}
+                  🔍 {t('calendar_explore')}
                 </button>
               </div>
             </div>
@@ -292,7 +271,7 @@ function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUse
 }
 
 /* ── Shared wrapper for the two empty-state screens ── */
-function EmptyShell({ isAr, t, currentUser, children }) {
+function EmptyShell({ t, currentUser, children }) {
   const name = currentUser?.name;
   return (
     <div className="animate-fade-in min-h-[calc(100vh-5rem)] flex flex-col">
@@ -306,20 +285,16 @@ function EmptyShell({ isAr, t, currentUser, children }) {
         <div className="relative">
           <p className="text-5xl mb-4">📅</p>
           <h1 className="text-2xl sm:text-3xl font-black mb-2">
-            {name
-              ? (isAr ? `التقويم الشخصي لـ ${name}` : `הלוח האישי של ${name}`)
-              : (isAr ? 'تقويمي الشخصي' : 'הלוח האישי שלי')}
+            {name ? t('calendar_personal_title', { name }) : t('calendar_my_title')}
           </h1>
           <p className="text-emerald-100 text-sm max-w-xs mx-auto leading-relaxed">
-            {isAr
-              ? 'الأنشطة التي سجلت فيها ستظهر هنا'
-              : 'פעילויות שנרשמת אליהן יופיעו כאן'}
+            {t('calendar_hero_subtitle')}
           </p>
         </div>
       </div>
 
       {/* Content area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-14
+      <div className="calendar-empty-content flex-1 flex flex-col items-center justify-center px-4 py-14
         bg-gradient-to-b from-emerald-50/40 to-white">
         <div className="max-w-sm w-full">
           {children}

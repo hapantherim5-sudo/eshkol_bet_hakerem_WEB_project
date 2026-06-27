@@ -3,14 +3,6 @@ const BASE = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || '');
 
 const REQUEST_TIMEOUT_MS = 15_000;
 
-/**
- * Production (Vercel): always use MongoDB via same-origin /api.
- * Local dev: set VITE_USE_API=true in .env (optional - uses vite proxy to /api).
- */
-export function apiEnabled() {
-  return import.meta.env.PROD || import.meta.env.VITE_USE_API === 'true';
-}
-
 async function request(path, options = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);

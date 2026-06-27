@@ -1,5 +1,6 @@
-import { STATUS_AR, TYPE_AR } from '../data/fakeData';
+import { STATUSES, getStatusLabelKey, getTypeLabelKey } from '../data/opportunityOptions';
 import { getOrgName, getCityName } from '../data/organizations';
+import { useT } from '../i18n/i18n';
 import { formatIsraeliDate } from '../utils/israeliDate';
 
 const CAT_STYLE = {
@@ -14,18 +15,19 @@ const CAT_STYLE = {
 function OpportunityCard({ opportunity, lang, onOpenModal }) {
   const o    = opportunity;
   const isAr = lang === 'ar';
+  const t = useT(lang);
 
   const title       = isAr ? o.titleAr : o.title;
   const description = isAr && o.descriptionAr ? o.descriptionAr : o.description;
-  const statusText  = isAr ? (STATUS_AR[o.status] || o.status) : o.status;
-  const typeText    = isAr ? (TYPE_AR[o.type]     || o.type)  : o.type;
-  const ageLabel    = isAr ? `${o.ageMin}–${o.ageMax} سنة` : `גיל ${o.ageMin}–${o.ageMax}`;
+  const statusText  = t(getStatusLabelKey(o.status) || o.status);
+  const typeText    = t(getTypeLabelKey(o.type) || o.type);
+  const ageLabel    = t('card_age_range', { min: o.ageMin, max: o.ageMax });
 
   const cat = CAT_STYLE[o.category] ?? { bar: 'bg-gray-300', shadow: 'hover:shadow-gray-100' };
 
   const statusClass =
-    o.status === 'פתוח'           ? 'bg-green-100 text-green-800'   :
-    o.status === 'מקומות אחרונים' ? 'bg-amber-100 text-amber-800'   :
+    o.status === STATUSES[0].value ? 'bg-green-100 text-green-800'   :
+    o.status === STATUSES[1].value ? 'bg-amber-100 text-amber-800'   :
                                     'bg-red-100   text-red-800';
 
   return (
