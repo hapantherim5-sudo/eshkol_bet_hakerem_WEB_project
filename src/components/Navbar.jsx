@@ -1,3 +1,7 @@
+// File: src/components/Navbar.jsx
+// Purpose: Navbar component
+// Role: React component for Navbar
+
 import { useState, useEffect, useRef } from 'react';
 import { isStaffRole } from '../utils/permissions';
 import { useT } from '../i18n/i18n';
@@ -9,6 +13,7 @@ const PUBLIC_LINKS = [
   { screen: 'gallery',       key: 'nav_gallery',        icon: '📸' },
 ];
 
+// Navbar — renders Navbar
 function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggleLang, onNavigate, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -16,6 +21,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
   const t = useT(lang);
 
   useEffect(() => {
+    // onScroll — handles onScroll
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -23,6 +29,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
 
   useEffect(() => {
     if (!menuOpen) return;
+    // handleClick — handles Click
     const handleClick = (e) => {
       if (navRef.current && !navRef.current.contains(e.target)) setMenuOpen(false);
     };
@@ -42,6 +49,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
   const allLinks = [...PUBLIC_LINKS, ...extraLinks];
   const isDark   = theme === 'dark';
 
+  // NavBtn — renders NavBtn
   const NavBtn = ({ link }) => {
     const active = currentScreen === link.screen;
     const isAdmin = link.screen === 'admin';
@@ -81,7 +89,7 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             onClick={() => { onNavigate('home'); setMenuOpen(false); }}
             className="flex items-center gap-2.5 shrink-0 group text-right">
             <img
-              src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
+              src="/eshkol-logo.png"
               alt={t('brand_logo_alt')}
               className="h-9 w-auto object-contain rounded-xl shrink-0
                 ring-2 ring-transparent group-hover:ring-[#8ca397] transition-all duration-200"

@@ -1,3 +1,7 @@
+// File: server/scripts/addEventDates.js
+// Purpose: addEventDates script
+// Role: module role description
+
 /**
  * One-time migration: add eventDate, startTime, endTime to every opportunity
  * that does not already have these fields.
@@ -19,6 +23,7 @@ const TIMES = {
   volunteer: [['09:00', '12:00'], ['15:00', '17:00'], ['10:00', '12:00'], ['16:00', '18:00']],
 };
 
+// schedule — handles schedule
 function schedule(opp) {
   const times = TIMES[opp.category] || TIMES.community;
   const [startTime, endTime] = times[(opp.id - 1) % times.length];
@@ -44,6 +49,7 @@ function schedule(opp) {
   return { eventDate: `${y}-${m}-${d}`, startTime, endTime };
 }
 
+// run — handles run
 async function run() {
   const db   = await connectDb();
   const opps = await db.collection(COLLECTIONS.opportunities).find({}).toArray();

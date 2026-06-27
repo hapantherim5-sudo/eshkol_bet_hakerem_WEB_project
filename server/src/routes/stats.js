@@ -1,3 +1,7 @@
+// File: server/src/routes/stats.js
+// Purpose: stats script
+// Role: API route handler for stats
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 
@@ -76,6 +80,7 @@ router.get('/stats', async (req, res, next) => {
       return { year: d.getFullYear(), month: d.getMonth() + 1 };
     });
 
+    // fillMonths — handles fillMonths
     const fillMonths = (raw) =>
       months.map(({ year, month }) => ({
         year,

@@ -1,3 +1,7 @@
+// File: server/src/routes/views.js
+// Purpose: views script
+// Role: API route handler for views
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 

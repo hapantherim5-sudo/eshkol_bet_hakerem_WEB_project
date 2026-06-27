@@ -1,3 +1,7 @@
+// File: src/components/staff/UserManagement.jsx
+// Purpose: UserManagement component
+// Role: React component for UserManagement
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { api } from '../../services/api';
 import { ORGANIZATIONS, getOrgName } from '../../data/organizations';
@@ -10,6 +14,7 @@ const ROLE_BADGE = {
   User:  'bg-emerald-100 text-emerald-700',
 };
 
+// emptyForm — handles emptyForm
 const emptyForm = () => ({
   name: '', username: '', password: '', role: 'User', organizationId: '',
 });
@@ -24,13 +29,16 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
   const [err,    setErr   ] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // set — handles set
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  // handleRoleChange — handles RoleChange
   const handleRoleChange = (role) => {
     set('role', role);
     if (role === 'User') set('organizationId', '');
   };
 
+  // handleSubmit — handles Submit
   const handleSubmit = async () => {
     if (!form.name.trim() || !form.username.trim()) {
       setErr(t('users_error_name_username_required'));
@@ -297,6 +305,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
 
   const hasActiveFilter = searchName || searchUsername || filterRole || filterOrg;
 
+  // handleFilterChange — handles FilterChange
   const handleFilterChange = (key, value) => {
     if (key === 'searchName')    setSearchName(value);
     if (key === 'searchUsername') setSearchUsername(value);
@@ -337,6 +346,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
     role === 'Staff' ? t('users_role_staff') :
                        t('users_role_youth');
 
+  // orgLabel — handles orgLabel
   const orgLabel = (orgId) => {
     return getOrgName(orgId, isAr) || '-';
   };

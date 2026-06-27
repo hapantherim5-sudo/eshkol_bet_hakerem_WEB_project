@@ -1,3 +1,7 @@
+// File: server/src/db.js
+// Purpose: db script
+// Role: MongoDB connection helper
+
 import dns from 'dns';
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
@@ -21,6 +25,7 @@ let db;
 // same single attempt instead of each spawning their own MongoClient.
 let connectPromise = null;
 
+// _connect — handles _connect
 async function _connect() {
   const maskedUri = uri.replace(/:\/\/([^:]+):([^@]+)@/, '://<user>:<pass>@');
   console.log('[db] connecting  uri=%s  db=%s', maskedUri, dbName);
@@ -37,6 +42,7 @@ async function _connect() {
   return db;
 }
 
+// connectDb — handles connectDb
 export async function connectDb() {
   if (db) return db;
   if (!connectPromise) {
@@ -49,11 +55,13 @@ export async function connectDb() {
   return connectPromise;
 }
 
+// getDb — handles getDb
 export function getDb() {
   if (!db) throw new Error('Database not connected. Call connectDb() first.');
   return db;
 }
 
+// closeDb — handles closeDb
 export async function closeDb() {
   if (client) {
     await client.close();

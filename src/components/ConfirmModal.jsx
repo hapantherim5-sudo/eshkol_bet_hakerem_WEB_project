@@ -1,5 +1,10 @@
+// File: src/components/ConfirmModal.jsx
+// Purpose: ConfirmModal component
+// Role: React component for ConfirmModal
+
 import { useT } from '../i18n/i18n';
 
+// ConfirmModal — renders ConfirmModal
 function ConfirmModal({
   lang,
   title,

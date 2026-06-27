@@ -1,3 +1,7 @@
+// File: src/data/organizations.js
+// Purpose: organizations script
+// Role: static application data definitions
+
 import he from '../i18n/he';
 import ar from '../i18n/ar';
 
@@ -12,11 +16,13 @@ const CITY_KEY_BY_VALUE = new Map([
   [he.city_majd_al_krum, 'city_majd_al_krum'],
 ]);
 
+// getCityName — handles getCityName
 export function getCityName(city, isAr) {
   const key = CITY_KEY_BY_VALUE.get(city);
   return key ? (isAr ? ar[key] : he[key]) : city;
 }
 
+// ORGANIZATIONS — renders ORGANIZATIONS
 export const ORGANIZATIONS = [
   { id: 'youth-misgav', nameKey: 'organization_youth_misgav' },
   { id: 'youth-karmiel', nameKey: 'organization_youth_karmiel' },
@@ -30,6 +36,7 @@ export const ORGANIZATIONS = [
   { id: 'mda', nameKey: 'organization_mda' },
 ];
 
+// getOrgName — handles getOrgName
 export function getOrgName(orgId, isAr) {
   const org = ORGANIZATIONS.find(item => item.id === orgId);
   if (!org) return '';

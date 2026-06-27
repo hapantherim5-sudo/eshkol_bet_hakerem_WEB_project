@@ -1,3 +1,7 @@
+// File: server/src/routes/registrations.js
+// Purpose: registrations script
+// Role: API route handler for registrations
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 import { nextId } from '../middleware/counter.js';

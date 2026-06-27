@@ -1,3 +1,7 @@
+// File: server/src/routes/events.js
+// Purpose: events script
+// Role: API route handler for events
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 import { nextId } from '../middleware/counter.js';

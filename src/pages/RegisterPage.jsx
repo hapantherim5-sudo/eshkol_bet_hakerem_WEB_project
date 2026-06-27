@@ -1,7 +1,12 @@
+// File: src/pages/RegisterPage.jsx
+// Purpose: RegisterPage component
+// Role: React page component for RegisterPage
+
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { useT } from '../i18n/i18n';
 
+// RegisterPage — renders RegisterPage
 function RegisterPage({ lang, onNavigate }) {
   const t = useT(lang);
   const [name,     setName    ] = useState('');
@@ -16,6 +21,7 @@ function RegisterPage({ lang, onNavigate }) {
 
   useEffect(() => () => clearTimeout(redirectTimer.current), []);
 
+  // handleRegister — handles Register
   const handleRegister = async () => {
     if (loading) return;
     if (!name.trim() || !username.trim() || !password.trim() || !confirm.trim()) {
@@ -65,7 +71,7 @@ function RegisterPage({ lang, onNavigate }) {
 
           <div className="bg-gradient-to-l from-emerald-600 to-teal-500 px-6 py-8 text-center">
             <img
-              src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
+              src="/eshkol-logo.png"
               alt={t('brand_logo_alt')}
               className="h-16 mx-auto mb-4 rounded-xl object-contain ring-4 ring-white/30 shadow-lg"
             />

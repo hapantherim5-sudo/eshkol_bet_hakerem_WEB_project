@@ -1,3 +1,7 @@
+// File: src/utils/scheduleEvents.js
+// Purpose: scheduleEvents script
+// Role: utility module for scheduleEvents
+
 import he from '../i18n/he';
 
 const WEEKDAY_NAMES = [
@@ -10,6 +14,7 @@ const WEEKDAY_NAMES = [
   [he.weekday_saturday, 6],
 ];
 
+// parseWeekdays — handles parseWeekdays
 export function parseWeekdays(daysStr) {
   // No weekday specified means the activity repeats every day.
   if (!daysStr?.trim()) return null;
@@ -20,6 +25,7 @@ export function parseWeekdays(daysStr) {
   return found.size ? [...found] : null;
 }
 
+// parseStartTime — handles parseStartTime
 export function parseStartTime(timeStr) {
   if (!timeStr?.trim()) return '09:00';
   const part = timeStr.trim().split(/[-–]/)[0].trim();
@@ -28,6 +34,7 @@ export function parseStartTime(timeStr) {
   return `${m[1].padStart(2, '0')}:${m[2]}`;
 }
 
+// dateKeyLocal — handles dateKeyLocal
 function dateKeyLocal(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -35,6 +42,7 @@ function dateKeyLocal(d) {
   return `${y}-${m}-${day}`;
 }
 
+// parseDateOnly — handles parseDateOnly
 function parseDateOnly(str) {
   if (!str) return null;
   // Noon prevents timezone offsets from moving a date-only value to the previous day.
@@ -42,6 +50,7 @@ function parseDateOnly(str) {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+// buildCalendarEvents — handles buildCalendarEvents
 export function buildCalendarEvents(opp) {
   const { startDate, endDate, days, time, title, titleAr, organizationId, city } = opp;
   const start = parseDateOnly(startDate);

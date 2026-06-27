@@ -1,3 +1,7 @@
+// File: src/utils/permissions.js
+// Purpose: permissions script
+// Role: utility module for permissions
+
 // Staff may only manage opportunities for their organization
 export function canManageOpportunity(user, opp) {
   if (!user) return false;
@@ -6,10 +10,12 @@ export function canManageOpportunity(user, opp) {
   return false;
 }
 
+// isStaffRole — checks whether staffrole
 export function isStaffRole(user) {
   return user?.role === 'Admin' || user?.role === 'Staff';
 }
 
+// filterManageable — handles filterManageable
 export function filterManageable(user, opportunities) {
   if (!user) return [];
   if (user.role === 'Admin') return opportunities;

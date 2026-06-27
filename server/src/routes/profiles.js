@@ -1,3 +1,7 @@
+// File: server/src/routes/profiles.js
+// Purpose: profiles script
+// Role: API route handler for profiles
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 
