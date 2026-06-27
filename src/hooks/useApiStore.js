@@ -1,3 +1,7 @@
+// File: src/hooks/useApiStore.js
+// Purpose: useApiStore script
+// Role: custom hook for backend data fetching and mutation
+
 import { useState, useCallback, useEffect } from 'react';
 import { api } from '../services/api';
 
@@ -18,6 +22,7 @@ export function useApiStore() {
     let cancelled = false;
     (async () => {
       try {
+        // bootstrap initial app data from backend
         const data = await api.bootstrap();
         if (cancelled) return;
         setLoadError(null);
@@ -80,6 +85,7 @@ export function useApiStore() {
 
   const register = useCallback(async (userId, opportunityId, profilePatch) => {
     try {
+      // send registration request to backend and persist local state on success
       const result = await api.register(userId, opportunityId, profilePatch);
       setRegistrations(prev => [...prev, result.registration]);
       if (profilePatch) {
@@ -103,6 +109,7 @@ export function useApiStore() {
 
   const unregister = useCallback(async (userId, opportunityId) => {
     try {
+      // send unregister request to backend then update registrations
       await api.unregister(userId, opportunityId);
       setRegistrations(prev =>
         prev.filter(r => !(r.userId === userId && r.opportunityId === opportunityId))

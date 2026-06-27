@@ -1,3 +1,7 @@
+// File: scripts/generate-gallery-images.js
+// Purpose: generate-gallery-images script
+// Role: project scripting helper
+
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
@@ -11,73 +15,73 @@ const __dirname = path.dirname(__filename);
 const galleryImages = [
   {
     id: 1,
-    filename: 'youth-football-training.jpg',
+    filename: 'youth-football-training.png',
     query: 'young people football soccer training diverse team',
     caption: 'Youth football training - community sports'
   },
   {
     id: 2,
-    filename: 'youth-art-workshop.jpg',
+    filename: 'youth-art-workshop.png',
     query: 'youth art class painting drawing workshop creative',
     caption: 'Art workshop - youth creativity'
   },
   {
     id: 3,
-    filename: 'community-garden-volunteering.jpg',
+    filename: 'community-garden-volunteering.png',
     query: 'volunteers gardening community outdoor young people',
     caption: 'Community garden volunteering'
   },
   {
     id: 4,
-    filename: 'youth-science-learning.jpg',
+    filename: 'youth-science-learning.png',
     query: 'young people science lab STEM education learning',
     caption: 'Science learning - youth education'
   },
   {
     id: 5,
-    filename: 'community-event-gathering.jpg',
+    filename: 'community-event-gathering.png',
     query: 'community event celebration youth gathering diverse',
     caption: 'Community event celebration'
   },
   {
     id: 6,
-    filename: 'youth-basketball-tournament.jpg',
+    filename: 'youth-basketball-tournament.png',
     query: 'youth basketball game team sport competition',
     caption: 'Basketball tournament - teamwork'
   },
   {
     id: 7,
-    filename: 'music-workshop-drums.jpg',
+    filename: 'music-workshop-drums.png',
     query: 'music workshop youth drums percussion band',
     caption: 'Music workshop - drums and instruments'
   },
   {
     id: 8,
-    filename: 'community-cleanup-volunteers.jpg',
+    filename: 'community-cleanup-volunteers.png',
     query: 'volunteers cleanup community park environmental',
     caption: 'Community cleanup - environmental volunteering'
   },
   {
     id: 9,
-    filename: 'youth-coding-workshop.jpg',
+    filename: 'youth-coding-workshop.png',
     query: 'young people coding programming laptop technology education',
     caption: 'Coding workshop - tech education'
   },
   {
     id: 10,
-    filename: 'youth-festival-celebration.jpg',
+    filename: 'youth-festival-celebration.png',
     query: 'youth festival celebration performance crowd diverse',
     caption: 'Youth festival - community celebration'
   },
   {
     id: 11,
-    filename: 'youth-dance-performance.jpg',
+    filename: 'youth-dance-performance.png',
     query: 'youth dance performance stage show entertainment',
     caption: 'Dance performance - youth expression'
   },
   {
     id: 12,
-    filename: 'nature-hiking-group.jpg',
+    filename: 'nature-hiking-group.png',
     query: 'young people hiking nature group outdoor adventure',
     caption: 'Nature hiking - group activity'
   }
@@ -91,6 +95,7 @@ function getUnsplashImageUrl(query, width = 600, height = 450) {
   return `https://source.unsplash.com/${width}x${height}/?${encoded}`;
 }
 
+// downloadImage — handles downloadImage
 async function downloadImage(url, filename) {
   return new Promise((resolve, reject) => {
     const filepath = path.join(__dirname, '..', 'public', 'gallery', filename);
@@ -110,6 +115,7 @@ async function downloadImage(url, filename) {
   });
 }
 
+// generateGalleryImages — handles generateGalleryImages
 async function generateGalleryImages() {
   console.log('🎨 Generating gallery images...\n');
   

@@ -1,3 +1,7 @@
+// File: src/components/staff/StaffPanel.jsx
+// Purpose: StaffPanel component
+// Role: React component for StaffPanel
+
 import { useLayoutEffect, useRef, useState } from 'react';
 import { filterManageable, canManageOpportunity } from '../../utils/permissions';
 import { getOrgName, getCityName } from '../../data/organizations';
@@ -6,6 +10,7 @@ import OpportunityForm from './OpportunityForm';
 import UserManagement from './UserManagement';
 import StatsDashboard from './StatsDashboard';
 
+// StaffPanel — renders StaffPanel
 function StaffPanel({
   lang, currentUser, opportunities, views, registrations, cancellations, profiles,
   onAdd, onUpdate, onDelete, onReplaceEventsForOpportunity, showToast,
@@ -35,6 +40,7 @@ function StaffPanel({
 
   useLayoutEffect(() => {
     if (!mode) return undefined;
+    // positionFormWindow — handles positionFormWindow
     const positionFormWindow = () => {
       const toolbarBottom = toolbarRef.current?.getBoundingClientRect().bottom ?? 96;
       setFormWindowTop(Math.round(toolbarBottom + 12));
@@ -44,6 +50,7 @@ function StaffPanel({
     return () => window.removeEventListener('resize', positionFormWindow);
   }, [mode]);
 
+  // handleSave — handles Save
   const handleSave = async (opp, calendarEvents) => {
     try {
       if (mode === 'add') {
@@ -65,6 +72,7 @@ function StaffPanel({
     if (window.confirm(t('admin_opportunity_delete_confirm'))) onDelete(opp.id);
   };
 
+  // handleTabChange — handles TabChange
   const handleTabChange = (nextTab) => {
     setMode(null);
     setTab(nextTab);

@@ -1,3 +1,7 @@
+// File: src/components/OpportunityCard.jsx
+// Purpose: OpportunityCard component
+// Role: React component for OpportunityCard
+
 import { STATUSES, getStatusLabelKey, getTypeLabelKey } from '../data/opportunityOptions';
 import { getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
@@ -12,6 +16,7 @@ const CAT_STYLE = {
   workshops: { bar: 'bg-amber-500',  shadow: 'hover:shadow-amber-100'  },
 };
 
+// OpportunityCard — renders OpportunityCard
 function OpportunityCard({ opportunity, lang, onOpenModal }) {
   const o    = opportunity;
   const isAr = lang === 'ar';

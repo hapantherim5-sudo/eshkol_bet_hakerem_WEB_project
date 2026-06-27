@@ -1,6 +1,11 @@
+// File: src/data/opportunityOptions.js
+// Purpose: opportunityOptions script
+// Role: static application data definitions
+
 import he from '../i18n/he';
 import ar from '../i18n/ar';
 
+// CATEGORIES — renders CATEGORIES
 export const CATEGORIES = [
   { id: 'sport',     labelKey: 'category_sport', icon: '⚽' },
   { id: 'art',       labelKey: 'category_art', icon: '🎨' },
@@ -10,6 +15,7 @@ export const CATEGORIES = [
   { id: 'workshops', labelKey: 'category_workshops', icon: '📚' },
 ];
 
+// STATUSES — renders STATUSES
 export const STATUSES = [
   { value: he.status_open, labelKey: 'status_open' },
   { value: he.status_last_places, labelKey: 'status_last_places' },
@@ -17,6 +23,7 @@ export const STATUSES = [
   { value: he.status_closed, labelKey: 'status_closed' },
 ];
 
+// OPPORTUNITY_TYPES — renders OPPORTUNITY_TYPES
 export const OPPORTUNITY_TYPES = [
   { value: he.opportunity_type_class, labelKey: 'opportunity_type_class' },
   { value: he.opportunity_type_workshop, labelKey: 'opportunity_type_workshop' },
@@ -27,18 +34,22 @@ export const OPPORTUNITY_TYPES = [
   { value: he.opportunity_type_program, labelKey: 'opportunity_type_program' },
 ];
 
+// OPPORTUNITY_SCOPES — renders OPPORTUNITY_SCOPES
 export const OPPORTUNITY_SCOPES = [
   { value: he.board_scope_local, labelKey: 'board_scope_local' },
   { value: he.board_scope_regional, labelKey: 'board_scope_regional' },
 ];
 
+// DEFAULT_REGISTRATION — renders DEFAULT_REGISTRATION
 export const DEFAULT_REGISTRATION = {
   he: he.registration_phone,
   ar: ar.registration_phone,
 };
 
+// getStatusLabelKey — handles getStatusLabelKey
 export const getStatusLabelKey = value =>
   STATUSES.find(status => status.value === value)?.labelKey;
 
+// getTypeLabelKey — handles getTypeLabelKey
 export const getTypeLabelKey = value =>
   OPPORTUNITY_TYPES.find(type => type.value === value)?.labelKey;

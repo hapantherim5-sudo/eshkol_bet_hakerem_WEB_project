@@ -1,3 +1,7 @@
+// File: server/src/routes/bootstrap.js
+// Purpose: bootstrap script
+// Role: API route handler for bootstrap
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 

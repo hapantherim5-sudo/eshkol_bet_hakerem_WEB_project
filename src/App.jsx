@@ -1,3 +1,7 @@
+// File: src\App.jsx
+// Purpose: App component
+// Role: main React application shell and screen router
+
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import StaffPanel from './components/staff/StaffPanel';
@@ -20,6 +24,7 @@ import {
 import { setDocumentLang, useT } from './i18n/i18n';
 import { isStaffRole } from './utils/permissions';
 
+// App — renders App
 function App() {
   const store = useDataStore();
   // Screen state replaces a routing library in this single-page application.
@@ -40,30 +45,37 @@ function App() {
   useEffect(() => setDocumentLang(lang), [lang]);
   useEffect(() => saveCurrentScreen(currentScreen), [currentScreen]);
 
+  // showToast — handles showToast
   const showToast = (msg, type = 'success') => {
     setToast(msg);
     setToastType(type);
+    // hide toast after 3 seconds
     setTimeout(() => setToast(''), 3000);
   };
 
+  // handleLogin — handles Login
   const handleLogin = (user) => {
     setCurrentUser(user);
     saveSession(user);
     setCurrentScreen(isStaffRole(user) ? 'admin' : 'opportunities');
   };
 
+  // handleLogout — handles Logout
   const handleLogout = () => {
     setCurrentUser(null);
     saveSession(null);
     setCurrentScreen('home');
   };
 
+  // handleNavigate — handles Navigate
   const handleNavigate = (screen) => {
+    // guard admin route to staff users only
     if (screen === 'admin' && !isStaffRole(currentUser)) {
       setCurrentScreen('login');
       return;
     }
     if (screen === 'my-registrations') {
+      // require a youth user account for this action
       if (!currentUser || currentUser.role !== 'User') {
         setCurrentScreen('login');
         showToast(t('toast_youth_login'));
@@ -73,11 +85,13 @@ function App() {
     setCurrentScreen(screen);
   };
 
+  // openOppModal — handles openOppModal
   const openOppModal = (opp) => {
     setSelectedOpp(opp);
     store.recordView(opp.id, currentUser?.id);
   };
 
+  // handleRegisterClick — handles RegisterClick
   const handleRegisterClick = () => {
     if (!currentUser) {
       setSelectedOpp(null);
@@ -92,6 +106,7 @@ function App() {
     setShowRegModal(true);
   };
 
+  // handleRegisterConfirm — handles RegisterConfirm
   const handleRegisterConfirm = async (profilePatch) => {
     try {
       const result = await store.register(currentUser.id, selectedOpp.id, profilePatch);
@@ -106,7 +121,9 @@ function App() {
     }
   };
 
+  // handleCancelRegistration — handles CancelRegistration
   const handleCancelRegistration = async (opportunityId) => {
+    // require a youth user account for this action
     if (!currentUser || currentUser.role !== 'User') return;
     const oppId = opportunityId ?? selectedOpp?.id;
     if (!oppId) return;

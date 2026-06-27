@@ -1,3 +1,7 @@
+// File: src/components/staff/StatsDashboard.jsx
+// Purpose: StatsDashboard component
+// Role: React component for StatsDashboard
+
 import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -13,6 +17,7 @@ const PALETTE = [
   '#f59e0b','#ef4444','#84cc16','#f97316','#e879f9','#a78bfa',
 ];
 
+// getLast12Months — handles getLast12Months
 function getLast12Months(locale) {
   const now = new Date();
   const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'short' });
@@ -26,9 +31,11 @@ function getLast12Months(locale) {
   });
 }
 
+// computeLocalStats — handles computeLocalStats
 function computeLocalStats(opportunities, registrations, cancellations, views, locale) {
   const months = getLast12Months(locale);
 
+  // groupByMonth — handles groupByMonth
   const groupByMonth = (items, dateField) =>
     months.map(({ year, month, label }) => ({
       label,
@@ -38,6 +45,7 @@ function computeLocalStats(opportunities, registrations, cancellations, views, l
       }).length,
     }));
 
+  // groupBy — handles groupBy
   const groupBy = (items, keyFn) => {
     const map = {};
     items.forEach(item => {
@@ -107,6 +115,7 @@ const KPI_META = [
   { key: 'activeOrganizations', icon: 'building',  tone: 'neutral', labelKey: 'stats_active_organizations' },
 ];
 
+// KpiIcon — renders KpiIcon
 function KpiIcon({ type }) {
   const paths = {
     users: <><circle cx="9" cy="7" r="3" /><circle cx="17" cy="8" r="2.5" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0M14.5 20a4 4 0 0 1 5.5-3.7" /></>,
@@ -123,6 +132,7 @@ function KpiIcon({ type }) {
   );
 }
 
+// KpiCard — renders KpiCard
 function KpiCard({ icon, tone, value, label }) {
   return (
     <div className={`stats-kpi-card stats-kpi-card--${tone} bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5`}>
@@ -137,6 +147,7 @@ function KpiCard({ icon, tone, value, label }) {
   );
 }
 
+// SectionCard — renders SectionCard
 function SectionCard({ title, children, className = '' }) {
   return (
     <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 ${className}`}>
@@ -149,6 +160,7 @@ function SectionCard({ title, children, className = '' }) {
   );
 }
 
+// BarTip — renders BarTip
 function BarTip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
@@ -159,6 +171,7 @@ function BarTip({ active, payload, label }) {
   );
 }
 
+// PieTip — renders PieTip
 function PieTip({ active, payload }) {
   if (!active || !payload?.length) return null;
   return (
@@ -169,12 +182,14 @@ function PieTip({ active, payload }) {
   );
 }
 
+// Skeleton — renders Skeleton
 function Skeleton({ h = 'h-52' }) {
   return (
     <div className={`${h} rounded-xl bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 animate-pulse`} />
   );
 }
 
+// Empty — renders Empty
 function Empty({ label }) {
   return (
     <div className="h-40 flex flex-col items-center justify-center text-gray-300 gap-2">
@@ -219,6 +234,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
 
   const rawStats = apiStats ?? localStats;
   const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'short' });
+  // localizeMonthSeries — handles localizeMonthSeries
   const localizeMonthSeries = (series = []) => series.map(item => item.label ? item : ({
     ...item,
     label: `${monthFormatter.format(new Date(item.year, item.month - 1, 1))} '${String(item.year).slice(2)}`,

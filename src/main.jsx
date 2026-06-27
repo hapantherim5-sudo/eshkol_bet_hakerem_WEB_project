@@ -1,3 +1,7 @@
+// File: src/main.jsx
+// Purpose: main component
+// Role: frontend entrypoint that mounts the React app
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

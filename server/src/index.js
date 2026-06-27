@@ -1,3 +1,7 @@
+// File: server/src/index.js
+// Purpose: index script
+// Role: server startup and MongoDB bootstrap
+
 import app from './app.js';
 import { connectDb } from './db.js';
 

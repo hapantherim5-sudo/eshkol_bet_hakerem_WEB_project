@@ -1,3 +1,7 @@
+// File: server/src/middleware/connectDb.js
+// Purpose: connectDb script
+// Role: middleware that ensures MongoDB is connected for each request
+
 import { connectDb } from '../db.js';
 
 export default async function (_req, res, next) {

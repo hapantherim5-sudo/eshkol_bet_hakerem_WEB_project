@@ -1,7 +1,12 @@
+// File: src/pages/LoginPage.jsx
+// Purpose: LoginPage component
+// Role: React page component for LoginPage
+
 import { useState } from 'react';
 import { api } from '../services/api';
 import { useT } from '../i18n/i18n';
 
+// LoginPage — renders LoginPage
 function LoginPage({ lang, onLogin, onNavigate }) {
   const t = useT(lang);
   const [username, setUsername] = useState('');
@@ -10,6 +15,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
   const [showPw,   setShowPw]   = useState(false);
   const [loading,  setLoading]  = useState(false);
 
+  // handleLogin — handles Login
   const handleLogin = async () => {
     if (loading) return;
     if (!username || !password) {
@@ -50,7 +56,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
 
           <div className="bg-gradient-to-l from-emerald-600 to-teal-500 px-6 py-8 text-center">
             <img
-              src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
+              src="/eshkol-logo.png"
               alt={t('brand_logo_alt')}
               className="h-16 mx-auto mb-4 rounded-xl object-contain ring-4 ring-white/30 shadow-lg"
             />

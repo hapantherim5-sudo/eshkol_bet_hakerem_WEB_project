@@ -1,3 +1,7 @@
+// File: server/src/routes/auth.js
+// Purpose: auth script
+// Role: API route handler for auth
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 

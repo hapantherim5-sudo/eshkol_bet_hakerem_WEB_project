@@ -1,3 +1,7 @@
+// File: src/components/OpportunityDetailModal.jsx
+// Purpose: OpportunityDetailModal component
+// Role: React component for OpportunityDetailModal
+
 import { useEffect } from 'react';
 import { getStatusLabelKey } from '../data/opportunityOptions';
 import { getOrgName, getCityName } from '../data/organizations';
@@ -13,6 +17,7 @@ const CAT_HEADER = {
   workshops: 'from-amber-400  to-yellow-500',
 };
 
+// OpportunityDetailModal — renders OpportunityDetailModal
 function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRegisterClick, onCancelRegistration }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
@@ -36,6 +41,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
     { icon: '📝', label: t('modal_registration'), val: isAr && o.registrationAr ? o.registrationAr : o.registration },
   ];
 
+  // closeModal — handles closeModal
   const closeModal = (event) => {
     event?.preventDefault();
     event?.stopPropagation();
@@ -43,6 +49,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
   };
 
   useEffect(() => {
+    // handleKeyDown — handles KeyDown
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') onClose();
     };

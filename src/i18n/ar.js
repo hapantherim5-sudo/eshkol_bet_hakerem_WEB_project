@@ -1,3 +1,7 @@
+// File: src/i18n/ar.js
+// Purpose: ar script
+// Role: localization strings and i18n helpers
+
 /**
  * Arabic language configuration for all user-facing text and localized data.
  * Keep every key synchronized with he.js. Components should reference keys

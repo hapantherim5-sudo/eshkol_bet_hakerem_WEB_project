@@ -1,3 +1,7 @@
+// File: src/components/calendar/EventsCalendar.jsx
+// Purpose: EventsCalendar component
+// Role: React component for EventsCalendar
+
 import { useState } from 'react';
 import { getMonthGrid, dateKey } from '../../utils/calendar';
 import { getOrgName, getCityName } from '../../data/organizations';
@@ -6,6 +10,7 @@ import { formatIsraeliDate } from '../../utils/israeliDate';
 
 const FEW_THRESHOLD = 3;
 
+// EventsCalendar — renders EventsCalendar
 function EventsCalendar({ lang, opportunities, onOpenOpp, onNavigate, currentUser, registrations }) {
   const isAr = lang === 'ar';
   const t    = useT(lang);
@@ -304,6 +309,7 @@ function EmptyShell({ t, currentUser, children }) {
   );
 }
 
+// CtaBtn — renders CtaBtn
 function CtaBtn({ onClick, children }) {
   return (
     <button

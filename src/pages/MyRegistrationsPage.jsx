@@ -1,8 +1,13 @@
+// File: src/pages/MyRegistrationsPage.jsx
+// Purpose: MyRegistrationsPage component
+// Role: React page component for MyRegistrationsPage
+
 import { useState } from 'react';
 import { getTypeLabelKey } from '../data/opportunityOptions';
 import { getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
 
+// formatDate — handles formatDate
 function formatDate(iso, locale) {
   if (!iso) return '';
   return new Date(iso).toLocaleDateString(locale, {
@@ -10,6 +15,7 @@ function formatDate(iso, locale) {
   });
 }
 
+// MyRegistrationsPage — renders MyRegistrationsPage
 function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, onOpenModal, onCancel, onNavigate }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
@@ -24,6 +30,7 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
     .filter(Boolean)
     .sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
 
+  // handleCancel — handles Cancel
   const handleCancel = (oppId) => {
     onCancel(oppId);
     setConfirmCancelId(null);
