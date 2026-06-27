@@ -1,31 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ORGANIZATIONS, getCityName } from '../data/organizations';
+import { ORGANIZATIONS } from '../data/organizations';
 import { CATEGORIES } from '../data/fakeData';
 import { useT } from '../i18n/i18n';
-
-const ROTATION_MS = 5000;
-const FADE_MS     = 280;
-
-function calcCd(isoDate, now) {
-  const diff = Math.max(0, new Date(isoDate).getTime() - now);
-  const s    = Math.floor(diff / 1000);
-  return {
-    days:    Math.floor(s / 86400),
-    hours:   Math.floor((s % 86400) / 3600),
-    minutes: Math.floor((s % 3600)  / 60),
-    seconds: s % 60,
-  };
-}
-const p2 = (n) => String(n).padStart(2, '0');
 
 function HomePage({ store, currentUser, lang, handleNavigate }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
-  const [currentTime, setCurrentTime] = useState(Date.now);
-
   const QUICK_LINKS = [
     { screen: 'opportunities', icon: '🔍', label: t('home_quick_explore'), gradient: 'from-emerald-400 to-teal-500',  shadow: 'hover:shadow-emerald-200' },
-    { screen: 'hot-this-week', icon: '🔥', label: t('home_quick_hot'),     gradient: 'from-orange-400 to-red-500',    shadow: 'hover:shadow-orange-200' },
     { screen: 'calendar',      icon: '📅', label: t('home_quick_calendar'),gradient: 'plum-gradient',                  shadow: 'hover:shadow-[#cdb7dc]' },
     { screen: 'gallery',       icon: '📸', label: t('home_quick_gallery'), gradient: 'from-cyan-400 to-teal-500',     shadow: 'hover:shadow-cyan-200'   },
   ];
@@ -41,60 +22,6 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
     { num: store.opportunities.length, label: t('home_stat_opportunities'), icon: '🎯', gradient: 'from-emerald-400 to-teal-500' },
     { num: ORGANIZATIONS.length,       label: t('home_stat_organizations'), icon: '🏢', gradient: 'plum-gradient' },
     { num: CATEGORIES.length,          label: t('home_stat_categories'),    icon: '✨', gradient: 'from-amber-400 to-orange-500' },
-  ];
-
-  const carouselItems = useMemo(() => {
-    const open = store.opportunities.filter(
-      o => o.status === 'פתוח' || o.status === 'מקומות אחרונים'
-    );
-    const pool = (open.length >= 3 ? open : store.opportunities).slice(0, 5);
-    return pool.map(opp => {
-      const ev = (store.events ?? [])
-        .filter(e => e.opportunityId === opp.id && e.startsAt && new Date(e.startsAt).getTime() > currentTime)
-        .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
-      return { opp, eventDate: ev?.startsAt ?? null };
-    });
-  }, [store.opportunities, store.events, currentTime]);
-
-  const [idx,     setIdx    ] = useState(0);
-  const [visible, setVisible] = useState(true);
-
-  const safeIdx     = carouselItems.length > 0 ? Math.min(idx, carouselItems.length - 1) : 0;
-  const currentItem = carouselItems[safeIdx];
-  const featuredOpp = currentItem?.opp ?? store.opportunities[0];
-  const eventDate   = currentItem?.eventDate ?? null;
-  const cd = eventDate ? calcCd(eventDate, currentTime) : null;
-
-  useEffect(() => {
-    const id = setInterval(() => setCurrentTime(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (carouselItems.length <= 1) return;
-    const id = setInterval(() => {
-      setVisible(false);
-      setTimeout(() => {
-        setIdx(prev => (prev + 1) % carouselItems.length);
-        setVisible(true);
-      }, FADE_MS);
-    }, ROTATION_MS);
-    return () => clearInterval(id);
-  }, [carouselItems.length]);
-
-  const goTo = (next) => {
-    if (next === safeIdx) return;
-    setVisible(false);
-    setTimeout(() => { setIdx(next); setVisible(true); }, FADE_MS);
-  };
-
-  const featuredCat = featuredOpp ? CATEGORIES.find(c => c.id === featuredOpp.category) : null;
-
-  const CD_LABELS = [
-    { key: 'days',    he: 'ימים',   ar: 'يوم'   },
-    { key: 'hours',   he: 'שעות',  ar: 'ساعة'  },
-    { key: 'minutes', he: 'דקות',  ar: 'دقيقة' },
-    { key: 'seconds', he: 'שניות', ar: 'ثانية' },
   ];
 
   return (
@@ -127,12 +54,6 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
                 transition-all duration-200 shadow-xl text-base tracking-wide">
               {t('home_explore_btn')}
             </button>
-            <button onClick={() => handleNavigate('hot-this-week')}
-              className="px-8 py-3.5 bg-white/10 text-white font-bold rounded-2xl
-                hover:bg-white/20 hover:scale-105 active:scale-95
-                transition-all duration-200 border border-white/40 text-base backdrop-blur-sm">
-              {t('home_hot_btn')}
-            </button>
           </div>
         </div>
       </div>
@@ -160,7 +81,7 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
         {/* Quick Links */}
         <section>
           <h2 className="text-xl font-black text-gray-800 mb-4">{t('home_quick_links_title')}</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {QUICK_LINKS.map((ql, i) => (
               <button key={i}
                 onClick={() => handleNavigate(ql.screen)}
@@ -176,86 +97,6 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
             ))}
           </div>
         </section>
-
-        {/* Featured Carousel */}
-        {featuredOpp && (
-          <section>
-            <h2 className="text-xl font-black text-gray-800 mb-4">{t('home_featured_title')}</h2>
-
-            <div
-              onClick={() => handleNavigate('opportunities')}
-              className="home-featured-card relative overflow-hidden
-                rounded-3xl p-6 sm:p-8 text-white cursor-pointer
-                hover:shadow-2xl hover:shadow-[#cdb7dc] hover:-translate-y-1 transition-all duration-300">
-              <div className="pointer-events-none absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5 animate-blob" />
-              <div className="pointer-events-none absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-slate-950/10 animate-blob" style={{ animationDelay: '2s' }} />
-
-              <div className="relative" style={{ transition: `opacity ${FADE_MS}ms ease`, opacity: visible ? 1 : 0 }}>
-                <div className="flex items-center gap-5">
-                  <span className="text-5xl sm:text-6xl shrink-0">{featuredOpp.icon}</span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-black border border-white/30">
-                        🔥 {t('home_featured_badge')}
-                      </span>
-                      {featuredCat && (
-                        <span className="px-2.5 py-1 bg-white/15 rounded-lg text-xs font-semibold border border-white/20">
-                          {featuredCat.icon} {isAr ? featuredCat.labelAr : featuredCat.label}
-                        </span>
-                      )}
-                      <span className="px-2.5 py-1 bg-white/20 rounded-lg text-xs font-semibold border border-white/25">
-                        📍 {getCityName(featuredOpp.city, isAr)}
-                      </span>
-                    </div>
-                    <h3 className="text-lg sm:text-2xl font-black leading-tight mb-1">
-                      {isAr ? featuredOpp.titleAr : featuredOpp.title}
-                    </h3>
-                    <p className="text-white/75 text-sm line-clamp-2">
-                      {isAr && featuredOpp.descriptionAr ? featuredOpp.descriptionAr : featuredOpp.description}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-3.5 border-t border-white/20 flex items-center justify-between gap-3">
-                  {cd ? (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-white/45 text-xs shrink-0">⏱</span>
-                      <div className="flex gap-1">
-                        {CD_LABELS.map(({ key, he: lHe, ar: lAr }) => (
-                          <div key={key}
-                            className="text-center bg-white/15 rounded-lg px-1.5 py-1 min-w-[36px]">
-                            <p className="text-sm font-black tabular-nums leading-none">{p2(cd[key])}</p>
-                            <p className="text-white/45 text-[10px] font-semibold leading-none mt-0.5">
-                              {isAr ? lAr : lHe}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-white/40 text-xs font-semibold">{t('home_featured_soon')}</p>
-                  )}
-
-                  {carouselItems.length > 1 && (
-                    <div className="flex gap-1.5 shrink-0">
-                      {carouselItems.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={e => { e.stopPropagation(); goTo(i); }}
-                          aria-label={`${t('home_carousel_goto')} ${i + 1}`}
-                          className={`rounded-full transition-all duration-300
-                            ${i === safeIdx
-                              ? 'w-5 h-2 bg-white shadow-sm'
-                              : 'w-2 h-2 bg-white/35 hover:bg-white/65'}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Community Perks */}
         <section>
@@ -284,13 +125,13 @@ function HomePage({ store, currentUser, lang, handleNavigate }) {
         {/* CTA */}
         {currentUser?.role === 'User' ? (
           <section>
-            <div className="bg-gradient-to-l from-emerald-50 to-teal-50 border border-emerald-100
+            <div className="home-welcome-card bg-gradient-to-l from-emerald-50 to-teal-50 border border-emerald-100
               rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-center sm:text-right">
                 <p className="font-black text-gray-800 text-base">
                   {isAr ? `مرحباً، ${currentUser.name}! 👋` : `שלום, ${currentUser.name}! 👋`}
                 </p>
-                <p className="text-sm text-gray-500 mt-0.5">{t('home_welcome_subtitle')}</p>
+                <p className="home-welcome-subtitle text-sm text-gray-500 mt-0.5">{t('home_welcome_subtitle')}</p>
               </div>
               <button onClick={() => handleNavigate('my-registrations')}
                 className="shrink-0 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold

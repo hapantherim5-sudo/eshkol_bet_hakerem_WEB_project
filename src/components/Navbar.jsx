@@ -6,7 +6,6 @@ const PUBLIC_LINKS = [
   { screen: 'home',          key: 'nav_home',          icon: '🏠' },
   { screen: 'opportunities', key: 'nav_opportunities',  icon: '🔍' },
   { screen: 'calendar',      key: 'nav_calendar',       icon: '📅' },
-  { screen: 'hot-this-week', key: 'nav_hot_this_week',  icon: '🔥' },
   { screen: 'gallery',       key: 'nav_gallery',        icon: '📸' },
   { screen: 'about',         key: 'nav_about',          icon: '📖' },
 ];

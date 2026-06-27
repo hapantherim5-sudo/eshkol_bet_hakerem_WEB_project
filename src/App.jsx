@@ -12,7 +12,6 @@ import OpportunitiesBoardPage from './pages/OpportunitiesBoardPage';
 import MyRegistrationsPage from './pages/MyRegistrationsPage';
 import AboutPage from './pages/AboutPage';
 import GalleryPage from './pages/GalleryPage';
-import HotThisWeekPage from './pages/HotThisWeekPage';
 
 import { useDataStore } from './hooks/useDataStore';
 import {
@@ -193,14 +192,6 @@ function App() {
             onNavigate={handleNavigate}
             currentUser={currentUser}
             registrations={store.registrations}
-          />
-        )}
-
-        {currentScreen === 'hot-this-week' && (
-          <HotThisWeekPage
-            opportunities={store.opportunities}
-            lang={lang}
-            onOpenModal={openOppModal}
           />
         )}
 

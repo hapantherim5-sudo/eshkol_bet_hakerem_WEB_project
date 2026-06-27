@@ -92,15 +92,9 @@ button:disabled,
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.65; }
 }
-@keyframes hotGlow {
-  0%, 100% { box-shadow: 0 0 18px rgba(251,146,60,0.35); }
-  50%       { box-shadow: 0 0 30px rgba(251,146,60,0.55), 0 0 55px rgba(251,146,60,0.25); }
-}
-
 .animate-scale-in      { animation: scaleIn       0.3s  ease-out both; }
 .animate-slide-right   { animation: slideInRight  0.35s ease-out both; }
 .animate-pulse-gentle  { animation: gentlePulse   2.4s  ease-in-out infinite; }
-.animate-hot-glow      { animation: hotGlow        2s   ease-in-out infinite; }
 
 /* Gallery masonry columns */
 .gallery-masonry {
@@ -113,9 +107,6 @@ button:disabled,
 
 /* Nav active glow */
 .nav-glow { box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); }
-
-/* Hot card glow */
-.glow-hot { box-shadow: 0 0 22px rgba(251, 146, 60, 0.3), 0 8px 24px rgba(0,0,0,0.12); }
 
 /* Glass card */
 .glass-card {
@@ -283,11 +274,22 @@ button:disabled,
   color: #ffffff;
 }
 
-.app-dark .login-page {
+.app-dark .home-welcome-card {
+  background: linear-gradient(135deg, #1e293b, #172b2a);
+  border-color: #334155;
+}
+
+.app-dark .home-welcome-subtitle {
+  color: #cbd5e1;
+}
+
+.app-dark .login-page,
+.app-dark .register-page {
   background: linear-gradient(135deg, #0f172a, #111827, #0f172a);
 }
 
-.app-dark .login-page > .pointer-events-none {
+.app-dark .login-page > .pointer-events-none,
+.app-dark .register-page > .pointer-events-none {
   opacity: 0.15;
 }
 
@@ -348,33 +350,6 @@ button:disabled,
   color: #ecfdf5;
 }
 
-.app-dark .hot-card {
-  background-color: #1e293b;
-  border-color: #334155;
-}
-
-.app-dark .hot-card-age {
-  background-color: #334155;
-  color: #e2e8f0;
-}
-
-.app-dark .hot-card .text-violet-600 {
-  color: #c4b5fd;
-}
-
-.app-dark .hot-board-cta {
-  background: #1e293b;
-  border-color: #334155;
-}
-
-.app-dark .hot-hero {
-  background: linear-gradient(135deg, #8a3f16, #9a421d, #743222);
-}
-
-.app-dark .hot-featured-gradient {
-  background: linear-gradient(135deg, #93411f, #a14c26, #7c3626);
-}
-
 .about-hero {
   background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
 }
@@ -397,14 +372,12 @@ button:disabled,
 
 /* One muted plum accent shared throughout the site. */
 .plum-gradient,
-.home-featured-card,
 .home-login-cta {
   background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
 }
 
 /* Keep that same accent family restrained in dark mode. */
 .app-dark .plum-gradient,
-.app-dark .home-featured-card,
 .app-dark .home-login-cta {
   background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
 }
