@@ -1,31 +1,17 @@
 import { useState } from 'react';
 import { useT } from '../i18n/i18n';
-
-const GALLERY_ITEMS = [
-  { id: 1,  src: '/gallery/youth-football-training.jpg',    captionHe: 'אימון כדורגל קהילתי',              captionAr: 'تدريب كرة القدم المجتمعي',           tag: 'sport',     tagLabelHe: 'ספורט',    tagLabelAr: 'رياضة',    tagColor: 'bg-orange-500' },
-  { id: 2,  src: '/gallery/youth-art-workshop.jpg',         captionHe: 'סדנת ציור ויצירה',                 captionAr: 'ورشة الرسم والإبداع',                tag: 'art',       tagLabelHe: 'אמנות',    tagLabelAr: 'فنون',     tagColor: 'bg-violet-500' },
-  { id: 3,  src: '/gallery/community-garden-volunteering.jpg', captionHe: 'פעילות התנדבות בגינה הקהילתית', captionAr: 'نشاط التطوع في الحديقة المجتمعية',  tag: 'volunteer', tagLabelHe: 'התנדבות',  tagLabelAr: 'تطوع',     tagColor: 'bg-emerald-500' },
-  { id: 4,  src: '/gallery/youth-science-learning.jpg',     captionHe: 'מעבדת מדע לנוער',                 captionAr: 'مختبر العلوم للشباب',                tag: 'science',   tagLabelHe: 'מדע',      tagLabelAr: 'علوم',     tagColor: 'bg-blue-500' },
-  { id: 5,  src: '/gallery/community-event-gathering.jpg',  captionHe: 'אירוע קהילתי שנתי',               captionAr: 'الحدث المجتمعي السنوي',              tag: 'community', tagLabelHe: 'קהילה',    tagLabelAr: 'مجتمع',    tagColor: 'bg-pink-500' },
-  { id: 6,  src: '/gallery/youth-basketball-tournament.jpg',captionHe: 'טורניר כדורסל בין-ישובי',          captionAr: 'بطولة كرة السلة بين البلدات',        tag: 'sport',     tagLabelHe: 'ספורט',    tagLabelAr: 'رياضة',    tagColor: 'bg-orange-500' },
-  { id: 7,  src: '/gallery/music-workshop-drums.jpg',       captionHe: 'סדנת מוזיקה ותופים',              captionAr: 'ورشة الموسيقى والطبل',               tag: 'art',       tagLabelHe: 'אמנות',    tagLabelAr: 'فنون',     tagColor: 'bg-violet-500' },
-  { id: 8,  src: '/gallery/community-cleanup-volunteers.jpg',captionHe: 'ניקוי פארק קהילתי',              captionAr: 'تنظيف الحديقة المجتمعية',           tag: 'volunteer', tagLabelHe: 'התנדבות',  tagLabelAr: 'تطوع',     tagColor: 'bg-emerald-500' },
-  { id: 9,  src: '/gallery/youth-coding-workshop.jpg',      captionHe: 'קורס קידוד ותכנות לנוער',         captionAr: 'دورة البرمجة للشباب',                tag: 'science',   tagLabelHe: 'טכנולוגיה',tagLabelAr: 'تكنولوجيا',tagColor: 'bg-blue-500' },
-  { id: 10, src: '/gallery/youth-festival-celebration.jpg', captionHe: 'פסטיבל נוער אזורי',               captionAr: 'مهرجان الشباب الإقليمي',             tag: 'community', tagLabelHe: 'אירוע',    tagLabelAr: 'حدث',      tagColor: 'bg-pink-500' },
-  { id: 11, src: '/gallery/youth-dance-performance.jpg',    captionHe: 'הצגת מחול סיום שנה',              captionAr: 'عرض الرقص في نهاية السنة',           tag: 'art',       tagLabelHe: 'אמנות',    tagLabelAr: 'فنون',     tagColor: 'bg-violet-500' },
-  { id: 12, src: '/gallery/nature-hiking-group.jpg',        captionHe: 'טיול שנתי לטבע הגליל',            captionAr: 'رحلة سنوية إلى طبيعة الجليل',       tag: 'community', tagLabelHe: 'פעילות',   tagLabelAr: 'نشاط',     tagColor: 'bg-pink-500' },
-];
+import { GALLERY_ITEMS } from '../data/galleryItems';
 
 const FILTERS = [
-  { id: 'all',       labelHe: '⭐ הכל',      labelAr: '⭐ الكل'   },
-  { id: 'sport',     labelHe: '⚽ ספורט',    labelAr: '⚽ رياضة'  },
-  { id: 'art',       labelHe: '🎨 אמנות',    labelAr: '🎨 فنون'   },
-  { id: 'volunteer', labelHe: '🤝 התנדבות',  labelAr: '🤝 تطوع'   },
-  { id: 'science',   labelHe: '🔬 מדע',      labelAr: '🔬 علوم'   },
-  { id: 'community', labelHe: '🏘️ קהילה',   labelAr: '🏘️ مجتمع' },
+  { id: 'all',       labelKey: 'gallery_filter_all' },
+  { id: 'sport',     labelKey: 'gallery_filter_sport' },
+  { id: 'art',       labelKey: 'gallery_filter_art' },
+  { id: 'volunteer', labelKey: 'gallery_filter_volunteer' },
+  { id: 'science',   labelKey: 'gallery_filter_science' },
+  { id: 'community', labelKey: 'gallery_filter_community' },
 ];
 
-function GalleryItem({ item, isAr }) {
+function GalleryItem({ item, t }) {
   const [hovered, setHovered] = useState(false);
   const [loaded,  setLoaded ] = useState(false);
 
@@ -41,7 +27,7 @@ function GalleryItem({ item, isAr }) {
 
       <img
         src={item.src}
-        alt={isAr ? item.captionAr : item.captionHe}
+        alt={t(item.captionKey)}
         className={`w-full object-cover rounded-2xl transition-transform duration-500
           ${hovered ? 'scale-105' : 'scale-100'}
           ${loaded ? 'opacity-100' : 'opacity-0'}`}
@@ -54,12 +40,12 @@ function GalleryItem({ item, isAr }) {
           : 'bg-gradient-to-t from-black/30 to-transparent'}`}>
 
         <span className={`self-start mb-2 px-2.5 py-1 ${item.tagColor} text-white text-[12px] font-black rounded-lg shadow-md`}>
-          {isAr ? item.tagLabelAr : item.tagLabelHe}
+          {t(item.tagLabelKey)}
         </span>
 
         <p className={`text-white text-sm font-bold leading-tight transition-all duration-300
           ${hovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-          {isAr ? item.captionAr : item.captionHe}
+          {t(item.captionKey)}
         </p>
       </div>
     </div>
@@ -68,7 +54,6 @@ function GalleryItem({ item, isAr }) {
 
 function GalleryPage({ lang }) {
   const t = useT(lang);
-  const isAr = lang === 'ar';
   const [activeFilter, setActiveFilter] = useState('all');
 
   const filtered = activeFilter === 'all'
@@ -78,7 +63,7 @@ function GalleryPage({ lang }) {
   return (
     <div className="animate-fade-in">
 
-      <div className="relative overflow-hidden bg-gradient-to-bl from-cyan-600 via-teal-500 to-emerald-500 text-white">
+      <div className="relative overflow-hidden bg-gradient-to-bl from-emerald-700 via-emerald-600 to-teal-500 text-white">
         <div className="pointer-events-none absolute -top-16 -right-12 w-64 h-64 rounded-full bg-white/5 animate-blob" />
         <div className="pointer-events-none absolute -bottom-10 -left-8 w-48 h-48 rounded-full bg-teal-900/20 animate-blob" style={{ animationDelay: '4s' }} />
 
@@ -90,10 +75,8 @@ function GalleryPage({ lang }) {
           <h1 className="text-3xl sm:text-5xl font-black mb-3 leading-tight">
             {t('gallery_subtitle')}
           </h1>
-          <p className="text-teal-100 text-base sm:text-lg max-w-lg mx-auto">
-            {isAr
-              ? 'لقطات حقيقية من فعاليات ونشاطات شبابنا في المجتمع'
-              : 'צילומים אמיתיים מפעילויות ואירועים של הנוער שלנו בקהילה'}
+          <p className="text-emerald-100 text-base sm:text-lg max-w-lg mx-auto">
+            {t('gallery_description')}
           </p>
         </div>
       </div>
@@ -109,19 +92,19 @@ function GalleryPage({ lang }) {
                 ${activeFilter === f.id
                   ? 'bg-teal-600 text-white border-teal-600 shadow-md'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-teal-300 hover:text-teal-700'}`}>
-              {isAr ? f.labelAr : f.labelHe}
+              {t(f.labelKey)}
             </button>
           ))}
         </div>
 
         <p className="text-sm text-gray-500 font-medium mb-5 text-center">
-          {isAr ? `${filtered.length} صورة` : `${filtered.length} תמונות`}
+          {t('gallery_photo_count', { count: filtered.length })}
         </p>
 
         <div className="gallery-masonry">
           {filtered.map((item, i) => (
             <div key={item.id} style={{ animationDelay: `${Math.min(i, 8) * 0.05}s` }}>
-              <GalleryItem item={item} isAr={isAr} />
+              <GalleryItem item={item} t={t} />
             </div>
           ))}
         </div>

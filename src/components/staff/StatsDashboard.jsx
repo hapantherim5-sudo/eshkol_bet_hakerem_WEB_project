@@ -3,31 +3,31 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, CartesianGrid,
 } from 'recharts';
-import { api, apiEnabled } from '../../services/api';
-import { pick } from '../../i18n/i18n';
+import { api } from '../../services/api';
+import { useT } from '../../i18n/i18n';
 import { getCityName } from '../../data/organizations';
+import { CATEGORIES } from '../../data/opportunityOptions';
 
 const PALETTE = [
   '#10b981','#06b6d4','#3b82f6','#8b5cf6',
   '#f59e0b','#ef4444','#84cc16','#f97316','#e879f9','#a78bfa',
 ];
 
-const HE_MONTHS = ['ינו׳','פבר׳','מרץ','אפר׳','מאי','יונ׳','יול׳','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
-
-function getLast12Months() {
+function getLast12Months(locale) {
   const now = new Date();
+  const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'short' });
   return Array.from({ length: 12 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
     return {
       year: d.getFullYear(),
       month: d.getMonth() + 1,
-      label: `${HE_MONTHS[d.getMonth()]} '${String(d.getFullYear()).slice(2)}`,
+      label: `${monthFormatter.format(d)} '${String(d.getFullYear()).slice(2)}`,
     };
   });
 }
 
-function computeLocalStats(opportunities, registrations, cancellations, views) {
-  const months = getLast12Months();
+function computeLocalStats(opportunities, registrations, cancellations, views, locale) {
+  const months = getLast12Months(locale);
 
   const groupByMonth = (items, dateField) =>
     months.map(({ year, month, label }) => ({
@@ -55,8 +55,8 @@ function computeLocalStats(opportunities, registrations, cancellations, views) {
 
   const regsByCategory = groupBy(registrations, reg => {
     const opp = opportunities.find(o => o.id === reg.opportunityId);
-    return opp?.categoryLabel || opp?.category;
-  }).map(r => ({ label: r._key, count: r.count }));
+    return opp?.category;
+  }).map(r => ({ category: r._key, count: r.count }));
 
   const oppCounts = {};
   registrations.forEach(reg => {
@@ -65,7 +65,7 @@ function computeLocalStats(opportunities, registrations, cancellations, views) {
   const topOpps = Object.entries(oppCounts)
     .map(([id, count]) => {
       const opp = opportunities.find(o => o.id === Number(id));
-      return { id: Number(id), title: opp?.title || `#${id}`, city: opp?.city, category: opp?.categoryLabel, count };
+      return { id: Number(id), title: opp?.title || `#${id}`, titleAr: opp?.titleAr, city: opp?.city, category: opp?.category, count };
     })
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
@@ -99,12 +99,12 @@ function computeLocalStats(opportunities, registrations, cancellations, views) {
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 const KPI_META = [
-  { key: 'totalUsers',          icon: 'users',     tone: 'neutral', labelHe: 'משתמשים',       labelAr: 'المستخدمون'   },
-  { key: 'totalOpportunities',  icon: 'clipboard', tone: 'neutral', labelHe: 'הזדמנויות',      labelAr: 'الفرص'        },
-  { key: 'totalRegistrations',  icon: 'check',     tone: 'success', labelHe: 'הרשמות',         labelAr: 'التسجيلات'   },
-  { key: 'totalCancellations',  icon: 'close',     tone: 'danger',  labelHe: 'ביטולים',        labelAr: 'الإلغاءات'   },
-  { key: 'totalViews',          icon: 'eye',       tone: 'teal',    labelHe: 'צפיות',          labelAr: 'المشاهدات'   },
-  { key: 'activeOrganizations', icon: 'building',  tone: 'neutral', labelHe: 'ארגונים פעילים', labelAr: 'منظمات نشطة' },
+  { key: 'totalUsers',          icon: 'users',     tone: 'neutral', labelKey: 'stats_users' },
+  { key: 'totalOpportunities',  icon: 'clipboard', tone: 'neutral', labelKey: 'stats_opportunities' },
+  { key: 'totalRegistrations',  icon: 'check',     tone: 'success', labelKey: 'stats_registrations' },
+  { key: 'totalCancellations',  icon: 'close',     tone: 'danger',  labelKey: 'stats_cancellations' },
+  { key: 'totalViews',          icon: 'eye',       tone: 'teal',    labelKey: 'stats_views' },
+  { key: 'activeOrganizations', icon: 'building',  tone: 'neutral', labelKey: 'stats_active_organizations' },
 ];
 
 function KpiIcon({ type }) {
@@ -123,8 +123,7 @@ function KpiIcon({ type }) {
   );
 }
 
-function KpiCard({ icon, tone, value, labelHe, labelAr, isAr }) {
-  const label = isAr ? labelAr : labelHe;
+function KpiCard({ icon, tone, value, label }) {
   return (
     <div className={`stats-kpi-card stats-kpi-card--${tone} bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5`}>
       <div className="stats-kpi-icon w-10 h-10 rounded-xl flex items-center justify-center text-emerald-600 bg-emerald-50 mb-3">
@@ -189,11 +188,13 @@ function Empty({ label }) {
 
 export default function StatsDashboard({ opportunities, registrations, cancellations, views, lang, showToast }) {
   const isAr = lang === 'ar';
-  const t = (he, ar) => pick(isAr, he, ar);
-  const empty = t('אין נתונים להצגה', 'لا توجد بيانات');
+  const t = useT(lang);
+  const empty = t('stats_empty');
+  const loadErrorMessage = t('stats_load_error');
+  const locale = t('calendar_date_locale');
 
   const [apiStats, setApiStats] = useState(null);
-  const [loading, setLoading] = useState(() => apiEnabled());
+  const [loading, setLoading] = useState(true);
   const showToastRef = useRef(showToast);
 
   useEffect(() => {
@@ -201,23 +202,43 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
   }, [showToast]);
 
   useEffect(() => {
-    if (!apiEnabled()) return;
     let isActive = true;
     api.getStats()
       .then(stats => { if (isActive) setApiStats(stats); })
       .catch(() => {
-        if (isActive) showToastRef.current(pick(isAr, 'שגיאה בטעינת נתוני הדשבורד', 'خطأ في تحميل بيانات لوحة التحكم'), 'error');
+        if (isActive) showToastRef.current(loadErrorMessage, 'error');
       })
       .finally(() => { if (isActive) setLoading(false); });
     return () => { isActive = false; };
-  }, [isAr]);
+  }, [lang, loadErrorMessage]);
 
   const localStats = useMemo(
-    () => computeLocalStats(opportunities, registrations, cancellations, views),
-    [opportunities, registrations, cancellations, views]
+    () => computeLocalStats(opportunities, registrations, cancellations, views, locale),
+    [opportunities, registrations, cancellations, views, locale]
   );
 
-  const stats = apiStats ?? localStats;
+  const rawStats = apiStats ?? localStats;
+  const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'short' });
+  const localizeMonthSeries = (series = []) => series.map(item => item.label ? item : ({
+    ...item,
+    label: `${monthFormatter.format(new Date(item.year, item.month - 1, 1))} '${String(item.year).slice(2)}`,
+  }));
+  const stats = {
+    ...rawStats,
+    registrationsByMonth: localizeMonthSeries(rawStats.registrationsByMonth),
+    cancellationsByMonth: localizeMonthSeries(rawStats.cancellationsByMonth),
+    registrationsByCategory: (rawStats.registrationsByCategory ?? []).map(item => {
+      const category = CATEGORIES.find(candidate => candidate.id === item.category);
+      return {
+        ...item,
+        label: category ? t(category.labelKey) : t('other'),
+      };
+    }),
+    topOpportunities: (rawStats.topOpportunities ?? []).map(item => ({
+      ...item,
+      title: isAr && item.titleAr ? item.titleAr : item.title,
+    })),
+  };
   const {
     kpis, registrationsByMonth, cancellationsByMonth,
     registrationsByCity, registrationsByCategory,
@@ -232,7 +253,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
   const topBarH = Math.max(220, (topOpportunities?.length ?? 0) * 40 + 40);
   const cityChartData = (registrationsByCity ?? []).map(item => ({
     ...item,
-    city: getCityName(item.city, isAr),
+    city: item.city === 'other' ? t('other') : getCityName(item.city, isAr),
   }));
 
   return (
@@ -240,22 +261,20 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
 
       {/* ── Section 1: KPI cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        {KPI_META.map(({ key, icon, tone, labelHe, labelAr }) => (
+        {KPI_META.map(({ key, icon, tone, labelKey }) => (
           <KpiCard
             key={key}
             icon={icon}
             tone={tone}
             value={kpis[key]}
-            labelHe={labelHe}
-            labelAr={labelAr}
-            isAr={isAr}
+            label={t(labelKey)}
           />
         ))}
       </div>
 
       {/* ── Section 2 + 3: Monthly bar charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title={t('הרשמות לפי חודש', 'التسجيلات الشهرية')}>
+        <SectionCard title={t('stats_registrations_by_month')}>
           {loading ? <Skeleton /> : (
             <div dir="ltr">
               <ResponsiveContainer width="100%" height={200}>
@@ -271,7 +290,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
           )}
         </SectionCard>
 
-        <SectionCard title={t('ביטולים לפי חודש', 'الإلغاءات الشهرية')}>
+        <SectionCard title={t('stats_cancellations_by_month')}>
           {loading ? <Skeleton /> : (
             <div dir="ltr">
               <ResponsiveContainer width="100%" height={200}>
@@ -290,7 +309,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
 
       {/* ── Section 4 + 5: Pie charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SectionCard title={t('הרשמות לפי עיר', 'التسجيلات حسب المدينة')}>
+        <SectionCard title={t('stats_registrations_by_city')}>
         {loading ? <Skeleton /> : !cityChartData.length ? <Empty label={empty} /> : (
             <div dir="ltr">
               <ResponsiveContainer width="100%" height={260}>
@@ -321,7 +340,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
           )}
         </SectionCard>
 
-        <SectionCard title={t('הרשמות לפי קטגוריה', 'التسجيلات حسب الفئة')}>
+        <SectionCard title={t('stats_registrations_by_category')}>
           {loading ? <Skeleton /> : !registrationsByCategory?.length ? <Empty label={empty} /> : (
             <div dir="ltr">
               <ResponsiveContainer width="100%" height={260}>
@@ -354,7 +373,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
       </div>
 
       {/* ── Section 6: Top 10 Opportunities ── */}
-      <SectionCard title={t('10 הפעילויות הפופולריות', 'أكثر 10 نشاطات شعبية')}>
+      <SectionCard title={t('stats_top_opportunities')}>
         {loading ? <Skeleton h="h-64" /> : !topOpportunities?.length ? <Empty label={empty} /> : (
           <div dir="ltr">
             <ResponsiveContainer width="100%" height={topBarH}>
@@ -388,7 +407,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         {/* Section 7 – Cities ranking */}
-        <SectionCard title={t('ערים מובילות', 'أبرز المدن')}>
+        <SectionCard title={t('stats_top_cities')}>
           {loading ? <Skeleton h="h-44" /> : !registrationsByCity?.length ? <Empty label={empty} /> : (
             <div className="space-y-2.5">
               {registrationsByCity.map((item, i) => {
@@ -414,21 +433,21 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
         </SectionCard>
 
         {/* Section 8 – Conversion rate */}
-        <SectionCard title={t('המרה: צפיות להרשמות', 'معدل التحويل: المشاهدات → التسجيلات')}>
+        <SectionCard title={t('stats_conversion_title')}>
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="stats-conversion-views bg-violet-50 rounded-xl p-4 text-center">
                 <div className="text-2xl font-black text-violet-700">{viewsTotal.toLocaleString()}</div>
-                <div className="text-xs text-violet-500 mt-1">{t('צפיות', 'مشاهدات')}</div>
+                <div className="text-xs text-violet-500 mt-1">{t('stats_views')}</div>
               </div>
               <div className="stats-conversion-registrations bg-emerald-50 rounded-xl p-4 text-center">
                 <div className="text-2xl font-black text-emerald-700">{regsTotal.toLocaleString()}</div>
-                <div className="text-xs text-emerald-500 mt-1">{t('הרשמות', 'تسجيلات')}</div>
+                <div className="text-xs text-emerald-500 mt-1">{t('stats_registrations')}</div>
               </div>
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-semibold text-gray-600">{t('שיעור המרה', 'معدل التحويل')}</span>
+                <span className="text-sm font-semibold text-gray-600">{t('stats_conversion_rate')}</span>
                 <span className="stats-conversion-rate text-2xl font-black text-blue-600">{convRate}%</span>
               </div>
               <div className="stats-conversion-track w-full bg-gray-100 rounded-full h-3 overflow-hidden">
@@ -438,7 +457,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                 />
               </div>
               <p className="stats-conversion-note text-xs text-gray-400 mt-2 text-center">
-                {t('מתוך כל הצפיות - כמה הפכו להרשמות', 'من إجمالي المشاهدات - كم تحولت إلى تسجيلات')}
+                {t('stats_conversion_note')}
               </p>
             </div>
           </div>
@@ -446,9 +465,9 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
       </div>
 
       {/* ── Section 10: User distribution ── */}
-      <SectionCard title={t('התפלגות משתמשים לפי תפקיד', 'توزيع المستخدمين حسب الدور')}>
+      <SectionCard title={t('stats_users_by_role')}>
         {loading ? <Skeleton h="h-44" /> : !usersByRole?.length ? (
-          <Empty label={t('נתוני תפקידים דורשים חיבור API', 'بيانات الأدوار تتطلب اتصال API')} />
+          <Empty label={t('stats_roles_require_api')} />
         ) : (
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div dir="ltr" className="w-full sm:w-64 shrink-0">
@@ -476,7 +495,7 @@ export default function StatsDashboard({ opportunities, registrations, cancellat
                 <div key={item.role} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: PALETTE[i % PALETTE.length] }} />
-                    <span className="text-sm font-semibold text-gray-700">{item.role}</span>
+                    <span className="text-sm font-semibold text-gray-700">{t(`role_${item.role.toLowerCase()}`)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-24 bg-gray-100 rounded-full h-1.5 hidden sm:block">

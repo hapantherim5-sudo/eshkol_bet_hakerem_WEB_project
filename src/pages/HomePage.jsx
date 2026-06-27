@@ -1,173 +1,214 @@
-import { ORGANIZATIONS } from '../data/organizations';
-import { CATEGORIES } from '../data/fakeData';
+import { useEffect, useState } from 'react';
 import { useT } from '../i18n/i18n';
+import { GALLERY_ITEMS } from '../data/galleryItems';
 
-function HomePage({ store, currentUser, lang, handleNavigate }) {
+const HERO_GALLERY_ITEMS = GALLERY_ITEMS.slice(0, 6);
+
+const STATS = [
+  { num: '500+', labelKey: 'home_stat_active_youth', icon: '👥' },
+  { num: '10', labelKey: 'home_stat_cities', icon: '🏘️' },
+  { num: '6', labelKey: 'home_stat_categories', icon: '✨' },
+  { num: '3', labelKey: 'home_stat_years', icon: '🗓️' },
+];
+
+const MISSION_CARDS = [
+  {
+    icon: '🌱',
+    titleKey: 'home_mission_growth_title',
+    textKey: 'home_mission_growth_text',
+  },
+  {
+    icon: '🤝',
+    titleKey: 'home_mission_belonging_title',
+    textKey: 'home_mission_belonging_text',
+  },
+  {
+    icon: '🚀',
+    titleKey: 'home_mission_opportunities_title',
+    textKey: 'home_mission_opportunities_text',
+  },
+];
+
+const VALUES = [
+  { icon: '💡', titleKey: 'home_value_innovation_title', textKey: 'home_value_innovation_text' },
+  { icon: '🌍', titleKey: 'home_value_diversity_title', textKey: 'home_value_diversity_text' },
+  { icon: '🏆', titleKey: 'home_value_excellence_title', textKey: 'home_value_excellence_text' },
+  { icon: '❤️', titleKey: 'home_value_care_title', textKey: 'home_value_care_text' },
+];
+
+const TEAM = [
+  { nameKey: 'home_team_1_name', roleKey: 'home_team_1_role', emoji: '👩‍💼' },
+  { nameKey: 'home_team_2_name', roleKey: 'home_team_2_role', emoji: '👨‍🏫' },
+  { nameKey: 'home_team_3_name', roleKey: 'home_team_3_role', emoji: '👩‍🎨' },
+  { nameKey: 'home_team_4_name', roleKey: 'home_team_4_role', emoji: '🏅' },
+];
+
+function HomePage({ currentUser, lang, handleNavigate, opportunitiesCount }) {
   const t = useT(lang);
-  const isAr = lang === 'ar';
-  const QUICK_LINKS = [
-    { screen: 'opportunities', icon: '🔍', label: t('home_quick_explore'), gradient: 'from-emerald-400 to-teal-500',  shadow: 'hover:shadow-emerald-200' },
-    { screen: 'calendar',      icon: '📅', label: t('home_quick_calendar'),gradient: 'plum-gradient',                  shadow: 'hover:shadow-[#cdb7dc]' },
-    { screen: 'gallery',       icon: '📸', label: t('home_quick_gallery'), gradient: 'from-cyan-400 to-teal-500',     shadow: 'hover:shadow-cyan-200'   },
+  const [heroSlide, setHeroSlide] = useState(0);
+  const stats = [
+    ...STATS.slice(0, 2),
+    { num: opportunitiesCount, labelKey: 'home_stat_opportunities', icon: '🎯' },
+    ...STATS.slice(2),
   ];
 
-  const COMMUNITY_PERKS = [
-    { icon: '🏆', title: t('home_perks_selfdev_title'),    text: t('home_perks_selfdev_text'),    color: 'text-amber-600',   bg: 'bg-amber-50' },
-    { icon: '🤝', title: t('home_perks_friends_title'),    text: t('home_perks_friends_text'),    color: 'text-pink-600',    bg: 'bg-pink-50'  },
-    { icon: '🚀', title: t('home_perks_experience_title'), text: t('home_perks_experience_text'), color: 'text-[#6c4e9b]',  bg: 'bg-[#f2eef7]' },
-    { icon: '🌍', title: t('home_perks_community_title'),  text: t('home_perks_community_text'),  color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  ];
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return undefined;
 
-  const statItems = [
-    { num: store.opportunities.length, label: t('home_stat_opportunities'), icon: '🎯', gradient: 'from-emerald-400 to-teal-500' },
-    { num: ORGANIZATIONS.length,       label: t('home_stat_organizations'), icon: '🏢', gradient: 'plum-gradient' },
-    { num: CATEGORIES.length,          label: t('home_stat_categories'),    icon: '✨', gradient: 'from-amber-400 to-orange-500' },
-  ];
+    const intervalId = window.setInterval(() => {
+      setHeroSlide(current => (current + 1) % HERO_GALLERY_ITEMS.length);
+    }, 4500);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   return (
     <div className="animate-fade-in">
-
-      {/* Hero */}
-      <div className="relative overflow-hidden bg-gradient-to-bl from-emerald-700 via-emerald-600 to-teal-500 text-white">
-        <div className="pointer-events-none absolute -top-24 -right-16 w-80 h-80 rounded-full bg-white/5 animate-blob" />
-        <div className="pointer-events-none absolute -bottom-16 -left-12 w-64 h-64 rounded-full bg-teal-900/20 animate-blob" style={{ animationDelay: '4s' }} />
-
-        <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center">
-          <div className="inline-flex items-center gap-1.5 mb-5 px-4 py-1.5 bg-white/20 backdrop-blur-sm
-            rounded-full text-xs font-semibold tracking-wide border border-white/30">
-            <span>🌟</span>
-            <span>{t('home_platform_badge')}</span>
+      <div className="relative overflow-hidden bg-[#395247] text-white">
+        <div className="absolute inset-0" aria-hidden="true">
+          {HERO_GALLERY_ITEMS.map((item, index) => (
+            <img
+              key={item.id}
+              src={item.src}
+              alt=""
+              className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ${index === heroSlide ? 'scale-105 opacity-100' : 'scale-100 opacity-0'}`}
+            />
+          ))}
+          <div className="absolute inset-0 bg-gradient-to-bl from-emerald-950/80 via-[#395247]/75 to-teal-800/75" />
+        </div>
+        <div className="pointer-events-none absolute -top-24 -right-16 h-80 w-80 rounded-full bg-white/5 animate-blob" />
+        <div className="pointer-events-none absolute -bottom-16 -left-12 h-64 w-64 rounded-full bg-black/10 animate-blob" style={{ animationDelay: '4s' }} />
+        <div className="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center sm:py-24">
+          <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-xs font-semibold tracking-wide backdrop-blur-sm">
+            <span>🌟</span><span>{t('home_platform_badge')}</span>
           </div>
-
-          <h1 className="text-3xl sm:text-5xl font-black mb-4 leading-tight">
-            {t('home_hero_title')}
-          </h1>
-
-          <p className="text-emerald-100 mb-10 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            {t('home_hero_subtitle')}
-          </p>
-
-          <div className="flex flex-wrap gap-3 justify-center">
-            <button onClick={() => handleNavigate('opportunities')}
-              className="home-hero-explore px-8 py-3.5 bg-white text-emerald-700 font-black rounded-2xl
-                hover:bg-emerald-50 hover:scale-105 active:scale-95
-                transition-all duration-200 shadow-xl text-base tracking-wide">
-              {t('home_explore_btn')}
-            </button>
+          <h1 className="mb-4 text-3xl font-black leading-tight sm:text-5xl">{t('home_hero_title')}</h1>
+          <p className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-emerald-100 sm:text-lg">{t('home_hero_subtitle')}</p>
+          <button onClick={() => handleNavigate('opportunities')} className="home-hero-explore rounded-2xl bg-white px-8 py-3.5 text-base font-black tracking-wide text-emerald-700 shadow-xl transition-all duration-200 hover:scale-105 hover:bg-emerald-50 active:scale-95">
+            {t('home_explore_btn')}
+          </button>
+          <div className="mt-6 flex justify-center gap-2" aria-hidden="true">
+            {HERO_GALLERY_ITEMS.map((item, index) => (
+              <span key={item.id} className={`h-1.5 rounded-full bg-white transition-all duration-500 ${index === heroSlide ? 'w-7 opacity-100' : 'w-1.5 opacity-45'}`} />
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-3 gap-3 sm:gap-5">
-            {statItems.map((s, i) => (
-              <div key={i} className="text-center">
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${s.gradient}
-                  flex items-center justify-center text-2xl mx-auto mb-2 shadow-md`}>
-                  {s.icon}
-                </div>
-                <p className="text-2xl sm:text-4xl font-black text-gray-800">{s.num}</p>
-                <p className="text-xs sm:text-sm text-gray-500 font-medium">{s.label}</p>
+      <div className="home-about-stats border-b border-gray-100 bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-7">
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-5">
+            {stats.map(item => (
+              <div key={item.labelKey} className="text-center">
+                <div className="mb-1 text-2xl">{item.icon}</div>
+                <p className="text-3xl font-black text-gray-800 sm:text-4xl">{item.num}</p>
+                <p className="mt-1 text-xs font-bold text-gray-500">{t(item.labelKey)}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12 space-y-10">
-
-        {/* Quick Links */}
+      <div className="mx-auto max-w-5xl space-y-14 px-4 py-10 sm:py-14">
         <section>
-          <h2 className="text-xl font-black text-gray-800 mb-4">{t('home_quick_links_title')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {QUICK_LINKS.map((ql, i) => (
-              <button key={i}
-                onClick={() => handleNavigate(ql.screen)}
-                className={`relative overflow-hidden rounded-2xl p-5 text-white text-right
-                  bg-gradient-to-br ${ql.gradient} shadow-md ${ql.shadow}
-                  hover:shadow-lg hover:-translate-y-1 active:scale-95 transition-all duration-200
-                  animate-card-in cursor-pointer`}
-                style={{ animationDelay: `${i * 0.08}s`, cursor: 'pointer' }}>
-                <div className="pointer-events-none absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/10" />
-                <p className="text-3xl mb-2">{ql.icon}</p>
-                <p className="text-sm font-black leading-tight">{ql.label}</p>
-              </button>
+          <div className="mb-7 text-center">
+            <span className="inline-block rounded-full bg-[#f2eef7] px-4 py-1 text-xs font-bold text-[#6c4e9b]">{t('about_identity_badge')}</span>
+            <h2 className="mt-3 text-2xl font-black text-gray-800 sm:text-3xl">{t('about_identity_title')}</h2>
+          </div>
+          <div className="about-home-intro grid items-center gap-8 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm sm:grid-cols-[1.3fr_0.7fr] sm:p-8">
+            <div className="space-y-3 text-sm leading-7 text-gray-600 sm:text-base">
+              <p>{t('about_para1')}</p>
+              <p>{t('about_para2')}</p>
+              <p>{t('about_para3')}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { icon: '🏘️', label: t('about_cities_label') },
+                { icon: '🎯', label: t('about_cats_label') },
+                { icon: '👥', label: t('about_growing_label') },
+                { icon: '🌐', label: t('about_bilingual_label') },
+              ].map(item => (
+                <div key={item.label} className="about-info-card rounded-2xl border border-[#dfd2eb] bg-white p-4 text-center">
+                  <div className="mb-2 text-2xl">{item.icon}</div>
+                  <p className="text-xs font-bold text-gray-700">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-7 text-center">
+            <span className="inline-block rounded-full bg-emerald-100 px-4 py-1 text-xs font-bold text-emerald-700">{t('about_mission_badge')}</span>
+            <h2 className="mt-3 text-2xl font-black text-gray-800 sm:text-3xl">{t('about_mission_title')}</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {MISSION_CARDS.map((card, index) => (
+              <article key={card.titleKey} className="about-mission-card rounded-2xl border border-gray-100 bg-white p-6 shadow-sm animate-card-in" style={{ animationDelay: `${index * 0.08}s` }}>
+                <div className="mb-4 text-4xl">{card.icon}</div>
+                <h3 className="text-base font-black text-gray-800">{t(card.titleKey)}</h3>
+                <p className="mt-2 text-sm leading-6 text-gray-500">{t(card.textKey)}</p>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* Community Perks */}
         <section>
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-black text-gray-800 mb-1">{t('home_why_title')}</h2>
-            <p className="text-sm text-gray-500">{t('home_why_subtitle')}</p>
+          <div className="mb-7 text-center">
+            <span className="inline-block rounded-full bg-amber-100 px-4 py-1 text-xs font-bold text-amber-700">{t('about_values_badge')}</span>
+            <h2 className="mt-3 text-2xl font-black text-gray-800 sm:text-3xl">{t('about_values_title')}</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {COMMUNITY_PERKS.map((p, i) => (
-              <div key={i}
-                className={`community-perk ${p.bg} rounded-2xl p-5 border border-white/50
-                  animate-card-in`}
-                style={{ animationDelay: `${i * 0.08}s` }}>
-                <div className="flex items-start gap-3">
-                  <span className="text-3xl shrink-0">{p.icon}</span>
-                  <div>
-                    <p className={`community-perk-title font-black text-sm mb-1 ${p.color}`}>{p.title}</p>
-                    <p className="community-perk-description text-xs text-gray-500 leading-relaxed">{p.text}</p>
-                  </div>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {VALUES.map((value, index) => (
+              <article key={value.titleKey} className="about-value-card rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-sm animate-card-in" style={{ animationDelay: `${index * 0.06}s` }}>
+                <div className="mb-2 text-3xl">{value.icon}</div>
+                <h3 className="text-sm font-black text-gray-800">{t(value.titleKey)}</h3>
+                <p className="mt-1 text-xs leading-5 text-gray-500">{t(value.textKey)}</p>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* CTA */}
-        {currentUser?.role === 'User' ? (
-          <section>
-            <div className="home-welcome-card bg-gradient-to-l from-emerald-50 to-teal-50 border border-emerald-100
-              rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-center sm:text-right">
-                <p className="font-black text-gray-800 text-base">
-                  {isAr ? `مرحباً، ${currentUser.name}! 👋` : `שלום, ${currentUser.name}! 👋`}
-                </p>
-                <p className="home-welcome-subtitle text-sm text-gray-500 mt-0.5">{t('home_welcome_subtitle')}</p>
-              </div>
-              <button onClick={() => handleNavigate('my-registrations')}
-                className="shrink-0 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold
-                  rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
-                {t('home_my_registrations_btn')}
-              </button>
-            </div>
-          </section>
-        ) : !currentUser ? (
-          <section>
-            <div className="home-login-cta relative overflow-hidden
-              rounded-2xl p-6 text-white">
-              <div className="pointer-events-none absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5 animate-blob" />
-              <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-right">
-                <div>
-                  <p className="font-black text-xl mb-1">{t('home_cta_title')}</p>
-                  <p className="text-white/75 text-sm">{t('home_cta_subtitle')}</p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-                  <button onClick={() => handleNavigate('register')}
-                    className="px-7 py-3 bg-white/15 border border-white/40 text-white font-bold
-                      rounded-xl transition-all hover:bg-white/25 hover:scale-105 active:scale-95
-                      backdrop-blur-sm text-sm">
-                    {t('home_cta_register_btn')}
-                  </button>
-                  <button onClick={() => handleNavigate('login')}
-                    className="home-cta-login px-7 py-3 bg-white text-[#6c4e9b] font-black
-                      rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg text-sm">
-                    {t('home_cta_login_btn')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        ) : null}
+        <section>
+          <div className="mb-7 text-center">
+            <span className="inline-block rounded-full bg-pink-100 px-4 py-1 text-xs font-bold text-pink-700">{t('about_team_badge')}</span>
+            <h2 className="mt-3 text-2xl font-black text-gray-800 sm:text-3xl">{t('about_team_title')}</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {TEAM.map((member, index) => (
+              <article key={member.nameKey} className="about-team-card rounded-2xl border border-gray-100 bg-white p-5 text-center shadow-sm animate-card-in" style={{ animationDelay: `${index * 0.07}s` }}>
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f2eef7] text-3xl">{member.emoji}</div>
+                <h3 className="text-sm font-black text-gray-800">{t(member.nameKey)}</h3>
+                <p className="mt-1 text-xs font-medium text-gray-500">{t(member.roleKey)}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
+        <section>
+          <div className="about-home-cta relative overflow-hidden rounded-3xl bg-gradient-to-bl from-emerald-600 via-teal-600 to-cyan-500 p-8 text-center text-white sm:p-10">
+            <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-white/5 animate-blob" />
+            <div className="relative">
+              <div className="mb-3 text-4xl">🌟</div>
+              <h2 className="text-2xl font-black sm:text-3xl">{t('about_cta_title')}</h2>
+              <p className="mx-auto mt-2 max-w-md text-sm text-emerald-100 sm:text-base">{t('about_cta_subtitle')}</p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                {!currentUser && (
+                  <>
+                    <button onClick={() => handleNavigate('register')} className="rounded-xl bg-white px-6 py-3 text-sm font-black text-emerald-700 shadow-lg transition hover:scale-105">{t('nav_register_btn')}</button>
+                    <button onClick={() => handleNavigate('login')} className="rounded-xl border border-white/40 bg-white/15 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/25">{t('nav_login_btn')}</button>
+                  </>
+                )}
+                {currentUser?.role === 'User' && (
+                  <button onClick={() => handleNavigate('my-registrations')} className="rounded-xl bg-white px-6 py-3 text-sm font-black text-emerald-700 shadow-lg transition hover:scale-105">{t('home_my_registrations_btn')}</button>
+                )}
+                <a href="mailto:info@bkerem.org.il" className="rounded-xl border border-white/30 bg-white/15 px-5 py-3 text-sm font-bold text-white">{t('about_contact_email')}</a>
+                <span className="rounded-xl border border-white/30 bg-white/15 px-5 py-3 text-sm font-bold">{t('about_contact_location')}</span>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

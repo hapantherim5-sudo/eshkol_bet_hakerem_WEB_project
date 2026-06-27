@@ -62,7 +62,7 @@ export async function closeDb() {
   }
 }
 
-/** Collection names - match the app’s localStorage keys conceptually */
+/** MongoDB collection names used by the API. */
 export const COLLECTIONS = {
   organizations: 'organizations',
   users: 'users',

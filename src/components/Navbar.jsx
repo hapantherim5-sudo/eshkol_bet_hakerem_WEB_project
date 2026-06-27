@@ -7,7 +7,6 @@ const PUBLIC_LINKS = [
   { screen: 'opportunities', key: 'nav_opportunities',  icon: '🔍' },
   { screen: 'calendar',      key: 'nav_calendar',       icon: '📅' },
   { screen: 'gallery',       key: 'nav_gallery',        icon: '📸' },
-  { screen: 'about',         key: 'nav_about',          icon: '📖' },
 ];
 
 function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggleLang, onNavigate, onLogout }) {
@@ -55,12 +54,12 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
           ${active
             ? isAdmin
               ? 'bg-sky-700 text-white shadow-sm shadow-slate-950/10'
-              : 'bg-gradient-to-l from-emerald-500 to-teal-500 text-white shadow-md nav-glow'
+              : 'bg-[#037c57] text-white'
             : isDark
               ? 'text-gray-300 hover:bg-slate-700/70 hover:text-white'
               : isAdmin
                 ? 'text-sky-700 hover:bg-sky-50 hover:text-sky-800'
-                : 'text-gray-600 hover:bg-emerald-50 hover:text-emerald-700'}`}>
+                : 'text-gray-600 hover:bg-[#edf2ef] hover:text-[#037c57]'}`}>
         <span className="text-sm">{link.icon}</span>
         <span className="hidden xl:inline">{t(link.key)}</span>
       </button>
@@ -83,15 +82,15 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             className="flex items-center gap-2.5 shrink-0 group text-right">
             <img
               src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
-              alt="לוגו"
+              alt={t('brand_logo_alt')}
               className="h-9 w-auto object-contain rounded-xl shrink-0
-                ring-2 ring-transparent group-hover:ring-emerald-300 transition-all duration-200"
+                ring-2 ring-transparent group-hover:ring-[#8ca397] transition-all duration-200"
             />
             <div className="hidden sm:block">
               <p className={`text-base font-black leading-none ${isDark ? 'text-white' : 'text-gray-800'}`}>
                 {t('nav_brand_title')}
               </p>
-              <p className="text-[12px] text-emerald-500 font-semibold mt-0.5 leading-none">
+              <p className="text-[12px] text-[#037c57] font-semibold mt-0.5 leading-none">
                 {t('nav_brand_subtitle')}
               </p>
             </div>
@@ -107,8 +106,8 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             <button onClick={onToggleLang}
               className={`h-8 w-8 flex items-center justify-center text-sm font-black rounded-xl border-2 transition-all duration-150
                 ${isDark
-                  ? 'border-emerald-500 text-emerald-400 hover:bg-slate-700'
-                  : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
+                  ? 'border-[#8ca397] text-[#a9c2b7] hover:bg-slate-700'
+                  : 'border-[#037c57] text-[#037c57] hover:bg-[#edf2ef]'}`}>
               {t('nav_lang_toggle')}
             </button>
 
@@ -121,8 +120,8 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
             {currentUser ? (
               <div className="hidden md:flex items-center gap-1.5">
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl
-                  ${isDark ? 'bg-slate-700' : 'bg-emerald-50'}`}>
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500
+                  ${isDark ? 'bg-slate-700' : 'bg-[#edf2ef]'}`}>
+                  <div className="w-5 h-5 rounded-full bg-[#037c57]
                     flex items-center justify-center text-white text-xs font-black shrink-0">
                     {currentUser.name?.[0] ?? '?'}
                   </div>
@@ -143,14 +142,13 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                   className={`h-8 px-3 text-sm font-bold rounded-xl border-2 transition-all duration-150
                     hover:scale-105 active:scale-95
                     ${isDark
-                      ? 'border-emerald-500 text-emerald-400 hover:bg-slate-700'
-                      : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
+                      ? 'border-[#8ca397] text-[#a9c2b7] hover:bg-slate-700'
+                      : 'border-[#037c57] text-[#037c57] hover:bg-[#edf2ef]'}`}>
                   {t('nav_register_btn')}
                 </button>
                 <button onClick={() => onNavigate('login')}
-                  className="h-8 px-4 bg-gradient-to-l from-emerald-600 to-teal-500
-                    hover:from-emerald-700 hover:to-teal-600 text-white text-sm font-black
-                    rounded-xl transition-all duration-150 shadow-md hover:shadow-emerald-200
+                  className="h-8 px-4 bg-[#037c57] hover:bg-[#026647] text-white text-sm font-black
+                    rounded-xl transition-all duration-150 shadow-md hover:shadow-[#037c57]/25
                     hover:scale-105 active:scale-95">
                   {t('nav_login_btn')}
                 </button>
@@ -172,8 +170,8 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
 
             {currentUser && (
               <div className={`flex items-center gap-2.5 px-3 py-2.5 mb-2 rounded-xl
-                ${isDark ? 'bg-slate-800' : 'bg-gradient-to-l from-emerald-50 to-teal-50'}`}>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500
+                ${isDark ? 'bg-slate-800' : 'bg-[#edf2ef]'}`}>
+                <div className="w-8 h-8 rounded-full bg-[#037c57]
                   flex items-center justify-center text-white text-sm font-black shrink-0">
                   {currentUser.name?.[0] ?? '?'}
                 </div>
@@ -181,7 +179,9 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                   <p className={`text-sm font-black truncate ${isDark ? 'text-white' : 'text-gray-800'}`}>
                     {currentUser.name}
                   </p>
-                  <p className="text-xs text-emerald-600 font-semibold">{currentUser.role}</p>
+                  <p className={`text-xs font-semibold ${isDark ? 'text-[#a9c2b7]' : 'text-[#037c57]'}`}>
+                    {t(`role_${currentUser.role.toLowerCase()}`)}
+                  </p>
                 </div>
               </div>
             )}
@@ -197,12 +197,12 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                     ${active
                       ? isAdmin
                         ? 'bg-sky-700 text-white'
-                        : 'bg-gradient-to-l from-emerald-500 to-teal-500 text-white shadow-md'
+                        : 'bg-[#037c57] text-white'
                       : isDark
                         ? 'text-gray-200 hover:bg-slate-800'
                         : isAdmin
                           ? 'text-sky-700 hover:bg-sky-50 hover:text-sky-800'
-                          : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'}`}>
+                          : 'text-gray-700 hover:bg-[#edf2ef] hover:text-[#037c57]'}`}>
                   <span className="text-base">{link.icon}</span>
                   <span>{t(link.key)}</span>
                 </button>
@@ -224,15 +224,15 @@ function Navbar({ theme, lang, currentUser, currentScreen, onToggleDark, onToggl
                   className={`flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-sm font-bold
                     min-h-[44px] border-2 transition-all
                     ${isDark
-                      ? 'border-emerald-500 text-emerald-400'
-                      : 'border-emerald-500 text-emerald-700 hover:bg-emerald-50'}`}>
+                      ? 'border-[#8ca397] text-[#a9c2b7]'
+                      : 'border-[#037c57] text-[#037c57] hover:bg-[#edf2ef]'}`}>
                   <span className="text-base">✍️</span>
                   <span>{t('nav_register_btn')}</span>
                 </button>
                 <button
                   onClick={() => { onNavigate('login'); setMenuOpen(false); }}
                   className="flex items-center gap-2.5 py-2.5 px-4 rounded-xl text-sm font-black
-                    min-h-[44px] bg-gradient-to-l from-emerald-600 to-teal-500 text-white
+                    min-h-[44px] bg-[#037c57] hover:bg-[#026647] text-white
                     shadow-md transition-all">
                   <span className="text-base">🔑</span>
                   <span>{t('nav_login_btn')}</span>

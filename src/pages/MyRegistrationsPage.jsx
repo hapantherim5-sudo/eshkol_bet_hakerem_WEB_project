@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TYPE_AR } from '../data/fakeData';
+import { getTypeLabelKey } from '../data/opportunityOptions';
 import { getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
 
@@ -42,7 +42,7 @@ function MyRegistrationsPage({ lang, currentUser, opportunities, registrations, 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {items.map((o, i) => {
             const title = isAr ? o.titleAr : o.title;
-            const typeText = isAr ? (TYPE_AR[o.type] || o.type) : o.type;
+            const typeText = t(getTypeLabelKey(o.type) || o.type);
             const isConfirming = confirmCancelId === o.id;
 
             return (

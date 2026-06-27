@@ -106,7 +106,6 @@ button:disabled,
 .gallery-masonry > * { break-inside: avoid; margin-bottom: 1rem; }
 
 /* Nav active glow */
-.nav-glow { box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); }
 
 /* Glass card */
 .glass-card {
@@ -358,10 +357,22 @@ button:disabled,
   background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
 }
 
+.app-dark .home-about-stats,
+.app-dark .about-home-intro,
 .app-dark .about-info-card,
-.app-dark .about-mission-card {
+.app-dark .about-mission-card,
+.app-dark .about-value-card,
+.app-dark .about-team-card {
   background: #1e293b;
   border-color: #334155;
+}
+
+.app-dark .about-home-cta {
+  background: linear-gradient(135deg, #134e4a, #115e59, #164e63);
+}
+
+.app-dark .calendar-empty-content {
+  background: #0f172a;
 }
 
 .app-dark .about-email-chip {

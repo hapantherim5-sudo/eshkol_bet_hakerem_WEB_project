@@ -10,7 +10,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OpportunitiesBoardPage from './pages/OpportunitiesBoardPage';
 import MyRegistrationsPage from './pages/MyRegistrationsPage';
-import AboutPage from './pages/AboutPage';
 import GalleryPage from './pages/GalleryPage';
 
 import { useDataStore } from './hooks/useDataStore';
@@ -24,7 +23,10 @@ import { isStaffRole } from './utils/permissions';
 function App() {
   const store = useDataStore();
   // Screen state replaces a routing library in this single-page application.
-  const [currentScreen, setCurrentScreen] = useState(() => loadCurrentScreen());
+  const [currentScreen, setCurrentScreen] = useState(() => {
+    const savedScreen = loadCurrentScreen();
+    return savedScreen === 'about' ? 'home' : savedScreen;
+  });
   const [currentUser, setCurrentUser] = useState(() => loadSession());
   const [theme, setTheme] = useState(() => loadTheme());
   const [lang, setLang] = useState('he');
@@ -130,6 +132,24 @@ function App() {
     );
   }
 
+  if (store.loadError) {
+    return (
+      <div dir="rtl" className="min-h-screen flex items-center justify-center bg-slate-950 px-4 text-center">
+        <div className="max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-8 text-white shadow-2xl">
+          <div className="mb-4 text-5xl">⚠️</div>
+          <h1 className="mb-2 text-xl font-black">{t('api_load_error_title')}</h1>
+          <p className="mb-6 text-sm leading-6 text-slate-300">{t('api_load_error_description')}</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="rounded-xl bg-[#037c57] px-6 py-3 text-sm font-black text-white transition hover:bg-[#026647]">
+            {t('api_load_retry')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div dir="rtl" className={`min-h-screen font-sans
       ${theme === 'dark' ? 'app-dark bg-slate-900 text-white' : 'bg-slate-50 text-gray-900'}`}>
@@ -161,10 +181,10 @@ function App() {
 
         {currentScreen === 'home' && (
           <HomePage
-            store={store}
             currentUser={currentUser}
             lang={lang}
             handleNavigate={handleNavigate}
+            opportunitiesCount={store.opportunities.length}
           />
         )}
 
@@ -197,10 +217,6 @@ function App() {
 
         {currentScreen === 'gallery' && (
           <GalleryPage lang={lang} />
-        )}
-
-        {currentScreen === 'about' && (
-          <AboutPage lang={lang} />
         )}
 
         {currentScreen === 'my-registrations' && currentUser?.role === 'User' && (

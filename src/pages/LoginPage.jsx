@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { api } from '../services/api';
-import { CITY_ORG } from '../data/opportunitiesSeed';
 import { useT } from '../i18n/i18n';
-
-const staffLabel = Object.keys(CITY_ORG).join(' · ');
 
 function LoginPage({ lang, onLogin, onNavigate }) {
   const t = useT(lang);
@@ -28,7 +25,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
       if (e.status === 401) {
         setError(t('login_err_credentials'));
       } else if (e.status === 408) {
-        setError(lang === 'ar' ? 'انتهت المهلة، حاول مجدداً' : 'פסק זמן, נסה שוב');
+        setError(t('error_timeout'));
       } else {
         setError(t('login_err_server'));
       }
@@ -54,7 +51,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
           <div className="bg-gradient-to-l from-emerald-600 to-teal-500 px-6 py-8 text-center">
             <img
               src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
-              alt="לוגו"
+              alt={t('brand_logo_alt')}
               className="h-16 mx-auto mb-4 rounded-xl object-contain ring-4 ring-white/30 shadow-lg"
             />
             <h2 className="text-2xl font-black text-white mb-1">{t('login_title')}</h2>
@@ -70,10 +67,8 @@ function LoginPage({ lang, onLogin, onNavigate }) {
                 <span className="text-gray-400 mr-auto text-xs group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="login-demo-panel mt-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
-                <p>Admin: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
-                <p>{t('login_staff_label')} ({t('login_password_label')}: 1234):</p>
-                <p className="login-demo-staff text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
-                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">youth</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <p>{t('login_admin_label')}: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <p className="mt-1">{t('login_user_label')}: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">youth</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
               </div>
             </details>
 

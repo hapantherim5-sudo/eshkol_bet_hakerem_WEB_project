@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { STATUS_AR } from '../data/fakeData';
+import { getStatusLabelKey } from '../data/opportunityOptions';
 import { getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
 import { formatIsraeliDate } from '../utils/israeliDate';
@@ -19,7 +19,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
   const o = opportunity;
 
   const headerGradient = CAT_HEADER[o.category] ?? 'from-emerald-500 to-teal-600';
-  const statusText = isAr ? (STATUS_AR[o.status] || o.status) : o.status;
+  const statusText = t(getStatusLabelKey(o.status) || o.status);
 
   const dateVal = o.eventDate ? formatIsraeliDate(o.eventDate) : null;
   const timeVal = o.startTime
@@ -62,7 +62,7 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
         <div className={`relative bg-gradient-to-br ${headerGradient} text-white px-5 pt-8 pb-6 rounded-t-3xl sm:rounded-t-3xl`}>
           <button
             type="button"
-            aria-label={isAr ? 'إغلاق' : 'סגירה'}
+            aria-label={t('close')}
             onClick={closeModal}
             className="absolute z-10 top-4 left-4 w-9 h-9 flex items-center justify-center
               bg-white/20 hover:bg-white/30 rounded-full text-white text-lg transition-all

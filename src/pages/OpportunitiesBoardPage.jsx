@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import OpportunityCard from '../components/OpportunityCard';
-import { CATEGORIES, TYPE_AR } from '../data/fakeData';
+import { CATEGORIES, OPPORTUNITY_SCOPES, getTypeLabelKey } from '../data/opportunityOptions';
 import { ORGANIZATIONS, getOrgName, getCityName } from '../data/organizations';
 import { useT } from '../i18n/i18n';
 
@@ -164,7 +164,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
                 ${active
                   ? (CAT_ACTIVE[cat.id] ?? 'bg-emerald-600 text-white border-emerald-600') + ' shadow-md'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'}`}>
-              {cat.icon} {isAr ? cat.labelAr : cat.label}
+              {cat.icon} {t(cat.labelKey)}
             </button>
           );
         })}
@@ -194,7 +194,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
                 onToggle={() => setOpenFilter(openFilter === 'org' ? null : 'org')}
                 onChange={(value) => { setFilterOrg(value); setOpenFilter(null); }}
                 options={[{ value: '', label: t('all') }, ...ORGANIZATIONS.map(o => ({
-                  value: o.id, label: isAr ? o.nameAr : o.nameHe,
+                  value: o.id, label: getOrgName(o.id, isAr),
                 }))]}
               />
             </div>
@@ -224,7 +224,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
                 onToggle={() => setOpenFilter(openFilter === 'type' ? null : 'type')}
                 onChange={(value) => { setFilterType(value); setOpenFilter(null); }}
                 options={[{ value: '', label: t('all') }, ...types.map(tp => ({
-                  value: tp, label: isAr ? (TYPE_AR[tp] || tp) : tp,
+                  value: tp, label: t(getTypeLabelKey(tp) || tp),
                 }))]}
               />
             </div>
@@ -241,8 +241,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
                 onChange={(value) => { setFilterScope(value); setOpenFilter(null); }}
                 options={[
                   { value: '', label: t('all') },
-                  { value: 'יישובי', label: t('board_scope_local') },
-                  { value: 'אזורי', label: t('board_scope_regional') },
+                  ...OPPORTUNITY_SCOPES.map(scope => ({ value: scope.value, label: t(scope.labelKey) })),
                 ]}
               />
             </div>

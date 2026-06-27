@@ -3,8 +3,6 @@ import { getDb, COLLECTIONS } from '../db.js';
 
 const router = Router();
 
-const HE_MONTHS = ['ינו׳','פבר׳','מרץ','אפר׳','מאי','יונ׳','יול׳','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
-
 router.get('/stats', async (req, res, next) => {
   try {
     const db = getDb();
@@ -64,7 +62,7 @@ router.get('/stats', async (req, res, next) => {
         { $limit: 10 },
         { $lookup: { from: 'opportunities', localField: '_id', foreignField: 'id', as: 'o' } },
         { $unwind: { path: '$o', preserveNullAndEmptyArrays: true } },
-        { $project: { _id: 0, id: '$_id', title: '$o.title', city: '$o.city', category: '$o.categoryLabel', count: 1 } },
+        { $project: { _id: 0, id: '$_id', title: '$o.title', titleAr: '$o.titleAr', city: '$o.city', category: '$o.category', count: 1 } },
       ]).toArray(),
 
       db.collection(COLLECTIONS.users).aggregate([
@@ -75,13 +73,14 @@ router.get('/stats', async (req, res, next) => {
     // Build full 12-month time-series (fill zeros for missing months)
     const months = Array.from({ length: 12 }, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
-      return { y: d.getFullYear(), m: d.getMonth() + 1, label: `${HE_MONTHS[d.getMonth()]} '${String(d.getFullYear()).slice(2)}` };
+      return { year: d.getFullYear(), month: d.getMonth() + 1 };
     });
 
     const fillMonths = (raw) =>
-      months.map(({ y, m, label }) => ({
-        label,
-        count: raw.find(r => r._id.y === y && r._id.m === m)?.count ?? 0,
+      months.map(({ year, month }) => ({
+        year,
+        month,
+        count: raw.find(r => r._id.y === year && r._id.m === month)?.count ?? 0,
       }));
 
     res.json({
@@ -95,13 +94,13 @@ router.get('/stats', async (req, res, next) => {
       },
       registrationsByMonth: fillMonths(regsByMonthRaw),
       cancellationsByMonth: fillMonths(cancelsByMonthRaw),
-      registrationsByCity: regsByCity.map(r => ({ city: r._id || 'אחר', count: r.count })),
+      registrationsByCity: regsByCity.map(r => ({ city: r._id || 'other', count: r.count })),
       registrationsByCategory: regsByCat.map(r => ({
-        label: r._id.label || r._id.cat || 'אחר',
+        category: r._id.cat || 'other',
         count: r.count,
       })),
       topOpportunities: topOpps,
-      usersByRole: usersByRole.map(r => ({ role: r._id || 'אחר', count: r.count })),
+      usersByRole: usersByRole.map(r => ({ role: r._id || 'other', count: r.count })),
       conversionRate: {
         views: totalViews,
         registrations: totalRegistrations,
