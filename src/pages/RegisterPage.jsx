@@ -50,7 +50,7 @@ function RegisterPage({ lang, onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4
+    <div className="register-page min-h-screen flex items-center justify-center px-4
       bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 relative overflow-hidden">
 
       <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72
