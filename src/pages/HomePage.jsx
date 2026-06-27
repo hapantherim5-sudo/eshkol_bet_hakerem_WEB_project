@@ -1,3 +1,7 @@
+// File: src/pages/HomePage.jsx
+// Purpose: HomePage component
+// Role: React page component for HomePage
+
 import { useEffect, useState } from 'react';
 import { useT } from '../i18n/i18n';
 import { GALLERY_ITEMS } from '../data/galleryItems';
@@ -43,6 +47,7 @@ const TEAM = [
   { nameKey: 'home_team_4_name', roleKey: 'home_team_4_role', emoji: '🏅' },
 ];
 
+// HomePage — renders HomePage
 function HomePage({ currentUser, lang, handleNavigate, opportunitiesCount }) {
   const t = useT(lang);
   const [heroSlide, setHeroSlide] = useState(0);

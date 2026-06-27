@@ -1,3 +1,7 @@
+// File: src/components/staff/OpportunityForm.jsx
+// Purpose: OpportunityForm component
+// Role: React component for OpportunityForm
+
 import { useState } from 'react';
 import {
   CATEGORIES, DEFAULT_REGISTRATION, OPPORTUNITY_SCOPES, OPPORTUNITY_TYPES, STATUSES,
@@ -7,6 +11,7 @@ import { useT } from '../../i18n/i18n';
 import { buildCalendarEvents } from '../../utils/scheduleEvents';
 import DateInputIL from '../DateInputIL';
 
+// empty — handles empty
 const empty = (defaults = {}) => ({
   icon: '✨', title: '', titleAr: '', category: 'sport', categoryLabel: '',
   type: OPPORTUNITY_TYPES[0].value, scope: OPPORTUNITY_SCOPES[0].value, city: '', organizationId: '',
@@ -17,6 +22,7 @@ const empty = (defaults = {}) => ({
   ...defaults,
 });
 
+// OpportunityForm — renders OpportunityForm
 function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   const isAr = lang === 'ar';
   const t = useT(lang);
@@ -28,12 +34,14 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   }));
   const [err, setErr] = useState('');
 
+  // set — handles set
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const orgOptions = user.role === 'Staff'
     ? ORGANIZATIONS.filter(o => o.id === user.organizationId)
     : ORGANIZATIONS;
 
+  // handleSubmit — handles Submit
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!form.title.trim() || !form.titleAr.trim() || !form.organizationId || !form.city.trim()) {

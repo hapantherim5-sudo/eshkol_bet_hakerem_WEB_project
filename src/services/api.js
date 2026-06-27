@@ -1,8 +1,13 @@
+// File: src/services/api.js
+// Purpose: api script
+// Role: frontend API client wrapper with timeout/error handling
+
 /** In production always use same-origin /api - ignore VITE_API_URL from Vercel env. */
 const BASE = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || '');
 
 const REQUEST_TIMEOUT_MS = 15_000;
 
+// request — handles request
 async function request(path, options = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -44,14 +49,19 @@ async function request(path, options = {}) {
   }
 }
 
+// api — sets up api
 export const api = {
+  // health — handles health
   health: () => request('/api/health'),
+  // bootstrap — handles bootstrap
   bootstrap: () => request('/api/bootstrap'),
+  // login — handles login
   login: (username, password) =>
     request('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
     }),
+  // registerUser — handles registerUser
   registerUser: (name, username, password) =>
     request('/api/auth/register', {
       method: 'POST',
@@ -64,21 +74,25 @@ export const api = {
   deleteOpportunity: id => request(`/api/opportunities/${id}`, { method: 'DELETE' }),
   addEvent: body => request('/api/events', { method: 'POST', body: JSON.stringify(body) }),
   deleteEvent: id => request(`/api/events/${id}`, { method: 'DELETE' }),
+  // replaceEventsForOpportunity — handles replaceEventsForOpportunity
   replaceEventsForOpportunity: (opportunityId, eventDefs) =>
     request(`/api/events/by-opportunity/${opportunityId}`, {
       method: 'PUT',
       body: JSON.stringify({ eventDefs }),
     }),
+  // recordView — handles recordView
   recordView: (opportunityId, userId) =>
     request('/api/views', {
       method: 'POST',
       body: JSON.stringify({ opportunityId, userId: userId ?? null }),
     }),
+  // register — handles register
   register: (userId, opportunityId, profilePatch) =>
     request('/api/registrations', {
       method: 'POST',
       body: JSON.stringify({ userId, opportunityId, profilePatch }),
     }),
+  // unregister — handles unregister
   unregister: (userId, opportunityId) =>
     request('/api/registrations', {
       method: 'DELETE',
@@ -89,6 +103,7 @@ export const api = {
   /* ── User management (Admin only) ── */
   getUsers: () => request('/api/users'),
   createUser: body => request('/api/users', { method: 'POST', body: JSON.stringify(body) }),
+  // updateUser — handles updateUser
   updateUser: (id, body) => request(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteUser: id => request(`/api/users/${id}`, { method: 'DELETE' }),
 

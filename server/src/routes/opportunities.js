@@ -1,3 +1,7 @@
+// File: server/src/routes/opportunities.js
+// Purpose: opportunities script
+// Role: API route handler for opportunities
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 import { nextId } from '../middleware/counter.js';

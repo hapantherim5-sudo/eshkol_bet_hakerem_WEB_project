@@ -1,8 +1,13 @@
+// File: src/components/RegistrationModal.jsx
+// Purpose: RegistrationModal component
+// Role: React component for RegistrationModal
+
 import { useState } from 'react';
 import { CATEGORIES } from '../data/opportunityOptions';
 import { useT } from '../i18n/i18n';
 import { formatIsraeliDate } from '../utils/israeliDate';
 
+// RegistrationModal — renders RegistrationModal
 function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
@@ -15,6 +20,7 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
     setInterests(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
+  // handleConfirm — handles Confirm
   const handleConfirm = () => {
     if (needsProfile && !settlement.trim()) return;
     onConfirm(needsProfile ? { settlement: settlement.trim(), interests } : null);

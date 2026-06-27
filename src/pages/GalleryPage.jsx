@@ -1,3 +1,7 @@
+// File: src/pages/GalleryPage.jsx
+// Purpose: GalleryPage component
+// Role: React page component for GalleryPage
+
 import { useState } from 'react';
 import { useT } from '../i18n/i18n';
 import { GALLERY_ITEMS } from '../data/galleryItems';
@@ -11,6 +15,7 @@ const FILTERS = [
   { id: 'community', labelKey: 'gallery_filter_community' },
 ];
 
+// GalleryItem — renders GalleryItem
 function GalleryItem({ item, t }) {
   const [hovered, setHovered] = useState(false);
   const [loaded,  setLoaded ] = useState(false);
@@ -52,6 +57,7 @@ function GalleryItem({ item, t }) {
   );
 }
 
+// GalleryPage — renders GalleryPage
 function GalleryPage({ lang }) {
   const t = useT(lang);
   const [activeFilter, setActiveFilter] = useState('all');

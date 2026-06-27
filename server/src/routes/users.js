@@ -1,3 +1,7 @@
+// File: server/src/routes/users.js
+// Purpose: users script
+// Role: API route handler for users
+
 import { Router } from 'express';
 import { getDb, COLLECTIONS } from '../db.js';
 

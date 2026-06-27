@@ -1,3 +1,7 @@
+// File: src/data/galleryItems.js
+// Purpose: galleryItems script
+// Role: static application data definitions
+
 export const GALLERY_ITEMS = [
   { id: 1, src: '/gallery/youth-football-training.jpg', captionKey: 'gallery_item_1_caption', tag: 'sport', tagLabelKey: 'gallery_tag_sport', tagColor: 'bg-orange-500' },
   { id: 2, src: '/gallery/youth-art-workshop.jpg', captionKey: 'gallery_item_2_caption', tag: 'art', tagLabelKey: 'gallery_tag_art', tagColor: 'bg-violet-500' },

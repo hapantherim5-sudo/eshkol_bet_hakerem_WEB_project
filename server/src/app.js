@@ -1,3 +1,7 @@
+// File: server/src/app.js
+// Purpose: app script
+// Role: Express application setup and route wiring
+
 import express from 'express';
 import cors from 'cors';
 import connectDbMiddleware from './middleware/connectDb.js';
@@ -15,6 +19,7 @@ import statsRouter from './routes/stats.js';
 
 const app = express();
 app.use(cors());
+// parse incoming JSON request bodies
 app.use(express.json());
 app.use(connectDbMiddleware);
 app.use('/api', healthRouter);

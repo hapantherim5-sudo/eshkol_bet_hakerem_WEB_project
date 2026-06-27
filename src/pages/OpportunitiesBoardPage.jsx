@@ -1,3 +1,7 @@
+// File: src/pages/OpportunitiesBoardPage.jsx
+// Purpose: OpportunitiesBoardPage component
+// Role: React page component for OpportunitiesBoardPage
+
 import { useEffect, useRef, useState } from 'react';
 import OpportunityCard from '../components/OpportunityCard';
 import { CATEGORIES, OPPORTUNITY_SCOPES, getTypeLabelKey } from '../data/opportunityOptions';
@@ -13,6 +17,7 @@ const CAT_ACTIVE = {
   workshops: 'bg-amber-500  text-white border-amber-500  shadow-amber-100',
 };
 
+// FilterDropdown — renders FilterDropdown
 function FilterDropdown({ id, label, value, options, open, onToggle, onChange }) {
   const selectedLabel = options.find(option => option.value === value)?.label ?? options[0]?.label;
 
@@ -53,6 +58,7 @@ function FilterDropdown({ id, label, value, options, open, onToggle, onChange })
   );
 }
 
+// OpportunitiesBoardPage — renders OpportunitiesBoardPage
 function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
@@ -87,6 +93,7 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
     return true;
   });
 
+  // clearFilters — handles clearFilters
   const clearFilters = () => {
     setSearchText(''); setFilterCity(''); setFilterOrg('');
     setFilterCat(''); setFilterType(''); setFilterScope(''); setFilterAge('');
@@ -99,9 +106,11 @@ function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
 
   useEffect(() => {
     if (!openFilter) return undefined;
+    // closeOnOutsideClick — handles closeOnOutsideClick
     const closeOnOutsideClick = (event) => {
       if (!filtersRef.current?.contains(event.target)) setOpenFilter(null);
     };
+    // closeOnEscape — handles closeOnEscape
     const closeOnEscape = (event) => {
       if (event.key === 'Escape') setOpenFilter(null);
     };

@@ -1,3 +1,7 @@
+// File: src/utils/calendar.js
+// Purpose: calendar script
+// Role: utility module for calendar
+
 export function getMonthGrid(year, month) {
   const first = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0).getDate();
@@ -8,6 +12,7 @@ export function getMonthGrid(year, month) {
   return cells;
 }
 
+// dateKey — handles dateKey
 export function dateKey(year, month, day) {
   const m = String(month + 1).padStart(2, '0');
   const d = String(day).padStart(2, '0');

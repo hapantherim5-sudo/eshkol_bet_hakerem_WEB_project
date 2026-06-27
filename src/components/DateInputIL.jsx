@@ -1,7 +1,12 @@
+// File: src/components/DateInputIL.jsx
+// Purpose: DateInputIL component
+// Role: React component for DateInputIL
+
 import { useEffect, useState } from 'react';
 import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../utils/israeliDate';
 import { useT } from '../i18n/i18n';
 
+// DateInputIL — renders DateInputIL
 function DateInputIL({ value, onChange, lang, className, id }) {
   const t = useT(lang);
   const [text, setText] = useState(() => isoToDisplay(value));
@@ -10,6 +15,7 @@ function DateInputIL({ value, onChange, lang, className, id }) {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setText(isoToDisplay(value)); }, [value]);
 
+  // apply — handles apply
   const apply = (display) => {
     const trimmed = display.trim();
     if (!trimmed) {
