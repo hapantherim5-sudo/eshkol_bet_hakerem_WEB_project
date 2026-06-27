@@ -1,3 +1,17 @@
+export const CITY_AR = {
+  'משגב': 'مسغاف',
+  'כרמיאל': 'كرميئيل',
+  'בענה': 'البعنة',
+  'דיר אלאסד': 'دير الأسد',
+  "סח'נין": 'سخنين',
+  'ראמה': 'الرامة',
+  'נחף': 'نحف',
+};
+
+export function getCityName(city, isAr) {
+  return isAr ? (CITY_AR[city] || city) : city;
+}
+
 export const ORGANIZATIONS = [
   { id: 'youth-misgav',      nameHe: 'רשות נוער משגב',           nameAr: 'سلطة شباب مشگاف' },
   { id: 'youth-karmiel',     nameHe: 'רשות נוער כרמיאל',         nameAr: 'سلطة شباب كرميئيل' },

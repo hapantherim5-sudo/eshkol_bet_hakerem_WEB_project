@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CATEGORIES } from '../data/fakeData';
 import { useT } from '../i18n/i18n';
+import { formatIsraeliDate } from '../utils/israeliDate';
 
 function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
   const t = useT(lang);
@@ -36,6 +37,24 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
         </div>
 
         <div className="p-5">
+          {(opportunity.eventDate || opportunity.startTime) && (
+            <div className="mb-4 flex items-center gap-2.5 px-4 py-3
+              bg-emerald-50 border border-emerald-100 rounded-xl">
+              <span className="text-emerald-600 text-lg shrink-0">📅</span>
+              <div className="text-sm font-semibold text-emerald-800">
+                {opportunity.eventDate && (
+                  <span>{formatIsraeliDate(opportunity.eventDate)}</span>
+                )}
+                {opportunity.startTime && (
+                  <span className="text-emerald-600">
+                    {' · '}🕐 {opportunity.startTime}
+                    {opportunity.endTime ? `–${opportunity.endTime}` : ''}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
           {needsProfile && (
             <div className="space-y-4 mb-5">
               <div>

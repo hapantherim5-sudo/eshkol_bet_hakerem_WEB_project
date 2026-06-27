@@ -19,16 +19,12 @@ function LoginPage({ lang, onLogin, onNavigate }) {
       setError(t('login_err_fields'));
       return;
     }
-    console.log('[login] attempt  username=%s', username);
     setError('');
     setLoading(true);
     try {
-      console.log('[login] calling api.login...');
       const user = await api.login(username, password);
-      console.log('[login] success  username=%s  role=%s', user?.username, user?.role);
       onLogin(user);
     } catch (e) {
-      console.error('[login] failed  status=%s  message=%s', e.status, e.message);
       if (e.status === 401) {
         setError(t('login_err_credentials'));
       } else if (e.status === 408) {
@@ -37,7 +33,6 @@ function LoginPage({ lang, onLogin, onNavigate }) {
         setError(t('login_err_server'));
       }
     } finally {
-      console.log('[login] request done, loading reset');
       setLoading(false);
     }
   };
@@ -78,7 +73,7 @@ function LoginPage({ lang, onLogin, onNavigate }) {
                 <p>Admin: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">admin</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
                 <p>{t('login_staff_label')} ({t('login_password_label')}: 1234):</p>
                 <p className="login-demo-staff text-emerald-600 font-medium leading-relaxed">{staffLabel}</p>
-                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">user1</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <p className="mt-1">User: <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">youth</code> / <code className="login-demo-code bg-white px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
               </div>
             </details>
 
@@ -144,8 +139,15 @@ function LoginPage({ lang, onLogin, onNavigate }) {
             </button>
 
             <button
+              onClick={() => onNavigate('register')}
+              className="w-full py-2.5 text-sm font-semibold text-emerald-600 hover:text-emerald-700
+                transition-colors duration-150 text-center">
+              {t('login_register_link')}
+            </button>
+
+            <button
               onClick={() => onNavigate('home')}
-              className="w-full py-2.5 text-sm font-semibold text-gray-500 hover:text-emerald-700
+              className="w-full py-2 text-sm font-semibold text-gray-500 hover:text-emerald-700
                 transition-colors duration-150">
               {t('login_back')}
             </button>

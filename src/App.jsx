@@ -7,16 +7,16 @@ import RegistrationModal from './components/RegistrationModal';
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import OpportunitiesBoardPage from './pages/OpportunitiesBoardPage';
 import MyRegistrationsPage from './pages/MyRegistrationsPage';
 import AboutPage from './pages/AboutPage';
 import GalleryPage from './pages/GalleryPage';
-import HotThisWeekPage from './pages/HotThisWeekPage';
 
 import { useDataStore } from './hooks/useDataStore';
 import {
   loadSession, saveSession, loadTheme, saveTheme, loadCurrentScreen, saveCurrentScreen,
-} from './hooks/useLocalStore';
+} from './utils/storage';
 
 import { setDocumentLang, useT } from './i18n/i18n';
 import { isStaffRole } from './utils/permissions';
@@ -172,6 +172,10 @@ function App() {
           <LoginPage lang={lang} onLogin={handleLogin} onNavigate={handleNavigate} />
         )}
 
+        {currentScreen === 'register' && (
+          <RegisterPage lang={lang} onNavigate={handleNavigate} />
+        )}
+
         {currentScreen === 'opportunities' && (
           <OpportunitiesBoardPage
             opportunities={store.opportunities}
@@ -182,20 +186,12 @@ function App() {
 
         {currentScreen === 'calendar' && (
           <EventsCalendar
-            events={store.events}
             lang={lang}
             opportunities={store.opportunities}
             onOpenOpp={openOppModal}
+            onNavigate={handleNavigate}
             currentUser={currentUser}
             registrations={store.registrations}
-          />
-        )}
-
-        {currentScreen === 'hot-this-week' && (
-          <HotThisWeekPage
-            opportunities={store.opportunities}
-            lang={lang}
-            onOpenModal={openOppModal}
           />
         )}
 
@@ -215,6 +211,7 @@ function App() {
             registrations={store.registrations}
             onOpenModal={openOppModal}
             onCancel={handleCancelRegistration}
+            onNavigate={handleNavigate}
           />
         )}
 
