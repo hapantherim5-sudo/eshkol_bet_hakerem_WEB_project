@@ -1,11 +1,13 @@
+import he from '../i18n/he';
+
 const WEEKDAY_NAMES = [
-  ['ראשון', 0],
-  ['שני', 1],
-  ['שלישי', 2],
-  ['רביעי', 3],
-  ['חמישי', 4],
-  ['שישי', 5],
-  ['שבת', 6],
+  [he.weekday_sunday, 0],
+  [he.weekday_monday, 1],
+  [he.weekday_tuesday, 2],
+  [he.weekday_wednesday, 3],
+  [he.weekday_thursday, 4],
+  [he.weekday_friday, 5],
+  [he.weekday_saturday, 6],
 ];
 
 export function parseWeekdays(daysStr) {

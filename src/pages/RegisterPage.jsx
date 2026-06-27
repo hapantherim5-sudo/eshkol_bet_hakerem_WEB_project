@@ -40,7 +40,7 @@ function RegisterPage({ lang, onNavigate }) {
       if (e.status === 409) {
         setError(t('signup_err_taken'));
       } else if (e.status === 408) {
-        setError(lang === 'ar' ? 'انتهت المهلة، حاول مجدداً' : 'פסק זמן, נסה שוב');
+        setError(t('error_timeout'));
       } else {
         setError(t('signup_err_server'));
       }
@@ -66,7 +66,7 @@ function RegisterPage({ lang, onNavigate }) {
           <div className="bg-gradient-to-l from-emerald-600 to-teal-500 px-6 py-8 text-center">
             <img
               src="https://bkerem.org.il/wp-content/uploads/2023/01/Logo.jpg"
-              alt="לוגו"
+              alt={t('brand_logo_alt')}
               className="h-16 mx-auto mb-4 rounded-xl object-contain ring-4 ring-white/30 shadow-lg"
             />
             <h2 className="text-2xl font-black text-white mb-1">{t('signup_title')}</h2>

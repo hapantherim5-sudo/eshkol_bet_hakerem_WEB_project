@@ -1,22 +1,25 @@
 import { useState } from 'react';
-import { CATEGORIES, OPPORTUNITY_TYPES, STATUSES } from '../../data/fakeData';
-import { ORGANIZATIONS } from '../../data/organizations';
-import { pick } from '../../i18n/i18n';
+import {
+  CATEGORIES, DEFAULT_REGISTRATION, OPPORTUNITY_SCOPES, OPPORTUNITY_TYPES, STATUSES,
+} from '../../data/opportunityOptions';
+import { ORGANIZATIONS, getOrgName } from '../../data/organizations';
+import { useT } from '../../i18n/i18n';
 import { buildCalendarEvents } from '../../utils/scheduleEvents';
 import DateInputIL from '../DateInputIL';
 
 const empty = (defaults = {}) => ({
-  icon: '✨', title: '', titleAr: '', category: 'sport', categoryLabel: 'ספורט',
-  type: 'חוג', scope: 'יישובי', city: '', organizationId: '',
+  icon: '✨', title: '', titleAr: '', category: 'sport', categoryLabel: '',
+  type: OPPORTUNITY_TYPES[0].value, scope: OPPORTUNITY_SCOPES[0].value, city: '', organizationId: '',
   ageMin: 12, ageMax: 18, time: '',
   description: '', descriptionAr: '', contact: '', phone: '',
-  registration: 'טלפון', registrationAr: 'هاتف', status: 'פתוח',
+  registration: DEFAULT_REGISTRATION.he, registrationAr: DEFAULT_REGISTRATION.ar, status: STATUSES[0].value,
   startDate: '', endDate: '',
   ...defaults,
 });
 
 function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   const isAr = lang === 'ar';
+  const t = useT(lang);
   const [form, setForm] = useState(() => empty({
     organizationId: user.role === 'Staff' ? user.organizationId : (initial?.organizationId || ''),
     ...initial,
@@ -34,15 +37,14 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!form.title.trim() || !form.titleAr.trim() || !form.organizationId || !form.city.trim()) {
-      setErr(pick(isAr, 'יש למלא שדות חובה', 'يرجى ملء الحقول المطلوبة'));
+      setErr(t('admin_opportunity_required_error'));
       return;
     }
-    const cat = CATEGORIES.find(c => c.id === form.category);
-    const payload = { ...form, categoryLabel: cat?.label || form.categoryLabel };
+    const payload = { ...form };
 
     if (form.startDate) {
       if (form.endDate && form.endDate < form.startDate) {
-        setErr(pick(isAr, 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה', 'يجب أن يكون تاريخ النهاية بعد البداية'));
+        setErr(t('admin_opportunity_date_error'));
         return;
       }
       const calendarEvents = buildCalendarEvents(payload);
@@ -54,95 +56,92 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   };
 
   const inputClass = 'w-full px-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none';
-  const label = (he, ar) => pick(isAr, he, ar);
-
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
       <p className="mb-4 text-xs text-gray-500">
         <span className="font-black text-red-500" aria-hidden="true">*</span>{' '}
-        {label('שדות המסומנים בכוכבית הם שדות חובה. כל שאר השדות אופציונליים.', 'الحقول المعلّمة بنجمة مطلوبة. جميع الحقول الأخرى اختيارية.')}
+        {t('admin_opportunity_required_note')}
       </p>
       {err && <p role="alert" className="text-sm text-red-600 mb-3">{err}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label htmlFor="opportunity-title" className="text-xs text-gray-500">{label('כותרת (עברית)', 'العنوان (عبري)')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <label htmlFor="opportunity-title" className="text-xs text-gray-500">{t('admin_opportunity_title_he')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
           <input id="opportunity-title" required className={inputClass} value={form.title} onChange={e => set('title', e.target.value)} />
         </div>
         <div>
-          <label htmlFor="opportunity-title-ar" className="text-xs text-gray-500">{label('כותרת (ערבית)', 'العنوان (عربي)')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <label htmlFor="opportunity-title-ar" className="text-xs text-gray-500">{t('admin_opportunity_title_ar')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
           <input id="opportunity-title-ar" required className={inputClass} value={form.titleAr} onChange={e => set('titleAr', e.target.value)} dir="rtl" />
         </div>
         <div>
-          <label htmlFor="opportunity-organization" className="text-xs text-gray-500">{label('ארגון מפעיל', 'الجهة المشغلة')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <label htmlFor="opportunity-organization" className="text-xs text-gray-500">{t('admin_opportunity_organization')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
           <select id="opportunity-organization" required className={inputClass} value={form.organizationId} onChange={e => set('organizationId', e.target.value)}
             disabled={user.role === 'Staff'}>
-            <option value="">{label('בחר', 'اختر')}</option>
+            <option value="">{t('admin_select')}</option>
             {orgOptions.map(o => (
-              <option key={o.id} value={o.id}>{isAr ? o.nameAr : o.nameHe}</option>
+              <option key={o.id} value={o.id}>{getOrgName(o.id, isAr)}</option>
             ))}
           </select>
         </div>
         <div>
-          <label htmlFor="opportunity-city" className="text-xs text-gray-500">{label('יישוב', 'البلدة')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <label htmlFor="opportunity-city" className="text-xs text-gray-500">{t('admin_opportunity_city')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
           <input id="opportunity-city" required className={inputClass} value={form.city} onChange={e => set('city', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('קטגוריה', 'الفئة')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_category')}</label>
           <select className={inputClass} value={form.category} onChange={e => set('category', e.target.value)}>
-            {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {isAr ? c.labelAr : c.label}</option>)}
+            {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {t(c.labelKey)}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('סוג', 'النوع')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_type')}</label>
           <select className={inputClass} value={form.type} onChange={e => set('type', e.target.value)}>
-            {OPPORTUNITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            {OPPORTUNITY_TYPES.map(type => <option key={type.value} value={type.value}>{t(type.labelKey)}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('היקף', 'النطاق')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_scope')}</label>
           <select className={inputClass} value={form.scope} onChange={e => set('scope', e.target.value)}>
-            <option value="יישובי">{label('יישובי', 'بلدي')}</option>
-            <option value="אזורי">{label('אזורי', 'إقليمي')}</option>
+            {OPPORTUNITY_SCOPES.map(scope => <option key={scope.value} value={scope.value}>{t(scope.labelKey)}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('סטטוס', 'الحالة')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_status')}</label>
           <select className={inputClass} value={form.status} onChange={e => set('status', e.target.value)}>
-            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+            {STATUSES.map(status => <option key={status.value} value={status.value}>{t(status.labelKey)}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('גיל מינימום', 'العمر الأدنى')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_age_min')}</label>
           <input type="number" className={inputClass} value={form.ageMin} onChange={e => set('ageMin', +e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('גיל מקסימום', 'العمر الأقصى')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_age_max')}</label>
           <input type="number" className={inputClass} value={form.ageMax} onChange={e => set('ageMax', +e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('שעת התחלה', 'وقت البداية')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_start_time')}</label>
           <input type="time" className={inputClass} value={form.time} onChange={e => set('time', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('תאריך התחלה', 'تاريخ البداية')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_start_date')}</label>
           <DateInputIL lang={lang} className={inputClass} value={form.startDate}
             onChange={v => set('startDate', v)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('תאריך סיום', 'تاريخ النهاية')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_end_date')}</label>
           <DateInputIL lang={lang} className={inputClass} value={form.endDate}
             onChange={v => set('endDate', v)} />
         </div>
         <div className="md:col-span-2">
-          <label className="text-xs text-gray-500">{label('תיאור', 'الوصف')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_description_he')}</label>
           <textarea className={inputClass} rows={2} value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
         <div className="md:col-span-2">
-          <label className="text-xs text-gray-500">{label('תיאור בערבית', 'الوصف بالعربية')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_description_ar')}</label>
           <textarea className={inputClass} rows={2} dir="rtl" value={form.descriptionAr} onChange={e => set('descriptionAr', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('אימוג׳י', 'رمز تعبيري')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_emoji')}</label>
           <div className="flex items-center gap-2">
             <span className="text-2xl leading-none">{form.icon || '✨'}</span>
             <input className={inputClass} maxLength={2} value={form.icon}
@@ -150,20 +149,20 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
           </div>
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('איש קשר', 'جهة الاتصال')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_contact')}</label>
           <input className={inputClass} value={form.contact} onChange={e => set('contact', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{label('טלפון', 'الهاتف')}</label>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_phone')}</label>
           <input className={inputClass} value={form.phone} onChange={e => set('phone', e.target.value)} />
         </div>
       </div>
       <div className="flex gap-2 mt-4 justify-end">
         <button type="button" onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
-          {label('ביטול', 'إلغاء')}
+          {t('cancel')}
         </button>
         <button type="submit" className="px-4 py-2 text-sm bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700">
-          {label('שמור', 'حفظ')}
+          {t('admin_save')}
         </button>
       </div>
     </form>

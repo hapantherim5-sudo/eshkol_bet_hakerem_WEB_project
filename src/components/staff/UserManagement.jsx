@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { api, apiEnabled } from '../../services/api';
-import { ORGANIZATIONS } from '../../data/organizations';
-import { pick } from '../../i18n/i18n';
+import { api } from '../../services/api';
+import { ORGANIZATIONS, getOrgName } from '../../data/organizations';
+import { useT } from '../../i18n/i18n';
 import ConfirmModal from '../ConfirmModal';
 
 const ROLE_BADGE = {
@@ -17,7 +17,7 @@ const emptyForm = () => ({
 /* ── Create / Edit form modal ── */
 function UserFormModal({ lang, initial, onSave, onClose }) {
   const isAr  = lang === 'ar';
-  const t     = (he, ar) => pick(isAr, he, ar);
+  const t     = useT(lang);
   const isEdit = !!initial;
 
   const [form,   setForm  ] = useState(() => initial ? { ...initial, password: '' } : emptyForm());
@@ -33,15 +33,15 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
 
   const handleSubmit = async () => {
     if (!form.name.trim() || !form.username.trim()) {
-      setErr(t('שם מלא ושם משתמש הם שדות חובה', 'الاسم الكامل واسم المستخدم مطلوبان'));
+      setErr(t('users_error_name_username_required'));
       return;
     }
     if (!isEdit && !form.password.trim()) {
-      setErr(t('סיסמה היא שדה חובה', 'كلمة المرور مطلوبة'));
+      setErr(t('users_error_password_required'));
       return;
     }
     if (form.role === 'Staff' && !form.organizationId) {
-      setErr(t('יש לבחור ארגון עבור משתמש סגל', 'يجب اختيار منظمة لمستخدم الطاقم'));
+      setErr(t('users_error_staff_org_required'));
       return;
     }
     setSaving(true);
@@ -53,9 +53,9 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
       await onSave(payload);
     } catch (e) {
       if (e.status === 409) {
-        setErr(t('שם המשתמש כבר קיים במערכת', 'اسم المستخدم مستخدم بالفعل'));
+        setErr(t('users_error_username_exists'));
       } else {
-        setErr(t('שגיאה בשמירה, נסה שוב', 'خطأ في الحفظ، حاول مرة أخرى'));
+        setErr(t('users_error_save'));
       }
       setSaving(false);
     }
@@ -75,22 +75,22 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
       >
         <div className="p-5 sm:p-6">
           <h3 className="text-lg font-black text-gray-800 mb-5">
-            {isEdit ? t('✏️ עריכת משתמש', '✏️ تعديل المستخدم') : t('➕ הוספת משתמש', '➕ إضافة مستخدم')}
+            {t(isEdit ? 'users_edit_title' : 'users_add_title')}
           </h3>
 
           <div className="space-y-3">
             <div>
-              <label className={labelCls}>{t('שם מלא *', 'الاسم الكامل *')}</label>
+              <label className={labelCls}>{t('users_full_name')}</label>
               <input
                 className={fieldCls}
-                placeholder={t('ישראל ישראלי', 'محمد أحمد')}
+                placeholder={t('users_full_name_placeholder')}
                 value={form.name}
                 onChange={e => set('name', e.target.value)}
               />
             </div>
 
             <div>
-              <label className={labelCls}>{t('שם משתמש *', 'اسم المستخدم *')}</label>
+              <label className={labelCls}>{t('users_username')}</label>
               <input
                 className={fieldCls}
                 placeholder="israel123"
@@ -103,8 +103,8 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
             <div>
               <label className={labelCls}>
                 {isEdit
-                  ? t('סיסמה חדשה (השאר ריק לשמור הנוכחית)', 'كلمة مرور جديدة (اتركها فارغة للإبقاء)')
-                  : t('סיסמה *', 'كلمة المرور *')}
+                  ? t('users_new_password')
+                  : t('users_password')}
               </label>
               <input
                 type="password"
@@ -117,15 +117,15 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
             </div>
 
             <div>
-              <label className={labelCls}>{t('תפקיד *', 'الدور *')}</label>
+              <label className={labelCls}>{t('users_role')}</label>
               <select
                 className={fieldCls}
                 value={form.role}
                 onChange={e => handleRoleChange(e.target.value)}
               >
-                <option value="Admin">{t('מנהל (Admin)', 'مسؤول (Admin)')}</option>
-                <option value="Staff">{t('סגל עירוני (Staff)', 'طاقم بلدي (Staff)')}</option>
-                <option value="User">{t('משתמש / נוער (User)', 'مستخدم / شباب (User)')}</option>
+                <option value="Admin">{t('users_role_admin_full')}</option>
+                <option value="Staff">{t('users_role_staff_full')}</option>
+                <option value="User">{t('users_role_user_full')}</option>
               </select>
             </div>
 
@@ -133,18 +133,18 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
               <div>
                 <label className={labelCls}>
                   {form.role === 'Staff'
-                    ? t('ארגון / עיר *', 'المنظمة / المدينة *')
-                    : t('ארגון (אופציונלי)', 'المنظمة (اختياري)')}
+                    ? t('users_staff_organization')
+                    : t('users_optional_organization')}
                 </label>
                 <select
                   className={fieldCls}
                   value={form.organizationId}
                   onChange={e => set('organizationId', e.target.value)}
                 >
-                  <option value="">{t('- בחר ארגון -', '- اختر منظمة -')}</option>
+                  <option value="">{t('users_select_organization')}</option>
                   {ORGANIZATIONS.map(o => (
                     <option key={o.id} value={o.id}>
-                      {isAr ? o.nameAr : o.nameHe}
+                      {getOrgName(o.id, isAr)}
                     </option>
                   ))}
                 </select>
@@ -164,7 +164,7 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
               disabled={saving}
               className="flex-1 py-3 sm:py-2.5 min-h-[44px] text-sm text-gray-600 border rounded-xl hover:bg-gray-50 transition"
             >
-              {t('ביטול', 'إلغاء')}
+              {t('cancel')}
             </button>
             <button
               onClick={handleSubmit}
@@ -173,7 +173,7 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
             >
               {saving
                 ? <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-                : isEdit ? t('שמור שינויים', 'حفظ التغييرات') : t('הוסף משתמש', 'إضافة مستخدم')}
+                : t(isEdit ? 'users_save_changes' : 'users_add_user')}
             </button>
           </div>
         </div>
@@ -185,7 +185,7 @@ function UserFormModal({ lang, initial, onSave, onClose }) {
 /* ── Filter bar ── */
 function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, onChange }) {
   const isAr = lang === 'ar';
-  const t    = (he, ar) => pick(isAr, he, ar);
+  const t    = useT(lang);
 
   const inputCls  = 'w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 transition bg-white';
   const selectCls = inputCls;
@@ -197,13 +197,13 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
         <input
           className={inputCls}
-          placeholder={t('🔍 חיפוש לפי שם...', '🔍 ابحث بالاسم...')}
+          placeholder={t('users_search_name')}
           value={searchName}
           onChange={e => onChange('searchName', e.target.value)}
         />
         <input
           className={inputCls}
-          placeholder={t('🔍 חיפוש לפי שם משתמש...', '🔍 ابحث باسم المستخدم...')}
+          placeholder={t('users_search_username')}
           value={searchUsername}
           onChange={e => onChange('searchUsername', e.target.value)}
           dir="ltr"
@@ -213,20 +213,20 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
           value={filterRole}
           onChange={e => onChange('filterRole', e.target.value)}
         >
-          <option value="">{t('- כל התפקידים -', '- جميع الأدوار -')}</option>
-          <option value="Admin">{t('מנהל', 'مسؤول')}</option>
-          <option value="Staff">{t('סגל', 'طاقم')}</option>
-          <option value="User">{t('נוער', 'شباب')}</option>
+          <option value="">{t('users_all_roles')}</option>
+          <option value="Admin">{t('users_role_admin')}</option>
+          <option value="Staff">{t('users_role_staff')}</option>
+          <option value="User">{t('users_role_youth')}</option>
         </select>
         <select
           className={selectCls}
           value={filterOrg}
           onChange={e => onChange('filterOrg', e.target.value)}
         >
-          <option value="">{t('- כל הארגונים -', '- جميع المنظمات -')}</option>
+          <option value="">{t('users_all_organizations')}</option>
           {ORGANIZATIONS.map(o => (
             <option key={o.id} value={o.id}>
-              {isAr ? o.nameAr : o.nameHe}
+              {getOrgName(o.id, isAr)}
             </option>
           ))}
         </select>
@@ -236,7 +236,7 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
           onClick={() => { onChange('searchName', ''); onChange('searchUsername', ''); onChange('filterRole', ''); onChange('filterOrg', ''); }}
           className="mt-2 text-xs text-gray-400 hover:text-red-500 transition"
         >
-          ✕ {t('נקה סינון', 'مسح الفلتر')}
+          ✕ {t('users_clear_filter')}
         </button>
       )}
     </div>
@@ -246,7 +246,8 @@ function FilterBar({ lang, searchName, searchUsername, filterRole, filterOrg, on
 /* ── Main export ── */
 export default function UserManagement({ lang, currentUser, showToast }) {
   const isAr = lang === 'ar';
-  const t    = (he, ar) => pick(isAr, he, ar);
+  const t    = useT(lang);
+  const loadUsersErrorMessage = t('users_load_toast_error');
 
   const [users,        setUsers       ] = useState([]);
   const [loading,      setLoading     ] = useState(true);
@@ -270,16 +271,13 @@ export default function UserManagement({ lang, currentUser, showToast }) {
     } catch (e) {
       /* Preserve the real error so we can show it in the UI */
       setLoadError(e);
-      showToast(pick(isAr, 'שגיאה בטעינת המשתמשים', 'خطأ في تحميل المستخدمين'), 'error');
+      showToast(loadUsersErrorMessage, 'error');
     } finally {
       setLoading(false);
     }
-  }, [isAr, showToast]);
+  }, [loadUsersErrorMessage, showToast]);
 
   useEffect(() => {
-    /* Only run when the API is reachable - prevents false error toasts
-       in localStorage-mode where there is no backend to call.           */
-    if (!apiEnabled()) return;
     const id = setTimeout(loadUsers, 0);
     return () => clearTimeout(id);
   }, [loadUsers]);
@@ -310,10 +308,10 @@ export default function UserManagement({ lang, currentUser, showToast }) {
   const handleSave = async (data) => {
     if (modalUser === 'new') {
       await api.createUser(data);
-      showToast(t('✓ המשתמש נוצר בהצלחה', '✓ تم إنشاء المستخدم بنجاح'));
+      showToast(t('users_created_success'));
     } else {
       await api.updateUser(modalUser.id, data);
-      showToast(t('✓ המשתמש עודכן בהצלחה', '✓ تم تحديث المستخدم بنجاح'));
+      showToast(t('users_updated_success'));
     }
     setModalUser(null);
     await loadUsers();
@@ -324,9 +322,9 @@ export default function UserManagement({ lang, currentUser, showToast }) {
     if (!deleteTarget) return;
     try {
       await api.deleteUser(deleteTarget.id);
-      showToast(t('המשתמש נמחק', 'تم حذف المستخدم'));
+      showToast(t('users_deleted_success'));
     } catch {
-      showToast(t('שגיאה במחיקת המשתמש', 'خطأ في حذف المستخدم'), 'error');
+      showToast(t('users_delete_error'), 'error');
     } finally {
       setDeleteTarget(null);
       await loadUsers();
@@ -335,36 +333,20 @@ export default function UserManagement({ lang, currentUser, showToast }) {
 
   /* ── Helpers ── */
   const roleLabel = (role) =>
-    role === 'Admin' ? t('מנהל', 'مسؤول') :
-    role === 'Staff' ? t('סגל',  'طاقم')  :
-                       t('נוער', 'شباب');
+    role === 'Admin' ? t('users_role_admin') :
+    role === 'Staff' ? t('users_role_staff') :
+                       t('users_role_youth');
 
   const orgLabel = (orgId) => {
-    const org = ORGANIZATIONS.find(o => o.id === orgId);
-    return org ? (isAr ? org.nameAr : org.nameHe) : '-';
+    return getOrgName(orgId, isAr) || '-';
   };
-
-  /* ── API unavailable (localStorage mode) ── */
-  if (!apiEnabled()) {
-    return (
-      <div className="text-center py-16 text-gray-400 text-sm">
-        <p className="text-4xl mb-3">🔌</p>
-        <p className="font-semibold text-gray-500 mb-1">
-          {t('ניהול משתמשים זמין רק במצב API', 'إدارة المستخدمين متاحة في وضع API فقط')}
-        </p>
-        <p className="text-xs">
-          {t('הוסף VITE_USE_API=true ל-.env כדי להפעיל', 'أضف VITE_USE_API=true إلى ملف .env للتفعيل')}
-        </p>
-      </div>
-    );
-  }
 
   /* ── Loading spinner ── */
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
         <div className="w-9 h-9 rounded-full border-4 border-emerald-100 border-t-emerald-500 animate-spin" />
-        <p className="text-sm">{t('טוען משתמשים...', 'جاري تحميل المستخدمين...')}</p>
+        <p className="text-sm">{t('users_loading')}</p>
       </div>
     );
   }
@@ -376,7 +358,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
       <div className="text-center py-14">
         <p className="text-4xl mb-3">⚠️</p>
         <p className="font-black text-gray-700 mb-1">
-          {t('לא ניתן לטעון את רשימת המשתמשים', 'تعذّر تحميل قائمة المستخدمين')}
+          {t('users_load_error')}
         </p>
         {detail && (
           <p className="text-xs text-red-500 font-mono bg-red-50 inline-block px-3 py-1 rounded-lg mb-4">
@@ -388,7 +370,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
             onClick={loadUsers}
             className="px-5 py-2.5 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 transition"
           >
-            {t('נסה שוב', 'حاول مجدداً')}
+            {t('users_retry')}
           </button>
         </div>
       </div>
@@ -401,7 +383,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4 gap-3">
         <h3 className="font-black text-gray-800 text-base">
-          {t('כל המשתמשים', 'جميع المستخدمين')}
+          {t('users_all_users')}
           <span className="mr-2 text-xs font-medium text-gray-400">
             ({filteredUsers.length}{hasActiveFilter ? ` / ${users.length}` : ''})
           </span>
@@ -410,7 +392,7 @@ export default function UserManagement({ lang, currentUser, showToast }) {
           onClick={() => setModalUser('new')}
           className="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-lg hover:bg-emerald-700 transition shrink-0"
         >
-          + {t('הוסף משתמש', 'أضف مستخدم')}
+          + {t('users_add_user')}
         </button>
       </div>
 
@@ -431,20 +413,20 @@ export default function UserManagement({ lang, currentUser, showToast }) {
             <>
               <p className="text-4xl mb-3">🔍</p>
               <p className="font-semibold text-gray-500 mb-2">
-                {t('לא נמצאו משתמשים התואמים לחיפוש', 'لا يوجد مستخدمون يطابقون البحث')}
+                {t('users_search_empty')}
               </p>
               <button
                 onClick={() => { setSearchName(''); setSearchUsername(''); setFilterRole(''); setFilterOrg(''); }}
                 className="text-xs text-emerald-600 hover:underline"
               >
-                {t('נקה את הסינון', 'مسح الفلتر')}
+                {t('users_clear_filter')}
               </button>
             </>
           ) : (
             <>
               <p className="text-4xl mb-3">👤</p>
               <p className="font-semibold text-gray-500">
-                {t('אין משתמשים במערכת עדיין', 'لا يوجد مستخدمون في النظام بعد')}
+                {t('users_empty')}
               </p>
             </>
           )}
@@ -454,11 +436,11 @@ export default function UserManagement({ lang, currentUser, showToast }) {
           <table className="w-full text-sm min-w-[520px]">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-right p-3 font-semibold text-gray-500">{t('שם', 'الاسم')}</th>
-                <th className="text-right p-3 font-semibold text-gray-500">{t('שם משתמש', 'اسم المستخدم')}</th>
-                <th className="text-right p-3 font-semibold text-gray-500">{t('תפקיד', 'الدور')}</th>
-                <th className="text-right p-3 font-semibold text-gray-500">{t('ארגון', 'المنظمة')}</th>
-                <th className="p-3 font-semibold text-gray-500 text-center">{t('פעולות', 'إجراءات')}</th>
+                <th className="text-right p-3 font-semibold text-gray-500">{t('users_column_name')}</th>
+                <th className="text-right p-3 font-semibold text-gray-500">{t('users_column_username')}</th>
+                <th className="text-right p-3 font-semibold text-gray-500">{t('users_column_role')}</th>
+                <th className="text-right p-3 font-semibold text-gray-500">{t('users_column_organization')}</th>
+                <th className="p-3 font-semibold text-gray-500 text-center">{t('users_column_actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -480,17 +462,17 @@ export default function UserManagement({ lang, currentUser, showToast }) {
                         onClick={() => setModalUser(u)}
                         className="text-xs px-3 py-1.5 bg-gray-100 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition"
                       >
-                        {t('ערוך', 'تعديل')}
+                        {t('admin_edit')}
                       </button>
                       <button
                         onClick={() => setDeleteTarget(u)}
                         disabled={u.id === currentUser.id}
                         title={u.id === currentUser.id
-                          ? t('לא ניתן למחוק את עצמך', 'لا يمكنك حذف حسابك الخاص')
+                          ? t('users_cannot_delete_self')
                           : undefined}
                         className="text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
                       >
-                        {t('מחק', 'حذف')}
+                        {t('admin_delete')}
                       </button>
                     </div>
                   </td>
@@ -515,12 +497,9 @@ export default function UserManagement({ lang, currentUser, showToast }) {
       {deleteTarget && (
         <ConfirmModal
           lang={lang}
-          titleHe="מחיקת משתמש"
-          titleAr="حذف المستخدم"
-          messageHe={`האם אתה בטוח שברצונך למחוק את "${deleteTarget.name}" (${deleteTarget.username})?`}
-          messageAr={`هل أنت متأكد أنك تريد حذف "${deleteTarget.name}" (${deleteTarget.username})؟`}
-          confirmHe="כן, מחק"
-          confirmAr="نعم، احذف"
+          title={t('users_delete_title')}
+          message={t('users_delete_message', { name: deleteTarget.name, username: deleteTarget.username })}
+          confirmLabel={t('users_delete_confirm')}
           danger
           onConfirm={handleDelete}
           onClose={() => setDeleteTarget(null)}
