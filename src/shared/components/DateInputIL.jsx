@@ -7,7 +7,7 @@ import { isoToDisplay, displayToIso, maskIsraeliDateInput } from '../../utils/is
 import { useT } from '../../i18n/i18n';
 
 // DateInputIL — renders DateInputIL
-function DateInputIL({ value, onChange, lang, className, id }) {
+function DateInputIL({ value, onChange, lang, className, id, required = false }) {
   const t = useT(lang);
   const [text, setText] = useState(() => isoToDisplay(value));
 
@@ -34,6 +34,7 @@ function DateInputIL({ value, onChange, lang, className, id }) {
     <input
       id={id}
       type="text"
+      required={required}
       inputMode="numeric"
       autoComplete="off"
       dir="ltr"

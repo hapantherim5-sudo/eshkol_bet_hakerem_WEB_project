@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { getStatusLabelKey } from '../../../data/opportunityOptions';
 import { getOrgName, getCityName } from '../../../data/organizations';
 import { useT } from '../../../i18n/i18n';
-import { formatIsraeliDate } from '../../../utils/israeliDate';
+import { getOpportunityDisplaySchedule } from '../../../utils/opportunitySchedule';
 
 const CAT_HEADER = {
   sport:     'from-orange-400 to-amber-500',
@@ -25,18 +25,18 @@ function OpportunityDetailModal({ opportunity, lang, isRegistered, onClose, onRe
 
   const headerGradient = CAT_HEADER[o.category] ?? 'from-emerald-500 to-teal-600';
   const statusText = t(getStatusLabelKey(o.status) || o.status);
-
-  const dateVal = o.eventDate ? formatIsraeliDate(o.eventDate) : null;
-  const timeVal = o.startTime
-    ? (o.endTime ? `${o.startTime} – ${o.endTime}` : o.startTime)
-    : (o.time || null);
+  const schedule = getOpportunityDisplaySchedule(o);
 
   const rows = [
     { icon: '📍', label: t('modal_city'),         val: getCityName(o.city, isAr) },
     { icon: '🏢', label: t('modal_org'),          val: getOrgName(o.organizationId, isAr) },
     { icon: '🎂', label: t('modal_age'),          val: `${o.ageMin}–${o.ageMax}` },
-    ...(dateVal ? [{ icon: '📅', label: t('modal_date'), val: dateVal }] : []),
-    ...(timeVal ? [{ icon: '🕐', label: t('modal_time'), val: timeVal }] : []),
+    ...(schedule.dateLabel
+      ? [{ icon: '📅', label: t('modal_date'), val: schedule.dateLabel }]
+      : []),
+    ...(schedule.timeLabel
+      ? [{ icon: '🕐', label: t('modal_time'), val: schedule.timeLabel }]
+      : []),
     { icon: '👤', label: t('modal_contact'),      val: o.contact },
     { icon: '📝', label: t('modal_registration'), val: isAr && o.registrationAr ? o.registrationAr : o.registration },
   ];

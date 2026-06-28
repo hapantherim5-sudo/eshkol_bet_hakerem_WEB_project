@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { spawn } from 'child_process'
 import { fileURLToPath } from 'url'
+import process from 'node:process'
 import path from 'path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -24,7 +25,9 @@ export default defineConfig({
         proc.on('error', err =>
           console.warn('[vite] Express auto-start failed:', err.message)
         )
-        const stop = () => { try { proc.kill() } catch (_) {} }
+        const stop = () => {
+          if (!proc.killed) proc.kill()
+        }
         server.httpServer?.once('close', stop)
         process.once('exit', stop)
       },
