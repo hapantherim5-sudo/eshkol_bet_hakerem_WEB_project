@@ -7,6 +7,7 @@ import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+export { COLLECTIONS } from './models/collections.js';
 
 // Windows / some ISPs fail SRV lookup for mongodb+srv:// - use public DNS
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -69,16 +70,3 @@ export async function closeDb() {
     db = null;
   }
 }
-
-/** MongoDB collection names used by the API. */
-export const COLLECTIONS = {
-  organizations: 'organizations',
-  users: 'users',
-  opportunities: 'opportunities',
-  events: 'events',
-  registrations: 'registrations',
-  cancellations: 'cancellations',
-  views: 'views',
-  profiles: 'profiles',
-  counters: 'counters',
-};
