@@ -1,298 +1,109 @@
-// File: src\App.jsx
-// Purpose: App component
-// Role: main React application shell and screen router
-
-import { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import StaffPanel from './components/staff/StaffPanel';
-import EventsCalendar from './components/calendar/EventsCalendar';
-import OpportunityDetailModal from './components/OpportunityDetailModal';
-import RegistrationModal from './components/RegistrationModal';
-
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import OpportunitiesBoardPage from './pages/OpportunitiesBoardPage';
-import MyRegistrationsPage from './pages/MyRegistrationsPage';
-import GalleryPage from './pages/GalleryPage';
-
-import { useDataStore } from './hooks/useDataStore';
-import {
-  loadSession, saveSession, loadTheme, saveTheme, loadCurrentScreen, saveCurrentScreen,
-} from './utils/storage';
-
-import { setDocumentLang, useT } from './i18n/i18n';
+import AppOverlays from './app/AppOverlays';
+import AppRoutes from './app/AppRoutes';
+import { LoadErrorScreen, LoadingScreen } from './app/AppStatus';
+import { useDataStore } from './app/data/useDataStore';
+import { useAppPreferences } from './app/hooks/useAppPreferences';
+import { useSession } from './app/hooks/useSession';
+import { useToast } from './app/hooks/useToast';
+import Navbar from './shared/components/Navbar';
+import { useOpportunityWorkflow } from './features/opportunities/hooks/useOpportunityWorkflow';
+import { useT } from './i18n/i18n';
+import Toast from './shared/components/Toast';
 import { isStaffRole } from './utils/permissions';
 
-// App — renders App
 function App() {
   const store = useDataStore();
-  // Screen state replaces a routing library in this single-page application.
-  const [currentScreen, setCurrentScreen] = useState(() => {
-    const savedScreen = loadCurrentScreen();
-    return savedScreen === 'about' ? 'home' : savedScreen;
-  });
-  const [currentUser, setCurrentUser] = useState(() => loadSession());
-  const [theme, setTheme] = useState(() => loadTheme());
-  const [lang, setLang] = useState('he');
-  const [selectedOpp, setSelectedOpp] = useState(null);
-  const [showRegModal, setShowRegModal] = useState(false);
-  const [toast,     setToast    ] = useState('');
-  const [toastType, setToastType] = useState('success');
-
+  const {
+    currentScreen,
+    setCurrentScreen,
+    theme,
+    lang,
+    toggleTheme,
+    toggleLanguage,
+  } = useAppPreferences();
+  const { currentUser, signIn, signOut } = useSession();
+  const { toast, showToast } = useToast();
   const t = useT(lang);
 
-  useEffect(() => setDocumentLang(lang), [lang]);
-  useEffect(() => saveCurrentScreen(currentScreen), [currentScreen]);
-
-  // showToast — handles showToast
-  const showToast = (msg, type = 'success') => {
-    setToast(msg);
-    setToastType(type);
-    // hide toast after 3 seconds
-    setTimeout(() => setToast(''), 3000);
-  };
-
-  // handleLogin — handles Login
-  const handleLogin = (user) => {
-    setCurrentUser(user);
-    saveSession(user);
+  const handleLogin = user => {
+    signIn(user);
     setCurrentScreen(isStaffRole(user) ? 'admin' : 'opportunities');
   };
 
-  // handleLogout — handles Logout
   const handleLogout = () => {
-    setCurrentUser(null);
-    saveSession(null);
+    signOut();
     setCurrentScreen('home');
   };
 
-  // handleNavigate — handles Navigate
-  const handleNavigate = (screen) => {
-    // guard admin route to staff users only
+  const handleNavigate = screen => {
     if (screen === 'admin' && !isStaffRole(currentUser)) {
       setCurrentScreen('login');
       return;
     }
-    if (screen === 'my-registrations') {
-      // require a youth user account for this action
-      if (!currentUser || currentUser.role !== 'User') {
-        setCurrentScreen('login');
-        showToast(t('toast_youth_login'));
-        return;
-      }
+    if (screen === 'my-registrations' && currentUser?.role !== 'User') {
+      setCurrentScreen('login');
+      showToast(t('toast_youth_login'));
+      return;
     }
     setCurrentScreen(screen);
   };
 
-  // openOppModal — handles openOppModal
-  const openOppModal = (opp) => {
-    setSelectedOpp(opp);
-    store.recordView(opp.id, currentUser?.id);
-  };
+  const opportunityWorkflow = useOpportunityWorkflow({
+    store,
+    currentUser,
+    navigate: handleNavigate,
+    showToast,
+    t,
+  });
 
-  // handleRegisterClick — handles RegisterClick
-  const handleRegisterClick = () => {
-    if (!currentUser) {
-      setSelectedOpp(null);
-      setCurrentScreen('login');
-      showToast(t('toast_login_required'));
-      return;
-    }
-    if (currentUser.role !== 'User') {
-      showToast(t('toast_staff_only'));
-      return;
-    }
-    setShowRegModal(true);
-  };
-
-  // handleRegisterConfirm — handles RegisterConfirm
-  const handleRegisterConfirm = async (profilePatch) => {
-    try {
-      const result = await store.register(currentUser.id, selectedOpp.id, profilePatch);
-      setShowRegModal(false);
-      if (result.ok) {
-        showToast(t('toast_registered'));
-      } else if (result.reason === 'duplicate') {
-        showToast(t('toast_already_reg'));
-      }
-    } catch {
-      showToast(t('toast_reg_error'), 'error');
-    }
-  };
-
-  // handleCancelRegistration — handles CancelRegistration
-  const handleCancelRegistration = async (opportunityId) => {
-    // require a youth user account for this action
-    if (!currentUser || currentUser.role !== 'User') return;
-    const oppId = opportunityId ?? selectedOpp?.id;
-    if (!oppId) return;
-    try {
-      const result = await store.unregister(currentUser.id, oppId);
-      if (result.ok) {
-        showToast(t('toast_unreg'));
-        if (selectedOpp?.id === oppId) setSelectedOpp(null);
-      }
-    } catch {
-      showToast(t('toast_unreg_error'), 'error');
-    }
-  };
-
-  if (store.ready === false) {
-    return (
-      <div dir="rtl" className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50">
-        <div className="w-12 h-12 rounded-full border-4 border-emerald-100 border-t-emerald-600 animate-spin mb-4" />
-        <p className="text-emerald-700 font-semibold text-sm">
-          {t('loading')}
-        </p>
-      </div>
-    );
-  }
-
+  if (!store.ready) return <LoadingScreen label={t('loading')} />;
   if (store.loadError) {
     return (
-      <div dir="rtl" className="min-h-screen flex items-center justify-center bg-slate-950 px-4 text-center">
-        <div className="max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-8 text-white shadow-2xl">
-          <div className="mb-4 text-5xl">⚠️</div>
-          <h1 className="mb-2 text-xl font-black">{t('api_load_error_title')}</h1>
-          <p className="mb-6 text-sm leading-6 text-slate-300">{t('api_load_error_description')}</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="rounded-xl bg-[#037c57] px-6 py-3 text-sm font-black text-white transition hover:bg-[#026647]">
-            {t('api_load_retry')}
-          </button>
-        </div>
-      </div>
+      <LoadErrorScreen
+        title={t('api_load_error_title')}
+        description={t('api_load_error_description')}
+        retryLabel={t('api_load_retry')}
+      />
     );
   }
 
   return (
-    <div dir="rtl" className={`min-h-screen font-sans
-      ${theme === 'dark' ? 'app-dark bg-slate-900 text-white' : 'bg-slate-50 text-gray-900'}`}>
-
+    <div dir="rtl" className={`min-h-screen font-sans ${
+      theme === 'dark' ? 'app-dark bg-slate-900 text-white' : 'bg-slate-50 text-gray-900'
+    }`}>
       <Navbar
-        theme={theme} lang={lang} currentUser={currentUser}
+        theme={theme}
+        lang={lang}
+        currentUser={currentUser}
         currentScreen={currentScreen}
-        onToggleDark={() => setTheme(p => {
-          const nextTheme = p === 'dark' ? '' : 'dark';
-          saveTheme(nextTheme);
-          return nextTheme;
-        })}
-        onToggleLang={() => setLang(p => p === 'he' ? 'ar' : 'he')}
+        onToggleDark={toggleTheme}
+        onToggleLang={toggleLanguage}
         onNavigate={handleNavigate}
         onLogout={handleLogout}
       />
 
-      {toast && (
-        <div className={`animate-toast fixed top-20 left-1/2 z-[70]
-          ${toastType === 'error' ? 'bg-red-500' : 'bg-emerald-600'}
-          text-white px-5 py-3 rounded-2xl shadow-xl
-          text-sm font-semibold flex items-center gap-2 whitespace-nowrap pointer-events-none`}>
-          <span className="text-base">{toastType === 'error' ? '✕' : '✓'}</span>
-          {toast}
-        </div>
-      )}
+      <Toast toast={toast} />
 
       <main className="pt-20 sm:pt-20">
-
-        {currentScreen === 'home' && (
-          <HomePage
-            currentUser={currentUser}
-            lang={lang}
-            handleNavigate={handleNavigate}
-            opportunitiesCount={store.opportunities.length}
-          />
-        )}
-
-        {currentScreen === 'login' && (
-          <LoginPage lang={lang} onLogin={handleLogin} onNavigate={handleNavigate} />
-        )}
-
-        {currentScreen === 'register' && (
-          <RegisterPage lang={lang} onNavigate={handleNavigate} />
-        )}
-
-        {currentScreen === 'opportunities' && (
-          <OpportunitiesBoardPage
-            opportunities={store.opportunities}
-            lang={lang}
-            onOpenModal={openOppModal}
-          />
-        )}
-
-        {currentScreen === 'calendar' && (
-          <EventsCalendar
-            lang={lang}
-            opportunities={store.opportunities}
-            onOpenOpp={openOppModal}
-            onNavigate={handleNavigate}
-            currentUser={currentUser}
-            registrations={store.registrations}
-          />
-        )}
-
-        {currentScreen === 'gallery' && (
-          <GalleryPage lang={lang} />
-        )}
-
-        {currentScreen === 'my-registrations' && currentUser?.role === 'User' && (
-          <MyRegistrationsPage
-            lang={lang}
-            currentUser={currentUser}
-            opportunities={store.opportunities}
-            registrations={store.registrations}
-            onOpenModal={openOppModal}
-            onCancel={handleCancelRegistration}
-            onNavigate={handleNavigate}
-          />
-        )}
-
-        {currentScreen === 'admin' && isStaffRole(currentUser) && (
-          <StaffPanel
-            lang={lang}
-            currentUser={currentUser}
-            opportunities={store.opportunities}
-            events={store.events}
-            views={store.views}
-            registrations={store.registrations}
-            cancellations={store.cancellations}
-            profiles={store.profiles}
-            onAdd={store.addOpportunity}
-            onUpdate={store.updateOpportunity}
-            onDelete={store.deleteOpportunity}
-            onAddEvent={store.addEvent}
-            onDeleteEvent={store.deleteEvent}
-            onReplaceEventsForOpportunity={store.replaceEventsForOpportunity}
-            showToast={showToast}
-          />
-        )}
+        <AppRoutes
+          currentScreen={currentScreen}
+          currentUser={currentUser}
+          lang={lang}
+          store={store}
+          onNavigate={handleNavigate}
+          onLogin={handleLogin}
+          onOpenOpportunity={opportunityWorkflow.openOpportunity}
+          onCancelRegistration={opportunityWorkflow.cancelRegistration}
+          showToast={showToast}
+        />
       </main>
 
-      {selectedOpp && !showRegModal && (
-        <OpportunityDetailModal
-          opportunity={selectedOpp}
-          lang={lang}
-          isRegistered={currentUser?.role === 'User' && store.isRegistered(currentUser.id, selectedOpp.id)}
-          onClose={() => setSelectedOpp(null)}
-          onRegisterClick={handleRegisterClick}
-          onCancelRegistration={
-            currentUser?.role === 'User' && store.isRegistered(currentUser.id, selectedOpp.id)
-              ? () => handleCancelRegistration(selectedOpp.id)
-              : null
-          }
-        />
-      )}
-
-      {showRegModal && selectedOpp && currentUser && (
-        <RegistrationModal
-          opportunity={selectedOpp}
-          lang={lang}
-          profile={store.getProfile(currentUser.id)}
-          onConfirm={handleRegisterConfirm}
-          onClose={() => setShowRegModal(false)}
-        />
-      )}
+      <AppOverlays
+        lang={lang}
+        currentUser={currentUser}
+        store={store}
+        workflow={opportunityWorkflow}
+      />
     </div>
   );
 }

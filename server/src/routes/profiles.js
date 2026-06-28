@@ -1,18 +1,8 @@
-// File: server/src/routes/profiles.js
-// Purpose: profiles script
-// Role: API route handler for profiles
-
 import { Router } from 'express';
-import { getDb, COLLECTIONS } from '../db.js';
+import { showProfile } from '../controllers/profileController.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 const router = Router();
-
-router.get('/profiles/:userId', async (req, res, next) => {
-  try {
-    const userId = Number(req.params.userId);
-    const doc = await getDb().collection(COLLECTIONS.profiles).findOne({ userId });
-    res.json(doc?.data || null);
-  } catch (err) { next(err); }
-});
+router.get('/profiles/:userId', asyncHandler(showProfile));
 
 export default router;
