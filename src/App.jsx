@@ -1,5 +1,5 @@
 import AppOverlays from './app/AppOverlays';
-import AppRoutes from './app/AppRoutes';
+import ScreenSwitcher from './app/ScreenSwitcher';
 import { LoadErrorScreen, LoadingScreen } from './app/AppStatus';
 import { useDataStore } from './app/data/useDataStore';
 import { useAppPreferences } from './app/hooks/useAppPreferences';
@@ -85,7 +85,7 @@ function App() {
       <Toast toast={toast} />
 
       <main className="pt-20 sm:pt-20">
-        <AppRoutes
+        <ScreenSwitcher
           currentScreen={currentScreen}
           currentUser={currentUser}
           lang={lang}

@@ -2,7 +2,7 @@
 // Purpose: scheduleEvents script
 // Role: utility module for scheduleEvents
 
-import he from '../i18n/he';
+import he from '../i18n/he.js';
 
 const WEEKDAY_NAMES = [
   [he.weekday_sunday, 0],
@@ -52,7 +52,17 @@ function parseDateOnly(str) {
 
 // buildCalendarEvents — handles buildCalendarEvents
 export function buildCalendarEvents(opp) {
-  const { startDate, endDate, days, time, title, titleAr, organizationId, city } = opp;
+  const {
+    startDate,
+    endDate,
+    days,
+    time,
+    endTime,
+    title,
+    titleAr,
+    organizationId,
+    city,
+  } = opp;
   const start = parseDateOnly(startDate);
   const end = parseDateOnly(endDate);
   if (!start || !end || end < start) return [];
@@ -69,7 +79,7 @@ export function buildCalendarEvents(opp) {
     if (include) {
       const key = dateKeyLocal(cursor);
       const startsAt = new Date(`${key}T${startTime}:00`).toISOString();
-      events.push({ title, titleAr, organizationId, city, startsAt });
+      events.push({ title, titleAr, organizationId, city, startsAt, endTime });
     }
     cursor.setDate(cursor.getDate() + 1);
   }

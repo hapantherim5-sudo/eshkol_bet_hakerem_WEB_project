@@ -15,7 +15,7 @@ import DateInputIL from '../../../shared/components/DateInputIL';
 const empty = (defaults = {}) => ({
   icon: '✨', title: '', titleAr: '', category: 'sport', categoryLabel: '',
   type: OPPORTUNITY_TYPES[0].value, scope: OPPORTUNITY_SCOPES[0].value, city: '', organizationId: '',
-  ageMin: 12, ageMax: 18, time: '',
+  ageMin: 12, ageMax: 18, time: '', endTime: '',
   description: '', descriptionAr: '', contact: '', phone: '',
   registration: DEFAULT_REGISTRATION.he, registrationAr: DEFAULT_REGISTRATION.ar, status: STATUSES[0].value,
   startDate: '', endDate: '',
@@ -29,8 +29,10 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
   const [form, setForm] = useState(() => empty({
     organizationId: user.role === 'Staff' ? user.organizationId : (initial?.organizationId || ''),
     ...initial,
-    startDate: initial?.startDate || '',
-    endDate: initial?.endDate || '',
+    time: initial?.time || initial?.startTime || '',
+    endTime: initial?.endTime || '',
+    startDate: initial?.startDate || initial?.eventDate || '',
+    endDate: initial?.endDate || initial?.eventDate || '',
   }));
   const [err, setErr] = useState('');
 
@@ -48,13 +50,27 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
       setErr(t('admin_opportunity_required_error'));
       return;
     }
+    const scheduleValues = [form.startDate, form.endDate, form.time, form.endTime];
+    if (scheduleValues.some(value => !value)) {
+      setErr(t('admin_opportunity_schedule_required_error'));
+      return;
+    }
+    if (form.endDate && form.endDate < form.startDate) {
+      setErr(t('admin_opportunity_date_error'));
+      return;
+    }
+    if (form.endTime && form.endTime <= form.time) {
+      setErr(t('admin_opportunity_time_error'));
+      return;
+    }
+
     const payload = { ...form };
+    // Remove legacy single-event fields when an old opportunity is edited.
+    // Current schedules are represented by start/end fields and event documents.
+    delete payload.eventDate;
+    delete payload.startTime;
 
     if (form.startDate) {
-      if (form.endDate && form.endDate < form.startDate) {
-        setErr(t('admin_opportunity_date_error'));
-        return;
-      }
       const calendarEvents = buildCalendarEvents(payload);
       onSave(payload, calendarEvents.length ? calendarEvents : null);
       return;
@@ -127,17 +143,21 @@ function OpportunityForm({ lang, initial, user, onSave, onCancel }) {
           <input type="number" className={inputClass} value={form.ageMax} onChange={e => set('ageMax', +e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{t('admin_opportunity_start_time')}</label>
-          <input type="time" className={inputClass} value={form.time} onChange={e => set('time', e.target.value)} />
+          <label className="text-xs text-gray-500">{t('admin_opportunity_start_time')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <input required type="time" className={inputClass} value={form.time} onChange={e => set('time', e.target.value)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{t('admin_opportunity_start_date')}</label>
-          <DateInputIL lang={lang} className={inputClass} value={form.startDate}
+          <label className="text-xs text-gray-500">{t('admin_opportunity_end_time')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <input required type="time" className={inputClass} value={form.endTime} onChange={e => set('endTime', e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500">{t('admin_opportunity_start_date')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <DateInputIL required lang={lang} className={inputClass} value={form.startDate}
             onChange={v => set('startDate', v)} />
         </div>
         <div>
-          <label className="text-xs text-gray-500">{t('admin_opportunity_end_date')}</label>
-          <DateInputIL lang={lang} className={inputClass} value={form.endDate}
+          <label className="text-xs text-gray-500">{t('admin_opportunity_end_date')} <span className="font-black text-red-500" aria-hidden="true">*</span></label>
+          <DateInputIL required lang={lang} className={inputClass} value={form.endDate}
             onChange={v => set('endDate', v)} />
         </div>
         <div className="md:col-span-2">

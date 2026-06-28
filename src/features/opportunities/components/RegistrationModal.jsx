@@ -5,13 +5,14 @@
 import { useState } from 'react';
 import { CATEGORIES } from '../../../data/opportunityOptions';
 import { useT } from '../../../i18n/i18n';
-import { formatIsraeliDate } from '../../../utils/israeliDate';
+import { getOpportunityDisplaySchedule } from '../../../utils/opportunitySchedule';
 
 // RegistrationModal — renders RegistrationModal
 function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
   const t = useT(lang);
   const isAr = lang === 'ar';
   const needsProfile = !profile?.settlement;
+  const schedule = getOpportunityDisplaySchedule(opportunity);
 
   const [settlement, setSettlement] = useState(profile?.settlement || '');
   const [interests, setInterests]   = useState(profile?.interests || []);
@@ -43,18 +44,17 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
         </div>
 
         <div className="p-5">
-          {(opportunity.eventDate || opportunity.startTime) && (
+          {(schedule.dateLabel || schedule.timeLabel) && (
             <div className="mb-4 flex items-center gap-2.5 px-4 py-3
               bg-emerald-50 border border-emerald-100 rounded-xl">
               <span className="text-emerald-600 text-lg shrink-0">📅</span>
               <div className="text-sm font-semibold text-emerald-800">
-                {opportunity.eventDate && (
-                  <span>{formatIsraeliDate(opportunity.eventDate)}</span>
+                {schedule.dateLabel && (
+                  <span>{schedule.dateLabel}</span>
                 )}
-                {opportunity.startTime && (
+                {schedule.timeLabel && (
                   <span className="text-emerald-600">
-                    {' · '}🕐 {opportunity.startTime}
-                    {opportunity.endTime ? `–${opportunity.endTime}` : ''}
+                    {schedule.dateLabel ? ' · ' : ''}🕐 {schedule.timeLabel}
                   </span>
                 )}
               </div>

@@ -8,7 +8,7 @@ import OpportunitiesBoardPage from '../features/opportunities/pages/Opportunitie
 import MyRegistrationsPage from '../features/registrations/pages/MyRegistrationsPage';
 import { isStaffRole } from '../utils/permissions';
 
-export default function AppRoutes({
+export default function ScreenSwitcher({
   currentScreen,
   currentUser,
   lang,
@@ -46,6 +46,7 @@ export default function AppRoutes({
         <EventsCalendar
           lang={lang}
           opportunities={store.opportunities}
+          events={store.events}
           onOpenOpp={onOpenOpportunity}
           onNavigate={onNavigate}
           currentUser={currentUser}
