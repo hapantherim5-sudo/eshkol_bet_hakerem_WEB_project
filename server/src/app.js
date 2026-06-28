@@ -21,8 +21,8 @@ const app = express();
 app.use(cors());
 // parse incoming JSON request bodies
 app.use(express.json());
-app.use(connectDbMiddleware);
 app.use('/api', healthRouter);
+app.use(connectDbMiddleware);
 app.use('/api', organizationsRouter);
 app.use('/api', authRouter);
 app.use('/api', bootstrapRouter);
@@ -43,7 +43,9 @@ app.use((err, req, res, next) => {
     req.method, req.path, err.message,
   );
   if (res.headersSent) return next(err);
-  return res.status(500).json({ error: 'server_error' });
+  const status = err.status || 500;
+  const body = err.body || { error: err.code || 'server_error' };
+  return res.status(status).json(body);
 });
 
 export default app;
