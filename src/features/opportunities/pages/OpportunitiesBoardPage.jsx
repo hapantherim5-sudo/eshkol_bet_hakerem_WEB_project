@@ -66,7 +66,7 @@ export default function OpportunitiesBoardPage({ opportunities, lang, onOpenModa
             <FilterField label={`📍 ${t('board_filter_city')}`}>{dropdown('city', filters.filterCity, filters.setFilterCity, [{ value: '', label: t('all') }, ...filters.cities.map(city => ({ value: city, label: getCityName(city, isArabic) }))])}</FilterField>
             <FilterField label={`🔖 ${t('board_filter_type')}`}>{dropdown('type', filters.filterType, filters.setFilterType, [{ value: '', label: t('all') }, ...filters.types.map(type => ({ value: type, label: t(getTypeLabelKey(type) || type) }))])}</FilterField>
             <FilterField label={`🗺️ ${t('board_filter_scope')}`}>{dropdown('scope', filters.filterScope, filters.setFilterScope, [{ value: '', label: t('all') }, ...OPPORTUNITY_SCOPES.map(scope => ({ value: scope.value, label: t(scope.labelKey) }))])}</FilterField>
-            <FilterField label={`🎂 ${t('board_filter_age')}`}><input type="number" min="6" max="99" value={filters.filterAge} onChange={event => filters.setFilterAge(event.target.value)} placeholder={t('board_filter_age_placeholder')} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500" /></FilterField>
+            <FilterField label={`🎂 ${t('board_filter_age')}`}><input type="number" min="6" max="99" value={filters.filterAge} onChange={event => filters.setFilterAge(event.target.value)} placeholder={t('board_age_placeholder')} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500" /></FilterField>
           </div>
         </div>
       </div>

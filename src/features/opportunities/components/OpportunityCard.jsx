@@ -5,7 +5,7 @@
 import { STATUSES, getStatusLabelKey, getTypeLabelKey } from '../../../data/opportunityOptions';
 import { getOrgName, getCityName } from '../../../data/organizations';
 import { useT } from '../../../i18n/i18n';
-import { formatIsraeliDate } from '../../../utils/israeliDate';
+import { getOpportunityDisplaySchedule } from '../../../utils/opportunitySchedule';
 
 const CAT_STYLE = {
   sport:     { bar: 'bg-orange-400', shadow: 'hover:shadow-orange-100' },
@@ -27,6 +27,7 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
   const statusText  = t(getStatusLabelKey(o.status) || o.status);
   const typeText    = t(getTypeLabelKey(o.type) || o.type);
   const ageLabel    = t('card_age_range', { min: o.ageMin, max: o.ageMax });
+  const schedule    = getOpportunityDisplaySchedule(o);
 
   const cat = CAT_STYLE[o.category] ?? { bar: 'bg-gray-300', shadow: 'hover:shadow-gray-100' };
 
@@ -70,17 +71,17 @@ function OpportunityCard({ opportunity, lang, onOpenModal }) {
           </span>
         </div>
 
-        {o.eventDate && (
+        {schedule.dateLabel && (
           <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-3
             text-xs text-gray-500 font-medium">
             <span className="flex items-center gap-1">
               <span>📅</span>
-              <span>{formatIsraeliDate(o.eventDate)}</span>
+              <span>{schedule.dateLabel}</span>
             </span>
-            {o.startTime && (
+            {schedule.timeLabel && (
               <span className="flex items-center gap-1">
                 <span>🕐</span>
-                <span>{o.startTime}{o.endTime ? `–${o.endTime}` : ''}</span>
+                <span>{schedule.timeLabel}</span>
               </span>
             )}
           </div>
