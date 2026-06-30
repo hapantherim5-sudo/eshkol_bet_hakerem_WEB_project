@@ -139,6 +139,8 @@ const ar = {
   reg_modal_title:       'تأكيد التسجيل',
   reg_city_label:        'بلدة السكن',
   reg_city_placeholder:  'أدخل البلدة...',
+  reg_city_required:     'يجب إدخال بلدة السكن لإكمال التسجيل',
+  reg_submitting:        'جارٍ التسجيل...',
   reg_interests_label:   'مجالات الاهتمام',
   reg_cancel_btn:        'إلغاء',
   reg_confirm_btn:       'أكد التسجيل ✓',

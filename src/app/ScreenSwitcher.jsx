@@ -13,6 +13,7 @@ export default function ScreenSwitcher({
   currentUser,
   lang,
   store,
+  opportunityFilters,
   onNavigate,
   onLogin,
   onOpenOpportunity,
@@ -36,8 +37,8 @@ export default function ScreenSwitcher({
     case 'opportunities':
       return (
         <OpportunitiesBoardPage
-          opportunities={store.opportunities}
           lang={lang}
+          filters={opportunityFilters}
           onOpenModal={onOpenOpportunity}
         />
       );
