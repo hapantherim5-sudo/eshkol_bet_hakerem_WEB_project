@@ -16,15 +16,28 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
 
   const [settlement, setSettlement] = useState(profile?.settlement || '');
   const [interests, setInterests]   = useState(profile?.interests || []);
+  const [validationError, setValidationError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const toggleInterest = id => {
     setInterests(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
   // handleConfirm — handles Confirm
-  const handleConfirm = () => {
-    if (needsProfile && !settlement.trim()) return;
-    onConfirm(needsProfile ? { settlement: settlement.trim(), interests } : null);
+  const handleConfirm = async () => {
+    if (submitting) return;
+    if (needsProfile && !settlement.trim()) {
+      setValidationError(t('reg_city_required'));
+      return;
+    }
+
+    setValidationError('');
+    setSubmitting(true);
+    try {
+      await onConfirm(needsProfile ? { settlement: settlement.trim(), interests } : null);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -65,14 +78,28 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
             <div className="space-y-4 mb-5">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1.5">
-                  📍 {t('reg_city_label')}
+                  📍 {t('reg_city_label')} *
                 </label>
                 <input
                   value={settlement}
-                  onChange={e => setSettlement(e.target.value)}
+                  onChange={e => {
+                    setSettlement(e.target.value);
+                    if (e.target.value.trim()) setValidationError('');
+                  }}
                   placeholder={t('reg_city_placeholder')}
+                  aria-invalid={Boolean(validationError)}
+                  aria-describedby={validationError ? 'registration-city-error' : undefined}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm
-                    focus:outline-none focus:border-emerald-500 bg-gray-50 focus:bg-white transition-all" />
+                    focus:outline-none focus:border-emerald-500 bg-gray-50 focus:bg-white transition-all
+                    aria-invalid:border-red-400" />
+                {validationError && (
+                  <p
+                    id="registration-city-error"
+                    role="alert"
+                    className="mt-1.5 text-sm font-semibold text-red-600">
+                    {validationError}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -100,16 +127,20 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
           <div className="flex flex-col sm:flex-row gap-2.5">
             <button
               onClick={onClose}
+              disabled={submitting}
               className="flex-1 py-3.5 sm:py-3 min-h-[44px] text-sm font-bold text-gray-600
-                border-2 border-gray-200 rounded-2xl hover:bg-gray-50 transition-all">
+                border-2 border-gray-200 rounded-2xl hover:bg-gray-50 transition-all
+                disabled:opacity-60 disabled:cursor-not-allowed">
               {t('reg_cancel_btn')}
             </button>
             <button
               onClick={handleConfirm}
+              disabled={submitting}
               className="flex-1 py-3.5 sm:py-3 min-h-[44px] text-sm font-black bg-emerald-600
                 text-white rounded-2xl hover:bg-emerald-700 transition-all
-                hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-100">
-              {t('reg_confirm_btn')}
+                hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-100
+                disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100">
+              {submitting ? t('reg_submitting') : t('reg_confirm_btn')}
             </button>
           </div>
         </div>

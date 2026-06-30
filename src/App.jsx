@@ -7,6 +7,7 @@ import { useSession } from './app/hooks/useSession';
 import { useToast } from './app/hooks/useToast';
 import Navbar from './shared/components/Navbar';
 import { useOpportunityWorkflow } from './features/opportunities/hooks/useOpportunityWorkflow';
+import { useOpportunityFilters } from './features/opportunities/hooks/useOpportunityFilters';
 import { useT } from './i18n/i18n';
 import Toast from './shared/components/Toast';
 import { isStaffRole } from './utils/permissions';
@@ -24,6 +25,7 @@ function App() {
   const { currentUser, signIn, signOut } = useSession();
   const { toast, showToast } = useToast();
   const t = useT(lang);
+  const opportunityFilters = useOpportunityFilters(store.opportunities, lang === 'ar');
 
   const handleLogin = user => {
     signIn(user);
@@ -90,6 +92,7 @@ function App() {
           currentUser={currentUser}
           lang={lang}
           store={store}
+          opportunityFilters={opportunityFilters}
           onNavigate={handleNavigate}
           onLogin={handleLogin}
           onOpenOpportunity={opportunityWorkflow.openOpportunity}

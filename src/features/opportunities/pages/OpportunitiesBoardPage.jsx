@@ -4,7 +4,6 @@ import { ORGANIZATIONS, getCityName, getOrgName } from '../../../data/organizati
 import { useT } from '../../../i18n/i18n';
 import FilterDropdown from '../components/FilterDropdown';
 import OpportunityCard from '../components/OpportunityCard';
-import { useOpportunityFilters } from '../hooks/useOpportunityFilters';
 
 const CATEGORY_TONES = {
   sport: 'bg-orange-500 border-orange-500', art: 'bg-violet-500 border-violet-500',
@@ -12,10 +11,9 @@ const CATEGORY_TONES = {
   community: 'bg-pink-500 border-pink-500', workshops: 'bg-amber-500 border-amber-500',
 };
 
-export default function OpportunitiesBoardPage({ opportunities, lang, onOpenModal }) {
+export default function OpportunitiesBoardPage({ lang, filters, onOpenModal }) {
   const t = useT(lang);
   const isArabic = lang === 'ar';
-  const filters = useOpportunityFilters(opportunities, isArabic);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [openFilter, setOpenFilter] = useState(null);
   const filtersRef = useRef(null);

@@ -139,6 +139,8 @@ const he = {
   reg_modal_title:       'אישור הרשמה',
   reg_city_label:        'יישוב מגורים',
   reg_city_placeholder:  'הכנס יישוב...',
+  reg_city_required:     'יש להזין יישוב מגורים כדי להשלים את ההרשמה',
+  reg_submitting:        'נרשם...',
   reg_interests_label:   'תחומי עניין',
   reg_cancel_btn:        'ביטול',
   reg_confirm_btn:       'אשר הרשמה ✓',
