@@ -1,19 +1,21 @@
-import AppOverlays from './app/AppOverlays';
-import ScreenSwitcher from './app/ScreenSwitcher';
-import { LoadErrorScreen, LoadingScreen } from './app/AppStatus';
-import { useDataStore } from './app/data/useDataStore';
-import { useAppPreferences } from './app/hooks/useAppPreferences';
-import { useSession } from './app/hooks/useSession';
-import { useToast } from './app/hooks/useToast';
-import Navbar from './shared/components/Navbar';
-import { useOpportunityWorkflow } from './features/opportunities/hooks/useOpportunityWorkflow';
-import { useOpportunityFilters } from './features/opportunities/hooks/useOpportunityFilters';
-import { useT } from './i18n/i18n';
-import Toast from './shared/components/Toast';
-import { isStaffRole } from './utils/permissions';
+// Frontend composition root: global session, data, navigation, and overlays.
+import { useEffect } from 'react';
+import AppOverlays from './AppOverlays';
+import ScreenSwitcher from './ScreenSwitcher';
+import { LoadErrorScreen, LoadingScreen } from './AppStatus';
+import { useApiStore } from './store/useApiStore';
+import { useAppPreferences } from './hooks/useAppPreferences';
+import { useSession } from './hooks/useSession';
+import { useToast } from './hooks/useToast';
+import Navbar from '../shared/components/Navbar';
+import { useOpportunityWorkflow } from '../features/opportunities/hooks/useOpportunityWorkflow';
+import { useOpportunityFilters } from '../features/opportunities/hooks/useOpportunityFilters';
+import { useT } from '../i18n/i18n';
+import Toast from '../shared/components/Toast';
+import { isStaffRole } from '../utils/permissions';
 
 function App() {
-  const store = useDataStore();
+  const store = useApiStore();
   const {
     currentScreen,
     setCurrentScreen,
@@ -27,15 +29,23 @@ function App() {
   const t = useT(lang);
   const opportunityFilters = useOpportunityFilters(store.opportunities, lang === 'ar');
 
-  const handleLogin = user => {
-    signIn(user);
-    setCurrentScreen(isStaffRole(user) ? 'admin' : 'opportunities');
+  const handleLogin = async session => {
+    signIn(session);
+    await store.reload();
+    setCurrentScreen(isStaffRole(session.user) ? 'admin' : 'opportunities');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     signOut();
     setCurrentScreen('home');
+    await store.reload();
   };
+
+  useEffect(() => {
+    if (!currentUser && ['admin', 'my-registrations'].includes(currentScreen)) {
+      setCurrentScreen('home');
+    }
+  }, [currentScreen, currentUser, setCurrentScreen]);
 
   const handleNavigate = screen => {
     if (screen === 'admin' && !isStaffRole(currentUser)) {

@@ -2,8 +2,7 @@ import * as authService from '../services/authService.js';
 
 export async function login(req, res) {
   const { username, password } = req.body || {};
-  const user = await authService.login(username, password);
-  res.json(user);
+  res.json(await authService.login(username, password));
 }
 
 export async function register(req, res) {

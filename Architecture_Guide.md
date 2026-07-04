@@ -1,5 +1,7 @@
 # Eshkol Bet Hakerem — Complete Architecture Guide
 
+New contributors should begin with `README.md` for setup commands, environment variables, and a concise project map. This guide is the detailed reference for file responsibilities and end-to-end flows.
+
 ---
 
 ## Part 1 — Big Picture
@@ -46,12 +48,12 @@ Versions below are the versions declared in the current `package.json` files.
 | Backend framework | Express | `^4.21.2` |
 | Database | MongoDB | Database chosen through `MONGODB_URI` and `MONGODB_DB` |
 | Database driver | Official `mongodb` Node driver | Root declares `^6.21.0`; `server/package.json` declares `^6.12.0` |
-| Authentication | Custom username/password lookup | Browser session saved in `localStorage`; no JWT, cookie session, or OAuth |
+| Authentication | Signed bearer token | HMAC-SHA256 token issued at login, validated by Express middleware, and stored with the safe user in tab-scoped `sessionStorage` |
 | Cross-origin support | `cors` | `^2.8.5` |
 | Environment loading | `dotenv` | `^16.4.7` |
 | Development proxy | Vite proxy | `/api` to `http://localhost:3001` |
 | Production deployment | Vercel | Static Vite build plus Express serverless entry in `api/index.js` |
-| Static assets | Vite `public/` directory | Logo, SVG icons, and gallery photographs |
+| Static assets | Vite `public/` directory | Logo and gallery photographs |
 | Code quality | ESLint | `^10.3.0` and React hook/refresh plugins |
 
 ### Why These Technologies
@@ -80,9 +82,10 @@ The frontend and backend communicate through **HTTP requests to REST-style endpo
 
 1. Builds the request URL.
 2. Adds `Content-Type: application/json`.
-3. serializes mutation bodies with `JSON.stringify`.
-4. aborts a request after 15 seconds.
-5. converts non-success responses into errors containing `status` and, when available, a parsed response `body`.
+3. Reads the current tab session and adds `Authorization: Bearer <token>` when a token exists.
+4. Serializes mutation bodies with `JSON.stringify`.
+5. Aborts a request after 15 seconds.
+6. Converts non-success responses into errors containing `status` and, when available, a parsed response `body`.
 
 In development, the browser requests `/api/...` from Vite. `vite.config.js` proxies those requests to `http://localhost:3001`, where Express is listening. `VITE_API_URL` may supply a development base URL; production deliberately uses the same origin.
 
@@ -124,7 +127,7 @@ The architecture is especially suitable for an academic project because every re
 - rules and multi-step operations belong to services.
 - MongoDB queries belong to repositories.
 
-One important current boundary is security: login verifies credentials, but the returned user is stored in browser `localStorage`, passwords are compared as stored values, and backend management routes have no authentication or authorization middleware. Frontend role checks improve the interface but do not protect the API. This is acceptable only as a current project limitation, not as production-grade access control.
+Security is enforced at both presentation and API boundaries. Login returns a safe user plus a signed, eight-hour bearer token. `optionalAuth` validates a supplied token, reloads the current user from MongoDB, and places it on `req.user`; route middleware then enforces authentication, roles, self-access, and organization ownership. The server ignores client-supplied identity fields for registrations, cancellations, and authenticated views. A remaining production-hardening item is password hashing: the current account repository still compares stored password values directly.
 
 ---
 
@@ -160,8 +163,9 @@ An alternative backend-only command is `npm run dev:server`, which delegates to 
 2. `express.json()` is registered.
 3. `/api/health` is mounted before database middleware, so health checks do not require MongoDB.
 4. `connectDbMiddleware` is registered for later routes.
-5. Organization, auth, bootstrap, opportunity, event, view, registration, profile, user, and statistics routers are mounted at `/api`.
-6. The four-argument global error handler is registered last.
+5. `optionalAuth` validates any bearer token and attaches the current database user to `req.user`.
+6. Organization, auth, bootstrap, opportunity, event, view, registration, profile, user, and statistics routers are mounted at `/api`; protected routers add role/self middleware.
+7. The four-argument global error handler is registered last.
 
 `server/src/index.js` selects `process.env.PORT` or port `3001`, starts listening, and handles `EADDRINUSE` by allowing an already-running local server to remain responsible.
 
@@ -186,17 +190,17 @@ The startup call in `server/src/index.js` is eager but non-blocking. The middlew
 
 **Files:** `index.html`, `src/main.jsx`, `src/index.css`
 
-**What happens:** Vite serves `index.html`. Its module script loads `src/main.jsx`, which imports global CSS and `App.jsx`. React's `createRoot` mounts `<App />` into `<div id="root">` inside `StrictMode`.
+**What happens:** Vite serves `index.html`. Its module script loads `src/main.jsx`, which imports global CSS and `src/app/App.jsx`. React's `createRoot` mounts `<App />` into `<div id="root">` inside `StrictMode`.
 
 ### Step 6: Root component initializes
 
-**File:** `src/App.jsx`
+**File:** `src/app/App.jsx`
 
 **Global state and hooks:**
 
-- `useDataStore()` selects the API-backed application store.
-- `useAppPreferences()` restores the saved screen and theme, owns language, and updates document language/title.
-- `useSession()` restores the current user from `localStorage`.
+- `useApiStore()` owns the API-backed application store.
+- `useAppPreferences()` restores the tab's current screen and the persistent theme, owns language, and updates document language/title.
+- `useSession()` restores a validated `{ user, token }` session from `sessionStorage`; old user-only session shapes are rejected.
 - `useToast()` manages temporary success/error messages.
 - `useOpportunityWorkflow()` manages opportunity selection, view recording, registration, and cancellation.
 
@@ -204,7 +208,7 @@ Until startup data finishes, `AppStatus.jsx` renders a loading screen. If bootst
 
 ### Step 7: Bootstrap data loads
 
-**Frontend file:** `src/app/data/useApiStore.js`
+**Frontend file:** `src/app/store/useApiStore.js`
 
 **API endpoint:** `GET /api/bootstrap`
 
@@ -218,7 +222,9 @@ routes/bootstrap.js
   -> MongoDB
 ```
 
-The repository loads opportunities, events, registrations, cancellations, views, and profiles in parallel. The service converts profile documents into an object keyed by `userId`. The frontend saves every returned collection in React state and marks the store ready.
+The repository loads opportunities, events, registrations, cancellations, views, and profiles in parallel. `bootstrapService` then applies role-aware filtering: guests receive only public opportunities/events; youth receive only their own registrations, cancellations, views, and profile; staff receive activity data only for opportunities owned by their organization and no profiles; administrators receive the complete datasets. Profiles are converted into an object keyed by `userId`.
+
+The frontend saves the returned collections in React state and marks the store ready. `useApiStore.reload()` repeats bootstrap after login and logout so acquiring or clearing a token immediately replaces guest/private cached data with the correct role-scoped dataset.
 
 ### Step 8: UI renders
 
@@ -236,26 +242,24 @@ The visible screen can be `home`, `login`, `register`, `opportunities`, `calenda
 index.html
 public/
 ├── eshkol-logo.png
-├── icons.svg
 └── gallery/                         static gallery photographs
 src/
 ├── main.jsx                         browser entry point
-├── App.jsx                          root composition and navigation guards
 ├── index.css                        Tailwind import and global styling
 ├── app/
+│   ├── App.jsx                      root composition and navigation guards
 │   ├── ScreenSwitcher.jsx           screen selection
 │   ├── AppOverlays.jsx              root-level modals
 │   ├── AppStatus.jsx                loading/error screens
-│   ├── data/
-│   │   ├── useDataStore.js          data-store facade
-│   │   └── useApiStore.js           API-backed application data
+│   ├── store/
+│   │   └── useApiStore.js           API-backed live application data
 │   └── hooks/
 │       ├── useAppPreferences.js
 │       ├── useSession.js
 │       └── useToast.js
 ├── features/
 │   ├── admin/
-│   │   ├── components/              staff panel and opportunity form
+│   │   ├── opportunities/           staff/admin opportunity screen and form
 │   │   ├── statistics/              dashboard, hooks, charts, calculations
 │   │   └── users/                   user management, hook, form, filters, table
 │   ├── auth/                        login/register pages and auth hook
@@ -271,7 +275,7 @@ src/
 └── utils/                           pure storage, permission, calendar/date helpers
 ```
 
-`app/` contains application-wide orchestration. `features/` groups code by user-facing domain. `shared/` is for UI that does not belong to one domain. `services/`, `i18n/`, `data/`, and `utils/` provide lower-level capabilities used by several features.
+`app/` contains application-wide orchestration and live server state. `features/` groups code by user-facing domain. `shared/` is for UI that does not belong to one domain. `services/`, `i18n/`, `data/`, and `utils/` provide lower-level capabilities used by several features. In particular, `src/data` contains static lookup values, while `src/app/store` contains mutable API-backed state.
 
 ## `src/main.jsx`
 
@@ -287,7 +291,7 @@ src/
 
 **How it fits:** It is the boundary between the static HTML shell and the React application.
 
-## `src/App.jsx`
+## `src/app/App.jsx`
 
 **Purpose:** Composes the global application shell.
 
@@ -343,31 +347,17 @@ src/
 
 **How it fits:** It guards the main UI until the store has completed its first request.
 
-## `src/app/data/useDataStore.js`
-
-**Purpose:** Defines the application-level data-store facade.
-
-**Why it exists:** Callers depend on `useDataStore`, while the implementation can remain replaceable.
-
-**Who calls it:** `App.jsx`.
-
-**What it receives:** No parameters.
-
-**Main responsibilities:** Currently re-export `useApiStore` as the only data source.
-
-**How it fits:** It prevents the root component from depending on the implementation filename.
-
-## `src/app/data/useApiStore.js`
+## `src/app/store/useApiStore.js`
 
 **Purpose:** Holds server-backed frontend data and mutation methods.
 
 **Why it exists:** Pages should not independently duplicate bootstrap, API calls, and state synchronization.
 
-**Who calls it:** `useDataStore`/`App.jsx`.
+**Who calls it:** `App.jsx`.
 
 **What it receives:** Data returned by `api.js`; mutation parameters from feature callbacks.
 
-**Main responsibilities:** Bootstrap six datasets; expose readiness/error state; add/update/delete opportunities and events; replace an opportunity's events; deduplicate views in the current client state; register/unregister youth; update cached profiles; and provide `isRegistered`/`getProfile` selectors.
+**Main responsibilities:** Bootstrap six role-scoped datasets; expose readiness/error state and an explicit `reload()` operation; add/update/delete opportunities; replace an opportunity's events; deduplicate views in current client state; register/unregister youth; update cached profiles; and provide `isRegistered`/`getProfile` selectors.
 
 **How it fits:** It is the browser-side source of truth for the main application data after bootstrap.
 
@@ -379,11 +369,11 @@ src/
 
 **Who calls it:** `App.jsx`.
 
-**What it receives:** A safe user returned by login.
+**What it receives:** `{ user, token }` returned by login.
 
-**Main responsibilities:** Restore, save, and clear `eshkol_session` in `localStorage`.
+**Main responsibilities:** Restore, save, and clear the safe user and signed token under `eshkol_session` in tab-scoped `sessionStorage`.
 
-**How it fits:** Its `currentUser` controls navigation and role-specific presentation. It does not create a server session.
+**How it fits:** Its `currentUser` controls navigation and role-specific presentation, while `api.js` reads the same stored session to authenticate requests. Refreshing the same tab preserves login; a new tab starts as a guest.
 
 ## `src/app/hooks/useAppPreferences.js`
 
@@ -395,7 +385,7 @@ src/
 
 **What it receives:** Stored screen/theme values and user toggle actions.
 
-**Main responsibilities:** Persist screen/theme, switch Hebrew/Arabic, and update `<html lang>` and the document title.
+**Main responsibilities:** Persist the current screen in `sessionStorage`, persist theme in `localStorage`, switch Hebrew/Arabic, and update `<html lang>` and the document title. A fresh tab defaults to `home`.
 
 **How it fits:** It supplies the state used by `Navbar`, the root CSS classes, and `ScreenSwitcher`.
 
@@ -569,7 +559,7 @@ src/
 
 **How it fits:** It uses static metadata and `public/gallery`; it makes no API request.
 
-## `src/features/admin/components/StaffPanel.jsx`
+## `src/features/admin/opportunities/pages/StaffPanel.jsx`
 
 **Purpose:** Hosts opportunity management, statistics, and admin-only user management.
 
@@ -583,7 +573,7 @@ src/
 
 **How it fits:** It is the administrative feature shell. Actual API mutations come from the store or nested admin hooks.
 
-## `src/features/admin/components/OpportunityForm.jsx`
+## `src/features/admin/opportunities/components/OpportunityForm.jsx`
 
 **Purpose:** Collects bilingual opportunity and schedule fields.
 
@@ -637,7 +627,7 @@ src/
 
 **What it receives:** Endpoint-specific arguments and request bodies.
 
-**Main responsibilities:** Expose health, bootstrap, auth, opportunity, event, view, registration, profile, user, and statistics methods through one request helper.
+**Main responsibilities:** Expose bootstrap, auth, opportunity, event replacement, view, registration, user, and statistics methods through one request helper; attach the bearer token; enforce the common timeout; and parse controlled API errors.
 
 **How it fits:** No React component needs to know development proxy or production base-URL rules.
 
@@ -722,11 +712,12 @@ server/
     ├── app.js                          Express app and middleware order
     ├── db.js                           MongoDB connection singleton
     ├── middleware/
+    │   ├── auth.js                     token, role, and self-access guards
     │   ├── asyncHandler.js             forwards rejected promises
     │   └── connectDb.js                ensures database availability
     ├── routes/                         endpoint and HTTP verb declarations
     ├── controllers/                    request/response adapters
-    ├── services/                       validation and business workflows
+    ├── services/                       validation, tokens, and business workflows
     ├── repositories/                   MongoDB queries/aggregations
     ├── models/
     │   ├── collections.js              collection name constants
@@ -777,42 +768,40 @@ There is no schema library or ORM. MongoDB documents are shaped by service/model
 
 **How it fits:** Middleware calls `connectDb`; repositories call `getDb`.
 
-## `server/src/middleware/connectDb.js` and `asyncHandler.js`
+## `server/src/middleware/auth.js`, `connectDb.js`, and `asyncHandler.js`
 
-**Purpose:** Handle database readiness and asynchronous error forwarding.
+**Purpose:** Handle authentication/authorization, database readiness, and asynchronous error forwarding.
 
 **Why they exist:** These behaviors apply across endpoint families and should not be repeated in controllers.
 
-**Main responsibilities:** Return `database_unavailable` if connection fails, and convert rejected controller promises into `next(error)` for the global handler.
+**Main responsibilities:** Validate optional bearer tokens; load the current safe user; require authentication, roles, or self-access where declared; return `database_unavailable` if connection fails; and convert rejected controller promises into `next(error)` for the global handler.
 
-**How they fit:** All database routes run after connection middleware, and route definitions wrap async controllers.
+**How they fit:** All database routes run after connection and optional-auth middleware. Protected route definitions compose `requireRoles(...)` or `requireSelfOrRoles(...)` before their async controllers.
 
 ### Routes and API Contract
 
 Route files only declare HTTP methods/paths and choose controllers. This makes the public API easy to scan.
 
-| Method | Path | Route file | Main result |
+| Method | Path | Access | Main result |
 |---|---|---|---|
-| GET | `/api/health` | `health.js` | `{ ok: true }` without a DB requirement |
-| GET | `/api/organizations` | `organizations.js` | Organization documents |
-| POST | `/api/auth/login` | `auth.js` | Safe user or 401 |
-| POST | `/api/auth/register` | `auth.js` | New safe youth user |
-| GET | `/api/bootstrap` | `bootstrap.js` | Initial application datasets |
-| POST | `/api/opportunities` | `opportunities.js` | New opportunity |
-| PUT | `/api/opportunities/:id` | `opportunities.js` | Replaced/upserted opportunity |
-| DELETE | `/api/opportunities/:id` | `opportunities.js` | Deletes opportunity and its events |
-| POST | `/api/events` | `events.js` | New event |
-| DELETE | `/api/events/:id` | `events.js` | Deletes one event |
-| PUT | `/api/events/by-opportunity/:opportunityId` | `events.js` | Replaces all events for one opportunity |
-| POST | `/api/views` | `views.js` | Records a unique user/opportunity view |
-| POST | `/api/registrations` | `registrations.js` | Registration and optional profile update |
-| DELETE | `/api/registrations` | `registrations.js` | Removes registration and records cancellation |
-| GET | `/api/profiles/:userId` | `profiles.js` | Profile data or `null` |
-| GET | `/api/users` | `users.js` | Safe user list |
-| POST | `/api/users` | `users.js` | New safe user |
-| PUT | `/api/users/:id` | `users.js` | Updated safe user |
-| DELETE | `/api/users/:id` | `users.js` | Deletes a user |
-| GET | `/api/stats` | `stats.js` | Aggregated dashboard data |
+| GET | `/api/health` | Public, no DB required | `{ ok: true }` |
+| GET | `/api/organizations` | Public | Organization documents |
+| POST | `/api/auth/login` | Public | `{ user, token }` or 401 |
+| POST | `/api/auth/register` | Public | New safe youth user |
+| GET | `/api/bootstrap` | Public with optional token | Role-filtered initial datasets |
+| POST | `/api/opportunities` | `Admin`, `Staff` | New validated opportunity; staff are limited to their organization |
+| PUT | `/api/opportunities/:id` | `Admin`, owning `Staff` | Replaces an existing opportunity; never upserts |
+| DELETE | `/api/opportunities/:id` | `Admin`, owning `Staff` | Deletes opportunity plus related events, registrations, cancellations, and views |
+| POST | `/api/events` | `Admin`, owning `Staff` | New event for an existing manageable opportunity |
+| DELETE | `/api/events/:id` | `Admin`, owning `Staff` | Deletes one event; admins may also remove legacy orphans |
+| PUT | `/api/events/by-opportunity/:opportunityId` | `Admin`, owning `Staff` | Replaces all validated events for one opportunity |
+| POST | `/api/views` | Public with optional token | Records a unique view; authenticated identity comes from the token |
+| POST | `/api/registrations` | `User` | Registration and optional profile update for `req.user.id` |
+| DELETE | `/api/registrations` | `User` | Removes the caller's registration and records cancellation |
+| GET | `/api/profiles/:userId` | Self or `Admin` | Profile data or `null` |
+| GET/POST | `/api/users` | `Admin` | Safe list or new managed user |
+| PUT/DELETE | `/api/users/:id` | `Admin` | Updated or deleted user with related-data cleanup |
+| GET | `/api/stats` | `Admin`, `Staff` | Aggregated dashboard data |
 
 ## `server/src/controllers/`
 
@@ -836,14 +825,15 @@ The files follow domain boundaries: `authController`, `bootstrapController`, `op
 
 | Service | Responsibility |
 |---|---|
-| `authService.js` | Validate login/registration, reject duplicate usernames, assign youth role, hide passwords |
-| `bootstrapService.js` | Convert profile document array into a `userId`-keyed object |
-| `opportunityService.js` | Allocate IDs, create/replace opportunities, cascade event deletion |
-| `eventService.js` | Allocate IDs and add/delete/replace event occurrences |
-| `viewService.js` | Avoid duplicate views for the same opportunity/user pair |
-| `registrationService.js` | Prevent duplicates, add registration, merge profile patch, remove registration, create cancellation history |
+| `authService.js` | Trim credentials, validate login/registration, reject duplicates, return safe users, and issue signed tokens |
+| `tokenService.js` | Issue and verify eight-hour HMAC-SHA256 bearer tokens containing only user ID and expiry |
+| `bootstrapService.js` | Filter private datasets by guest/User/Staff/Admin and convert allowed profiles into a `userId`-keyed object |
+| `opportunityService.js` | Validate required fields/schedules, enforce organization ownership, return real 404s, and cascade deletion |
+| `eventService.js` | Validate parent opportunity and ownership before adding/deleting/replacing occurrences |
+| `viewService.js` | Validate the parent opportunity and avoid duplicate views for the same opportunity/user pair |
+| `registrationService.js` | Validate IDs/parent opportunity, prevent duplicates, merge profile patch, remove registration, and create cancellation history |
 | `profileService.js` | Return profile data without its storage wrapper |
-| `userService.js` | Validate admin CRUD input, enforce username uniqueness, return safe users |
+| `userService.js` | Validate roles/password/organization, enforce username uniqueness, clean related data, and return safe users |
 | `statsService.js` | Build a complete 12-month series and normalize repository aggregation output |
 | `organizationService.js` | List organizations through its repository |
 
@@ -861,12 +851,12 @@ The files follow domain boundaries: `authController`, `bootstrapController`, `op
 |---|---|
 | `bootstrapRepository.js` | Parallel reads of six startup datasets, with sorting/projection |
 | `counterRepository.js` | Atomic `$inc` sequence values for several entity types |
-| `opportunityRepository.js` | Insert, replace/upsert, and delete by numeric ID |
-| `eventRepository.js` | Insert/delete events and delete all by opportunity |
-| `registrationRepository.js` | Find/insert/remove registration and insert cancellation |
+| `opportunityRepository.js` | Find, insert, replace without upsert, and delete by numeric ID |
+| `eventRepository.js` | Find/insert/delete events and delete all by opportunity |
+| `registrationRepository.js` | Find/insert/remove registration, insert cancellation, and delete both relationship types by opportunity |
 | `profileRepository.js` | Find or upsert data by `userId` |
-| `viewRepository.js` | Find and insert a view pair |
-| `userRepository.js` | Credential/username lookup, safe projections, CRUD, and next user ID calculation |
+| `viewRepository.js` | Find/insert a view pair and delete views by opportunity |
+| `userRepository.js` | Credential/username lookup, safe projections, CRUD, monotonic user IDs, and related-data cleanup |
 | `organizationRepository.js` | Return organizations without Mongo `_id` |
 | `statsRepository.js` | Counts, distinct organizations, lookups, grouping, sorting, and monthly aggregation pipelines |
 
@@ -907,6 +897,18 @@ The files follow domain boundaries: `authController`, `bootstrapController`, `op
 | `counters` | Sequence values used for numeric IDs |
 
 Indexes are not created in the current repository code. Duplicate prevention for registrations/views is currently implemented by a read before insert, while counters provide atomic numeric sequences.
+
+### Authentication and Authorization Model
+
+1. `POST /api/auth/login` validates credentials and returns `{ user, token }`.
+2. `tokenService.js` signs an HMAC-SHA256 token containing the user ID (`sub`) and an eight-hour expiry (`exp`). The signing secret comes from `AUTH_SECRET`; the MongoDB URI and a development-only constant are fallbacks for local compatibility.
+3. The frontend keeps the user and token together in `sessionStorage`. Refreshing the same tab preserves the session, while opening a fresh tab starts at `home` as a guest. Only the theme preference remains in `localStorage`.
+4. `api.js` adds `Authorization: Bearer <token>` to authenticated requests.
+5. `optionalAuth` verifies the signature and expiry, reloads the current safe user from MongoDB, and sets `req.user`. Roles are therefore taken from current database state rather than trusted token or request-body claims.
+6. Route guards require authentication, accepted roles, or the same user ID where appropriate. Services also enforce staff organization ownership and replace client-supplied identity fields with `req.user.id` for registrations, cancellations, and views.
+7. `GET /api/bootstrap` is role-aware: guests receive public opportunity/event data, youth receive their own activity/profile data, staff receive organization-scoped management data, and admins receive complete administrative data.
+
+The remaining security limitation is password storage: current user documents still contain directly compared password values. A production hardening step should migrate these values to a slow salted password hash and require a strong production `AUTH_SECRET`.
 
 ---
 
@@ -959,7 +961,7 @@ React re-renders overlays/pages; toast confirms success
 
 | Who | Depends on | For |
 |---|---|---|
-| `src/main.jsx` | `src/App.jsx`, `src/index.css` | Start the React UI |
+| `src/main.jsx` | `src/app/App.jsx`, `src/index.css` | Start the React UI |
 | `App.jsx` | app hooks, routes, overlays, shared navigation | Compose global state and UI |
 | `ScreenSwitcher` | feature pages/containers | Choose the active screen |
 | Feature pages | feature hooks/components, data, i18n, utils | Implement user-facing domains |
@@ -987,9 +989,9 @@ React re-renders overlays/pages; toast confirms success
 5. **Role decision:** `requestRegistration` sends guests to `login`, rejects staff/admin with a toast, or opens `RegistrationModal` for a youth user.
 6. **Profile input:** `RegistrationModal` receives `store.getProfile(currentUser.id)`. If no settlement is present, it collects settlement and interest categories. Otherwise it sends `null` as the patch.
 7. **Frontend function:** Confirmation calls `useOpportunityWorkflow.confirmRegistration`, which calls `store.register(userId, opportunityId, profilePatch)`.
-8. **API request:** `api.register` sends `POST /api/registrations` with JSON `{ userId, opportunityId, profilePatch }`.
-9. **Backend route/controller:** `routes/registrations.js` calls `registrationController.register`, which passes the request body to `registrationService.register`.
-10. **Business rule:** The service uses `registrationRepository.find` to reject an existing user/opportunity pair with HTTP `409`.
+8. **API request:** `api.register` sends `POST /api/registrations` with the bearer token and JSON `{ userId, opportunityId, profilePatch }`.
+9. **Backend authorization:** `requireRoles("User")` requires a valid youth token. The controller overwrites any body `userId` with `req.user.id`, so callers cannot register another account.
+10. **Business rule:** The service validates numeric IDs and verifies that the opportunity exists, then uses `registrationRepository.find` to reject an existing user/opportunity pair with HTTP `409`.
 11. **Database action:** The counter repository allocates the next registration ID, `entities.createRegistration` adds `createdAt`, and the registration repository inserts the document.
 12. **Optional database action:** When `profilePatch` exists, the service reads the previous profile, merges it, and upserts `{ userId, data }`.
 13. **Response:** The controller returns HTTP `201` with `{ ok: true, registration }`.
@@ -1003,28 +1005,29 @@ React re-renders overlays/pages; toast confirms success
 ### 1. Login and Browser Session
 
 1. `LoginPage` validates username/password and calls `useAuthActions.login`.
-2. `api.login` sends `POST /api/auth/login`.
-3. `authService` asks `userRepository.findByCredentials` for an exact username/password match.
+2. `api.login` sends public `POST /api/auth/login`.
+3. `authService` trims the credentials and asks `userRepository.findByCredentials` for a match.
 4. Invalid credentials become `AppError(401, "invalid_credentials")`.
-5. A valid user passes through `toSafeUser`, removing `password` and `_id`.
-6. `App.handleLogin` saves the user through `useSession` and routes staff/admin to `admin`, or youth to `opportunities`.
-7. Refresh restores the safe user object from `localStorage`; no token is checked with the server.
+5. A valid account passes through `toSafeUser`; `tokenService.issueToken` signs `{ sub, exp }` and login returns `{ user, token }`.
+6. `App.handleLogin` saves the pair through `useSession`, calls `store.reload()` so bootstrap becomes role-aware, and routes staff/admin to `admin` or youth to `opportunities`.
+7. `api.js` reads the session and attaches the token to later requests. Server middleware verifies the signature/expiry and reloads the current account from MongoDB, so deleted users and changed roles take effect immediately.
+8. Refreshing the same tab restores the pair from `sessionStorage`; closing/opening a tab starts at `home` as a guest. Logout clears the session before reloading public bootstrap data.
 
 ### 2. Opening an Opportunity and Recording a View
 
 1. A card, calendar item, or registration item calls `openOpportunity`.
 2. The workflow immediately selects it for the detail modal.
 3. `useApiStore.recordView` checks the already-loaded `views` array for the same `opportunityId` and user (or `null` guest).
-4. If not present, it sends `POST /api/views`.
-5. `viewService` performs a second database lookup, inserts a timestamped view only when missing, and returns either the new view or `skipped: true`.
+4. If not present, it sends `POST /api/views`; a supplied body `userId` is ignored.
+5. `viewController` uses `req.user.id` when authenticated or `null` for a guest. `viewService` validates the opportunity, performs a second duplicate lookup, and returns either the new view or `skipped: true`.
 6. The client appends a local view record after the API succeeds.
 
 ### 3. Cancelling a Registration
 
 1. The youth confirms cancellation in `MyRegistrationsPage` or the detail modal.
 2. `useOpportunityWorkflow.cancelRegistration` calls `store.unregister`.
-3. `api.unregister` sends `DELETE /api/registrations` with the user/opportunity IDs in a JSON body.
-4. `registrationService.unregister` removes the active registration.
+3. `api.unregister` sends authenticated `DELETE /api/registrations` with the opportunity ID.
+4. The route requires `User`, and the controller overwrites body identity with `req.user.id` before `registrationService.unregister` removes the active registration.
 5. If nothing was deleted, it returns a controlled `404`.
 6. Otherwise it allocates a cancellation ID and inserts a timestamped cancellation record.
 7. The frontend removes the registration from state, closes the matching selected opportunity if needed, and shows a toast.
@@ -1035,9 +1038,9 @@ React re-renders overlays/pages; toast confirms success
 2. The form validates bilingual titles, organization, city, complete start/end date and time fields, date order, and time order.
 3. If a date range exists, `buildCalendarEvents` creates occurrence definitions.
 4. Create calls `POST /api/opportunities`; edit calls `PUT /api/opportunities/:id`.
-5. `opportunityService` creates the document and repository write. A new ID comes from the counters collection.
+5. Server role middleware requires `Staff`/`Admin`. `opportunityService` repeats validation, verifies ownership for staff, returns 404 for missing IDs, and writes without upsert. A new ID comes from the counters collection.
 6. `StaffPanel` then calls `PUT /api/events/by-opportunity/:opportunityId` to replace occurrence documents.
-7. `eventService` deletes old events and inserts newly numbered events one by one.
+7. `eventService` verifies that the parent opportunity exists and is manageable, deletes old events, and inserts newly numbered events one by one.
 8. `useApiStore` updates opportunity/event arrays and the staff panel shows success feedback.
 
 ### 5. Statistics Dashboard
@@ -1116,9 +1119,9 @@ React re-renders overlays/pages; toast confirms success
 
 ### Middleware
 
-**Why it exists:** CORS, JSON parsing, database readiness, and async error forwarding are cross-cutting request behavior.
+**Why it exists:** CORS, JSON parsing, database readiness, bearer-token parsing, authorization guards, and async error forwarding are cross-cutting request behavior.
 
-**What breaks without it:** Every endpoint must repeat setup and error handling, or failed promises/connections may leave inconsistent responses.
+**What breaks without it:** Every endpoint must repeat setup, authentication, role/self checks, and error handling, increasing the risk of inconsistent responses or unauthorized access.
 
 ### Utilities and Static Data
 
@@ -1149,12 +1152,12 @@ React re-renders overlays/pages; toast confirms success
 | `controllers` | HTTP adapters | Read `req`, call service, write `res` |
 | `repositories` | Persistence adapters | MongoDB reads, writes, projections, and aggregations |
 | `models` | Entity/storage definitions | Collection constants and document creation/sanitization |
-| `middleware` | Functions in the Express request chain | DB readiness and async error forwarding |
+| `middleware` | Functions in the Express request chain | DB readiness, bearer authentication, authorization guards, and async error forwarding |
 | `utils` | Reusable helpers with no primary UI role | Dates, storage, permissions, calendar/schedule math, `AppError` |
 | `data` | Static reference data | Organizations, opportunity options, gallery metadata |
 | `i18n` | Internationalization/localization | Translation dictionaries and translation helpers |
 | `api` | Deployment-facing API entry | Vercel function exporting Express |
-| `public` | Files served directly at root paths | Logo, icons, gallery images |
+| `public` | Files served directly at root paths | Logo and gallery images |
 
 ---
 
@@ -1164,7 +1167,7 @@ React re-renders overlays/pages; toast confirms success
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ Browser                                                                      │
 │                                                                              │
-│ index.html -> src/main.jsx -> src/App.jsx                                    │
+│ index.html -> src/main.jsx -> src/app/App.jsx                                │
 │                              │                                               │
 │             ┌────────────────┼──────────────────┐                            │
 │             v                v                  v                            │
@@ -1182,7 +1185,7 @@ React re-renders overlays/pages; toast confirms success
 │             └──────────┬─────────┘                                           │
 │                        v                                                     │
 │                 src/services/api.js                                          │
-│             Fetch + JSON + 15 s timeout                                      │
+│             Fetch + JSON + bearer token + 15 s timeout                       │
 └────────────────────────┬─────────────────────────────────────────────────────┘
                          │ HTTP /api/*
             Development  │ Vite proxy -> localhost:3001
@@ -1191,7 +1194,7 @@ React re-renders overlays/pages; toast confirms success
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ Express application: server/src/app.js                                      │
 │                                                                              │
-│ cors -> express.json -> /health -> connectDb middleware -> domain routes     │
+│ cors -> JSON -> /health -> DB -> optionalAuth -> guarded domain routes       │
 │                                                               │              │
 │                                                               v              │
 │  routes/                                                               │     │
@@ -1202,7 +1205,7 @@ React re-renders overlays/pages; toast confirms success
 │  controllers/   request/body/params -> service -> JSON/status                │
 │       │                                                                      │
 │       v                                                                      │
-│  services/      validation, IDs, workflows, normalization, errors            │
+│  services/      validation, IDs, authorization, workflows, cascades, errors  │
 │       │                  │                                                   │
 │       │                  └--> models/entities.js + utils/AppError.js          │
 │       v                                                                      │
@@ -1222,7 +1225,7 @@ React re-renders overlays/pages; toast confirms success
 └──────────────────────────────────────────────────────────────────────────────┘
 
 External/runtime inputs:
-- `.env`: MongoDB URI and database name
+- `.env`: MongoDB URI, database name, and `AUTH_SECRET`
 - Google public DNS configured by db.js for SRV resolution
 - Google Fonts loaded by index.html (Heebo)
 - Vercel deployment/proxy layer in production
@@ -1258,7 +1261,7 @@ Routes make the API paths and verbs explicit. Controllers translate HTTP-shaped 
 
 ### Why do we have Middleware?
 
-Middleware applies behavior needed across requests: CORS headers, JSON parsing, database readiness, and rejected-promise forwarding. The health endpoint is intentionally mounted before database middleware.
+Middleware applies behavior needed across requests: CORS headers, JSON parsing, database readiness, optional bearer-token authentication, role/self authorization, and rejected-promise forwarding. The health endpoint is intentionally mounted before database and authentication middleware.
 
 ### How does the database connect to everything?
 
@@ -1266,16 +1269,18 @@ Middleware applies behavior needed across requests: CORS headers, JSON parsing, 
 
 ### What happens internally when a user performs any action?
 
-A component calls a callback or hook. If the action needs persistence, the hook/store calls `api.js`, which sends JSON to Express. Middleware runs, a route selects a controller, the controller calls a service, and the service uses repositories/models to read or change MongoDB. JSON returns through the same layers, React state updates, and React re-renders the affected UI.
+A component calls a callback or hook. If the action needs persistence, the hook/store calls `api.js`, which sends JSON and the current bearer token to Express. Middleware verifies the token and loads `req.user`; route guards check access, a controller calls a service, and the service applies business and ownership rules before using repositories/models to read or change MongoDB. JSON returns through the same layers, React state updates, and React re-renders the affected UI.
 
 ### If I had to explain this architecture to my lecturer in 5 minutes, what would I say?
 
-> Eshkol Bet Hakerem is a full-stack JavaScript platform for youth opportunities in Hebrew and Arabic. The frontend is a React Single Page Application built with Vite and Tailwind. It does not use React Router; a saved `currentScreen` value and `ScreenSwitcher` choose the visible screen. `App.jsx` is the composition root, while domain code is organized into features such as authentication, opportunities, registrations, calendar, and administration.
+> Eshkol Bet Hakerem is a full-stack JavaScript platform for youth opportunities in Hebrew and Arabic. The frontend is a React Single Page Application built with Vite and Tailwind. It does not use React Router; `ScreenSwitcher` chooses the visible screen and the current screen is kept in `sessionStorage`, so a fresh tab opens at `home` as a guest while refreshing the same tab preserves its session. `App.jsx` is the composition root, while domain code is organized into features such as authentication, opportunities, registrations, calendar, and administration.
 >
-> The frontend loads its main data once through `GET /api/bootstrap` and keeps it in a custom React hook called `useApiStore`. Focused hooks manage the session, preferences, notifications, filters, registration workflow, users, and statistics. All HTTP calls go through one Fetch wrapper with JSON handling and a timeout.
+> The frontend loads role-filtered data through `GET /api/bootstrap` and keeps it in a custom React hook called `useApiStore`; the store reloads after login and logout so the visible dataset matches the current identity. Focused hooks manage the session, preferences, notifications, filters, registration workflow, users, and statistics. All HTTP calls go through one Fetch wrapper with JSON handling, bearer authentication, and a timeout.
 >
-> The backend is an Express REST API organized into routes, controllers, services, and repositories. Routes define paths, controllers handle HTTP, services contain rules, and repositories are the only normal runtime modules that query MongoDB. Shared middleware handles CORS, JSON, database connection, and asynchronous errors.
+> The backend is an Express REST API organized into routes, controllers, services, and repositories. Routes define paths and access guards, controllers adapt HTTP, services contain validation, ownership, cascade, and workflow rules, and repositories are the only normal runtime modules that query MongoDB. Shared middleware handles CORS, JSON, database connection, signed-token authentication, authorization, and asynchronous errors.
 >
 > Locally, Vite starts both the frontend and Express and proxies `/api` to port 3001. In production, Vercel serves the Vite build and sends `/api` requests to the same Express app through `api/index.js`. MongoDB stores users, opportunities, events, registrations, cancellations, views, profiles, organizations, and counters.
 >
-> The main strength is separation of responsibilities: UI, browser workflows, HTTP transport, server business rules, and persistence each have a clear layer. The main current limitations to mention are that navigation is state-based rather than URL-based and authentication is browser-local with no backend authorization middleware. Calendar data has both generated events and legacy opportunity dates, so a frontend compatibility utility normalizes both representations for display.
+> Authentication uses an eight-hour HMAC-signed token stored per tab in `sessionStorage`. The server reloads the user from MongoDB, derives identity from the token, checks roles and staff organization ownership, and filters bootstrap data by role. Deleting opportunities or users also cascades dependent records to avoid orphaned data.
+>
+> The main strength is separation of responsibilities: UI, browser workflows, HTTP transport, server security/business rules, and persistence each have a clear layer. The main current limitations to mention are that navigation is state-based rather than URL-based and passwords still require migration to slow salted hashes. Calendar data has both generated events and legacy opportunity dates, so a frontend compatibility utility normalizes both representations for display.

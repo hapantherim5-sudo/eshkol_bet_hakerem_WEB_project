@@ -16,6 +16,7 @@ import registrationsRouter from './routes/registrations.js';
 import profilesRouter from './routes/profiles.js';
 import usersRouter from './routes/users.js';
 import statsRouter from './routes/stats.js';
+import { optionalAuth } from './middleware/auth.js';
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api', healthRouter);
 app.use(connectDbMiddleware);
+app.use(optionalAuth);
 app.use('/api', organizationsRouter);
 app.use('/api', authRouter);
 app.use('/api', bootstrapRouter);

@@ -1,11 +1,13 @@
 import * as users from '../repositories/userRepository.js';
 import { createUser, toSafeUser } from '../models/entities.js';
 import { AppError } from '../utils/AppError.js';
+import { issueToken } from './tokenService.js';
 
 export async function login(username, password) {
-  const user = await users.findByCredentials(username, password);
+  const user = await users.findByCredentials(username?.trim(), password?.trim());
   if (!user) throw new AppError(401, 'invalid_credentials');
-  return toSafeUser(user);
+  const safeUser = toSafeUser(user);
+  return { user: safeUser, token: issueToken(safeUser) };
 }
 
 export async function register({ name, username, password }) {

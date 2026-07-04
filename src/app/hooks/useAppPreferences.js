@@ -8,10 +8,7 @@ import {
 } from '../../utils/storage';
 
 export function useAppPreferences() {
-  const [currentScreen, setCurrentScreen] = useState(() => {
-    const savedScreen = loadCurrentScreen();
-    return savedScreen === 'about' ? 'home' : savedScreen;
-  });
+  const [currentScreen, setCurrentScreen] = useState(() => loadCurrentScreen());
   const [theme, setTheme] = useState(() => loadTheme());
   const [lang, setLang] = useState('he');
 

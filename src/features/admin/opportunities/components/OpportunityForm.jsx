@@ -1,15 +1,15 @@
-// File: src/components/staff/OpportunityForm.jsx
+// File: src/features/admin/opportunities/components/OpportunityForm.jsx
 // Purpose: OpportunityForm component
-// Role: React component for OpportunityForm
+// Role: opportunity create/edit form used by the admin screen
 
 import { useState } from 'react';
 import {
   CATEGORIES, DEFAULT_REGISTRATION, OPPORTUNITY_SCOPES, OPPORTUNITY_TYPES, STATUSES,
-} from '../../../data/opportunityOptions';
-import { ORGANIZATIONS, getOrgName } from '../../../data/organizations';
-import { useT } from '../../../i18n/i18n';
-import { buildCalendarEvents } from '../../../utils/scheduleEvents';
-import DateInputIL from '../../../shared/components/DateInputIL';
+} from '../../../../data/opportunityOptions';
+import { ORGANIZATIONS, getOrgName } from '../../../../data/organizations';
+import { useT } from '../../../../i18n/i18n';
+import { buildCalendarEvents } from '../../../../utils/scheduleEvents';
+import DateInputIL from '../../../../shared/components/DateInputIL';
 
 // empty — handles empty
 const empty = (defaults = {}) => ({

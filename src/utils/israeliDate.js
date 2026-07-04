@@ -43,14 +43,3 @@ export function formatIsraeliDate(isoOrDate) {
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
-
-// formatIsraeliDateTime — handles formatIsraeliDateTime
-export function formatIsraeliDateTime(iso) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleString('he-IL', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', hour12: false,
-  });
-}

@@ -19,3 +19,10 @@ export function remove(userId, opportunityId) {
 export function insertCancellation(cancellation) {
   return cancellations().insertOne(cancellation);
 }
+
+export function deleteByOpportunityId(opportunityId) {
+  return Promise.all([
+    registrations().deleteMany({ opportunityId }),
+    cancellations().deleteMany({ opportunityId }),
+  ]);
+}

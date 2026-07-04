@@ -1,4 +1,4 @@
-// File: src/hooks/useApiStore.js
+// File: src/app/store/useApiStore.js
 // Purpose: useApiStore script
 // Role: custom hook for backend data fetching and mutation
 
@@ -18,20 +18,36 @@ export function useApiStore() {
   const [views, setViews] = useState([]);
   const [profiles, setProfiles] = useState({});
 
+  const applyBootstrap = useCallback(data => {
+    setLoadError(null);
+    setOpportunities(data.opportunities || []);
+    setEvents(data.events || []);
+    setRegistrations(data.registrations || []);
+    setCancellations(data.cancellations || []);
+    setViews(data.views || []);
+    setProfiles(data.profiles || {});
+  }, []);
+
+  const reload = useCallback(async () => {
+    try {
+      const data = await api.bootstrap();
+      applyBootstrap(data);
+      return data;
+    } catch (error) {
+      setLoadError(error);
+      throw error;
+    } finally {
+      setReady(true);
+    }
+  }, [applyBootstrap]);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        // bootstrap initial app data from backend
         const data = await api.bootstrap();
         if (cancelled) return;
-        setLoadError(null);
-        setOpportunities(data.opportunities);
-        setEvents(data.events);
-        setRegistrations(data.registrations);
-        setCancellations(data.cancellations);
-        setViews(data.views);
-        setProfiles(data.profiles || {});
+        applyBootstrap(data);
       } catch (e) {
         if (!cancelled) setLoadError(e);
         console.error('API bootstrap failed:', e);
@@ -40,7 +56,7 @@ export function useApiStore() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [applyBootstrap]);
 
   const addOpportunity = useCallback(async opp => {
     const item = await api.addOpportunity(opp);
@@ -57,17 +73,6 @@ export function useApiStore() {
     await api.deleteOpportunity(id);
     setOpportunities(prev => prev.filter(o => o.id !== id));
     setEvents(prev => prev.filter(e => e.opportunityId !== id));
-  }, []);
-
-  const addEvent = useCallback(async ev => {
-    const item = await api.addEvent(ev);
-    setEvents(prev => [...prev, item]);
-    return item;
-  }, []);
-
-  const deleteEvent = useCallback(async id => {
-    await api.deleteEvent(id);
-    setEvents(prev => prev.filter(e => e.id !== id));
   }, []);
 
   const replaceEventsForOpportunity = useCallback(async (opportunityId, eventDefs) => {
@@ -132,11 +137,10 @@ export function useApiStore() {
     cancellations,
     views,
     profiles,
+    reload,
     addOpportunity,
     updateOpportunity,
     deleteOpportunity,
-    addEvent,
-    deleteEvent,
     replaceEventsForOpportunity,
     recordView,
     register,

@@ -3,6 +3,10 @@ import { COLLECTIONS } from '../models/collections.js';
 
 const events = () => getDb().collection(COLLECTIONS.events);
 
+export function findById(id) {
+  return events().findOne({ id });
+}
+
 export function insert(event) {
   return events().insertOne(event);
 }
