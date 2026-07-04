@@ -10,3 +10,7 @@ export function find(opportunityId, userId) {
 export function insert(view) {
   return views().insertOne(view);
 }
+
+export function deleteByOpportunityId(opportunityId) {
+  return views().deleteMany({ opportunityId });
+}

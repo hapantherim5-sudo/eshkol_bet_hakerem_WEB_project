@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import { loadSession, saveSession } from '../../utils/storage';
 
 export function useSession() {
-  const [currentUser, setCurrentUser] = useState(() => loadSession());
+  const [currentUser, setCurrentUser] = useState(() => loadSession()?.user || null);
 
-  const signIn = useCallback(user => {
-    setCurrentUser(user);
-    saveSession(user);
+  const signIn = useCallback(session => {
+    setCurrentUser(session.user);
+    saveSession(session);
   }, []);
 
   const signOut = useCallback(() => {

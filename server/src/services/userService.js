@@ -11,6 +11,7 @@ export async function createUserAccount(input) {
   if (!name?.trim() || !username?.trim() || !password?.trim() || !role) {
     throw new AppError(400, 'missing_fields');
   }
+  validateAccountFields({ password, role, organizationId });
   if (await users.findByUsername(username.trim())) throw new AppError(409, 'username_taken');
 
   const id = await users.getNextUserId();
@@ -21,6 +22,7 @@ export async function createUserAccount(input) {
 
 export async function updateUserAccount(id, input) {
   assertValidId(id);
+  validateAccountFields(input || {}, true);
   const { username } = input || {};
   if (username?.trim() && await users.findUsernameConflict(username.trim(), id)) {
     throw new AppError(409, 'username_taken');
@@ -36,8 +38,21 @@ export async function deleteUserAccount(id) {
   assertValidId(id);
   const result = await users.deleteById(id);
   if (result.deletedCount === 0) throw new AppError(404, 'not_found');
+  await users.deleteRelatedData(id);
 }
 
 function assertValidId(id) {
   if (Number.isNaN(id)) throw new AppError(400, 'invalid_id');
+}
+
+function validateAccountFields({ password, role, organizationId }, partial = false) {
+  if (password !== undefined && password.trim().length < 4) {
+    throw new AppError(400, 'password_too_short');
+  }
+  if (role !== undefined && !['User', 'Staff', 'Admin'].includes(role)) {
+    throw new AppError(400, 'invalid_role');
+  }
+  if ((!partial || role === 'Staff') && role === 'Staff' && !organizationId) {
+    throw new AppError(400, 'organization_required');
+  }
 }

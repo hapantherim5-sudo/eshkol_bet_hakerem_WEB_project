@@ -84,16 +84,11 @@ button:disabled,
   from { opacity: 0; transform: scale(0.90); }
   to   { opacity: 1; transform: scale(1); }
 }
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
 @keyframes gentlePulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.65; }
 }
 .animate-scale-in      { animation: scaleIn       0.3s  ease-out both; }
-.animate-slide-right   { animation: slideInRight  0.35s ease-out both; }
 .animate-pulse-gentle  { animation: gentlePulse   2.4s  ease-in-out infinite; }
 
 /* Gallery masonry columns */
@@ -106,13 +101,6 @@ button:disabled,
 .gallery-masonry > * { break-inside: avoid; margin-bottom: 1rem; }
 
 /* Nav active glow */
-
-/* Glass card */
-.glass-card {
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
 
 /* Dark theme overrides for components that use fixed light utility classes. */
 .app-dark {
@@ -184,10 +172,6 @@ button:disabled,
   background-color: #475569;
 }
 
-.app-dark .glass-card {
-  background: rgba(30, 41, 59, 0.88);
-}
-
 .app-dark .admin-toolbar {
   background: rgba(30, 41, 59, 0.95);
   border-color: #475569;
@@ -204,12 +188,9 @@ button:disabled,
 }
 
 .app-dark .stats-conversion-views .text-violet-700 { color: #c4b5fd; }
-.app-dark .stats-conversion-views .text-violet-500 { color: #a78bfa; }
 .app-dark .stats-conversion-registrations .text-emerald-700 { color: #6ee7b7; }
-.app-dark .stats-conversion-registrations .text-emerald-500 { color: #86efac; }
 .app-dark .stats-conversion-rate { color: #60a5fa; }
 .app-dark .stats-conversion-track { background-color: #334155; }
-.app-dark .stats-conversion-note { color: #94a3b8; }
 
 /* Statistics KPI strip: one calm accent and crisp, non-emoji icons. */
 .stats-kpi-icon svg {
@@ -231,55 +212,8 @@ button:disabled,
 .app-dark .stats-kpi-value { color: #f8fafc; }
 .app-dark .stats-kpi-label { color: #cbd5e1; }
 
-.stats-kpi-card--success .stats-kpi-icon { background-color: #ecfdf5; color: #059669; }
-.stats-kpi-card--success .stats-kpi-value { color: #047857; }
-.stats-kpi-card--danger .stats-kpi-icon { background-color: #fff1f2; color: #e11d48; }
-.stats-kpi-card--danger .stats-kpi-value { color: #be123c; }
-.stats-kpi-card--teal .stats-kpi-icon { background-color: #ecfeff; color: #0891b2; }
-.stats-kpi-card--teal .stats-kpi-value { color: #0e7490; }
-
-.app-dark .stats-kpi-card--neutral .stats-kpi-icon { background-color: #334155; color: #cbd5e1; }
-.app-dark .stats-kpi-card--success .stats-kpi-icon { background-color: #15362b; color: #6ee7b7; }
-.app-dark .stats-kpi-card--success .stats-kpi-value { color: #6ee7b7; }
-.app-dark .stats-kpi-card--danger .stats-kpi-icon { background-color: #3b1d28; color: #fda4af; }
-.app-dark .stats-kpi-card--danger .stats-kpi-value { color: #fda4af; }
-.app-dark .stats-kpi-card--teal .stats-kpi-icon { background-color: #15343a; color: #67e8f9; }
-.app-dark .stats-kpi-card--teal .stats-kpi-value { color: #67e8f9; }
-
-/* Keep the community-benefit cards readable and colorful in dark mode. */
-.app-dark .community-perk {
-  border-color: #334155;
-}
-
-.app-dark .community-perk:nth-child(1) { background-color: #352c16; }
-.app-dark .community-perk:nth-child(2) { background-color: #351f2b; }
-.app-dark .community-perk:nth-child(3) { background-color: #2d2648; }
-.app-dark .community-perk:nth-child(4) { background-color: #15362b; }
-
-.app-dark .community-perk:nth-child(1) .community-perk-title { color: #fcd34d; }
-.app-dark .community-perk:nth-child(2) .community-perk-title { color: #f9a8d4; }
-.app-dark .community-perk:nth-child(3) .community-perk-title { color: #c4b5fd; }
-.app-dark .community-perk:nth-child(4) .community-perk-title { color: #6ee7b7; }
-
-.app-dark .community-perk-description {
-  color: #cbd5e1;
-}
-
-.app-dark .home-cta-login {
-  color: #ffffff;
-}
-
 .app-dark .home-hero-explore {
   color: #ffffff;
-}
-
-.app-dark .home-welcome-card {
-  background: linear-gradient(135deg, #1e293b, #172b2a);
-  border-color: #334155;
-}
-
-.app-dark .home-welcome-subtitle {
-  color: #cbd5e1;
 }
 
 .app-dark .login-page,
@@ -316,10 +250,6 @@ button:disabled,
   color: #ecfdf5;
 }
 
-.app-dark .login-demo-staff {
-  color: #86efac;
-}
-
 .app-dark .modal-register-btn {
   box-shadow: none;
 }
@@ -349,14 +279,6 @@ button:disabled,
   color: #ecfdf5;
 }
 
-.about-hero {
-  background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
-}
-
-.app-dark .about-hero {
-  background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
-}
-
 .app-dark .home-about-stats,
 .app-dark .about-home-intro,
 .app-dark .about-info-card,
@@ -375,20 +297,12 @@ button:disabled,
   background: #0f172a;
 }
 
-.app-dark .about-email-chip {
-  background-color: #0f766e;
-  color: #ffffff;
-  box-shadow: none;
-}
-
 /* One muted plum accent shared throughout the site. */
-.plum-gradient,
 .home-login-cta {
   background: linear-gradient(135deg, #5550a5, #6c4e9b, #885fb0);
 }
 
 /* Keep that same accent family restrained in dark mode. */
-.app-dark .plum-gradient,
 .app-dark .home-login-cta {
   background: linear-gradient(135deg, #363052, #49335f, #5a3d67);
 }

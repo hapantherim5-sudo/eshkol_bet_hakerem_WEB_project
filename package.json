@@ -8,6 +8,7 @@
     "dev:server": "npm --prefix server run dev",
     "build": "vite build",
     "lint": "eslint .",
+    "check": "npm run lint && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,7 +19,6 @@
     "mongodb": "^6.21.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-is": "^19.2.7",
     "recharts": "^3.8.1"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@
 // Purpose: RegistrationModal component
 // Role: React component for RegistrationModal
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { CATEGORIES } from '../../../data/opportunityOptions';
 import { useT } from '../../../i18n/i18n';
 import { getOpportunityDisplaySchedule } from '../../../utils/opportunitySchedule';
@@ -18,6 +18,7 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
   const [interests, setInterests]   = useState(profile?.interests || []);
   const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const submissionInFlight = useRef(false);
 
   const toggleInterest = id => {
     setInterests(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -25,17 +26,21 @@ function RegistrationModal({ opportunity, lang, profile, onConfirm, onClose }) {
 
   // handleConfirm — handles Confirm
   const handleConfirm = async () => {
-    if (submitting) return;
+    // React state updates after this handler returns, so use a synchronous
+    // guard to prevent two rapid clicks from sending two API requests.
+    if (submissionInFlight.current) return;
     if (needsProfile && !settlement.trim()) {
       setValidationError(t('reg_city_required'));
       return;
     }
 
     setValidationError('');
+    submissionInFlight.current = true;
     setSubmitting(true);
     try {
       await onConfirm(needsProfile ? { settlement: settlement.trim(), interests } : null);
     } finally {
+      submissionInFlight.current = false;
       setSubmitting(false);
     }
   };

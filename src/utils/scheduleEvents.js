@@ -15,7 +15,7 @@ const WEEKDAY_NAMES = [
 ];
 
 // parseWeekdays — handles parseWeekdays
-export function parseWeekdays(daysStr) {
+function parseWeekdays(daysStr) {
   // No weekday specified means the activity repeats every day.
   if (!daysStr?.trim()) return null;
   const found = new Set();
@@ -26,7 +26,7 @@ export function parseWeekdays(daysStr) {
 }
 
 // parseStartTime — handles parseStartTime
-export function parseStartTime(timeStr) {
+function parseStartTime(timeStr) {
   if (!timeStr?.trim()) return '09:00';
   const part = timeStr.trim().split(/[-–]/)[0].trim();
   const m = part.match(/^(\d{1,2}):(\d{2})/);

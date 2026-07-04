@@ -26,8 +26,8 @@ function LoginPage({ lang, onLogin, onNavigate }) {
     setError('');
     setLoading(true);
     try {
-      const user = await login(username, password);
-      onLogin(user);
+      const session = await login(username, password);
+      await onLogin(session);
     } catch (e) {
       if (e.status === 401) {
         setError(t('login_err_credentials'));

@@ -1,19 +1,19 @@
-// File: src/components/staff/StaffPanel.jsx
+// File: src/features/admin/opportunities/pages/StaffPanel.jsx
 // Purpose: StaffPanel component
-// Role: React component for StaffPanel
+// Role: administrative opportunity-management screen
 
 import { useLayoutEffect, useRef, useState } from 'react';
-import { filterManageable, canManageOpportunity } from '../../../utils/permissions';
-import { getOrgName, getCityName } from '../../../data/organizations';
-import { useT } from '../../../i18n/i18n';
-import OpportunityForm from './OpportunityForm';
-import UserManagement from '../users/UserManagement';
-import StatsDashboard from '../statistics/StatsDashboard';
-import ConfirmModal from '../../../shared/components/ConfirmModal';
+import { filterManageable, canManageOpportunity } from '../../../../utils/permissions';
+import { getOrgName, getCityName } from '../../../../data/organizations';
+import { useT } from '../../../../i18n/i18n';
+import OpportunityForm from '../components/OpportunityForm';
+import UserManagement from '../../users/UserManagement';
+import StatsDashboard from '../../statistics/StatsDashboard';
+import ConfirmModal from '../../../../shared/components/ConfirmModal';
 
 // StaffPanel — renders StaffPanel
 function StaffPanel({
-  lang, currentUser, opportunities, views, registrations, cancellations, profiles,
+  lang, currentUser, opportunities, views, registrations, cancellations,
   onAdd, onUpdate, onDelete, onReplaceEventsForOpportunity, showToast,
 }) {
   const isAr = lang === 'ar';
@@ -206,7 +206,6 @@ function StaffPanel({
           registrations={registrations}
           cancellations={cancellations}
           views={views}
-          profiles={profiles}
           lang={lang}
           showToast={showToast}
         />

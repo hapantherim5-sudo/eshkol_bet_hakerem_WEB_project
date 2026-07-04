@@ -1,4 +1,4 @@
-import StaffPanel from '../features/admin/components/StaffPanel';
+import StaffPanel from '../features/admin/opportunities/pages/StaffPanel';
 import LoginPage from '../features/auth/pages/LoginPage';
 import RegisterPage from '../features/auth/pages/RegisterPage';
 import EventsCalendar from '../features/calendar/components/EventsCalendar';
@@ -77,7 +77,6 @@ export default function ScreenSwitcher({
           views={store.views}
           registrations={store.registrations}
           cancellations={store.cancellations}
-          profiles={store.profiles}
           onAdd={store.addOpportunity}
           onUpdate={store.updateOpportunity}
           onDelete={store.deleteOpportunity}

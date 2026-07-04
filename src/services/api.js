@@ -2,6 +2,8 @@
 // Purpose: api script
 // Role: frontend API client wrapper with timeout/error handling
 
+import { loadSession } from '../utils/storage';
+
 /** In production always use same-origin /api - ignore VITE_API_URL from Vercel env. */
 const BASE = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || '');
 
@@ -14,12 +16,17 @@ async function request(path, options = {}) {
 
   // Destructure so we can merge headers cleanly and guarantee our signal is last.
   const { headers: extraHeaders, ...rest } = options;
+  const token = loadSession()?.token;
 
   console.log('[api] →', options.method || 'GET', path);
   try {
     const res = await fetch(`${BASE}${path}`, {
       ...rest,
-      headers: { 'Content-Type': 'application/json', ...extraHeaders },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...extraHeaders,
+      },
       signal: controller.signal,
     });
     console.log('[api] ←', res.status, path);
@@ -51,8 +58,6 @@ async function request(path, options = {}) {
 
 // api — sets up api
 export const api = {
-  // health — handles health
-  health: () => request('/api/health'),
   // bootstrap — handles bootstrap
   bootstrap: () => request('/api/bootstrap'),
   // login — handles login
@@ -72,8 +77,6 @@ export const api = {
   updateOpportunity: opp =>
     request(`/api/opportunities/${opp.id}`, { method: 'PUT', body: JSON.stringify(opp) }),
   deleteOpportunity: id => request(`/api/opportunities/${id}`, { method: 'DELETE' }),
-  addEvent: body => request('/api/events', { method: 'POST', body: JSON.stringify(body) }),
-  deleteEvent: id => request(`/api/events/${id}`, { method: 'DELETE' }),
   // replaceEventsForOpportunity — handles replaceEventsForOpportunity
   replaceEventsForOpportunity: (opportunityId, eventDefs) =>
     request(`/api/events/by-opportunity/${opportunityId}`, {
@@ -98,7 +101,6 @@ export const api = {
       method: 'DELETE',
       body: JSON.stringify({ userId, opportunityId }),
     }),
-  getProfile: userId => request(`/api/profiles/${userId}`),
 
   /* ── User management (Admin only) ── */
   getUsers: () => request('/api/users'),
