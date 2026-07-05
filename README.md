@@ -112,4 +112,4 @@ Current limitation: passwords are still stored as directly compared values. Befo
 
 The root manifest owns the full application, frontend tooling, and dependencies required by the Vercel deployment. `server/package.json` allows the Express API to be installed or run independently. For normal local development from the repository root, use the root commands above.
 
-For a deeper explanation of individual files, API access rules, data flows, and deployment, see [Architecture_Guide.md](./Architecture_Guide.md). For the complete frontend/backend function inventory and call trees, see [FUNCTION_TREE.md](./FUNCTION_TREE.md).
+For a deeper explanation of individual files, API access rules, data flows, and deployment, see [Architecture_Guide.md](./Architecture_Guide.md). For the complete frontend/backend function inventory and call trees, see [FUNCTION_TREE.md](./FUNCTION_TREE.md). For collection schemas, relationships, indexes, and MongoDB operations, see [MONGODB_DATABASE_GUIDE.md](./MONGODB_DATABASE_GUIDE.md).
