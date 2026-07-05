@@ -2,6 +2,16 @@
 
 A full-stack React and Express platform for discovering and managing youth opportunities in Hebrew and Arabic.
 
+## Final Project Deliverables
+
+The complete final project submission is available in the [`final project files`](./final%20project%20files/) directory.
+
+This directory contains:
+
+- The final project documentation in Word format (`.docx`)
+- The final project documentation in PDF format (`.pdf`)
+- The project's marketing and demonstration video (`.mp4`)
+
 ## Quick Start
 
 Requirements:
@@ -44,6 +54,7 @@ Never commit `.env` or real credentials.
 
 ```text
 .
+├── final project files/         final submission documents and marketing video
 ├── api/                         Vercel serverless entry point
 ├── public/                      assets served without bundling
 ├── server/                      Express API
@@ -68,9 +79,13 @@ Never commit `.env` or real credentials.
 │   ├── i18n/                    Hebrew and Arabic translations
 │   └── utils/                   reusable non-UI helpers
 ├── Architecture_Guide.md        detailed architecture and request flows
+├── FUNCTION_TREE.md             frontend/backend function inventory
+├── MONGODB_DATABASE_GUIDE.md    MongoDB schemas, relationships and operations
 ├── vite.config.js               frontend tooling and local API startup
 └── vercel.json                  production API rewrite
 ```
+
+
 
 ### Frontend organization
 
