@@ -2,6 +2,18 @@
 
 A full-stack React and Express platform for discovering and managing youth opportunities in Hebrew and Arabic.
 
+**[Live Demo · Eshkol Bet Hakerem](https://eshkol-bet-hakerem-web-project.vercel.app/)**
+
+## Screenshots
+
+| Home | Opportunities |
+| --- | --- |
+| ![Home](./final%20project%20files/01-home.jpg) | ![Opportunities](./final%20project%20files/02-opportunities.jpg) |
+
+| Calendar | Gallery |
+| --- | --- |
+| ![Calendar](./final%20project%20files/03-calendar.jpg) | ![Gallery](./final%20project%20files/04-gallery.jpg) |
+
 ## Final Project Deliverables
 
 The complete final project submission is available in the [`final project files`](./final%20project%20files/) directory.
