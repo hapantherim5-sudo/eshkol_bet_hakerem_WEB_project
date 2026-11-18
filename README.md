@@ -10,7 +10,9 @@ A full-stack React and Express platform for discovering and managing youth oppor
 | --- | --- |
 | ![Home](./final%20project%20files/01-home.jpg) | ![Opportunities](./final%20project%20files/02-opportunities.jpg) |
 
-![Gallery](./final%20project%20files/04-gallery.jpg)
+| Gallery |
+| --- |
+| ![Gallery](./final%20project%20files/04-gallery.jpg) |
 
 ## Final Project Deliverables
 
