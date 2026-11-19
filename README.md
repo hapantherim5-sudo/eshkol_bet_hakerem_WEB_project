@@ -25,6 +25,11 @@ A full-stack React and Express platform for discovering and managing youth oppor
 | --- |
 | ![Gallery](./final%20project%20files/04-gallery.jpg) |
 
+## My Contributions
+
+- Worked on the React opportunities board, registration flow, and personal calendar. [Pull request #7](https://github.com/hapantherim5-sudo/eshkol_bet_hakerem_WEB_project/pull/7) · [Pull request #15](https://github.com/hapantherim5-sudo/eshkol_bet_hakerem_WEB_project/pull/15)
+- Contributed to the Express API, MongoDB integration, and Vercel deployment setup. [Pull request #7](https://github.com/hapantherim5-sudo/eshkol_bet_hakerem_WEB_project/pull/7) · [Pull request #10](https://github.com/hapantherim5-sudo/eshkol_bet_hakerem_WEB_project/pull/10)
+
 ## Final Project Deliverables
 
 The complete final project submission is available in the [`final project files`](./final%20project%20files/) directory.
