@@ -4,6 +4,17 @@ A full-stack React and Express platform for discovering and managing youth oppor
 
 **[Live Demo · Eshkol Bet Hakerem](https://eshkol-bet-hakerem-web-project.vercel.app/)**
 
+## Tech Stack
+
+| Area | Technology and role |
+| --- | --- |
+| Frontend | React 19, Vite, and Tailwind CSS, with Recharts for dashboards |
+| Backend | Node.js and Express, organized into routes, controllers, services, and repositories |
+| Database | MongoDB via the official Node.js driver |
+| Communication | HTTP/JSON API under `/api`. Protected requests use signed bearer tokens. |
+| Deployment | Vercel serves the frontend and routes `/api` requests to the Express serverless entry point. |
+| Local development | npm, Vite’s development proxy, ESLint, and a local or hosted MongoDB database |
+
 ## Screenshots
 
 | Home | Opportunities |
